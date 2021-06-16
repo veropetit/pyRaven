@@ -1,7 +1,5 @@
-MyPackage 1
-============
 
-MyModule 1
-####################
+Raven_zeeman.pro
+================
 
 .. idl:autofile:: ../raven/raven_zeeman.pro
