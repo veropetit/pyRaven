@@ -1,3 +1,5 @@
+import numpy as np
+
 def voigt_fara(u, a):
 
 # This function computes the H and L profiles.
