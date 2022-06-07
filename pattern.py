@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 
 
 
-def zeeman_pattern(down, up, *lande_parameters):
+def zeeman_pattern(down, up, **lande_parameters):
     
 # Input parameter
 # up   - S, L, J of upper level
@@ -25,7 +25,7 @@ def zeeman_pattern(down, up, *lande_parameters):
 # calculate the Lande factor in LS coupling if not given
     
     if ('g_u' in lande_parameters):
-        print('overwriting LS lande for up-level level ', lande_parameters['gu_u'])
+        print('overwriting LS lande for up-level level ', lande_parameters['g_u'])
     else:
         if j_u == 0:
             g_u=0
@@ -35,7 +35,7 @@ def zeeman_pattern(down, up, *lande_parameters):
 
         
     if ('g_d' in lande_parameters):
-        print('overwriting LS lande for down-level level ', lande_parameters['gu_d'])
+        print('overwriting LS lande for down-level level ', lande_parameters['g_d'])
     else:
         if j_d == 0:
             g_d=0
