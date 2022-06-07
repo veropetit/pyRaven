@@ -1,6 +1,13 @@
 import numpy as np
 
 def voigt_fara(u, a):
+'''
+Calculation of Voigt and Faraday-Voigt profiles
+
+:param u: array of frequency in doppler width units.
+:param a: damping coefficient
+:return w: complex array where Voigt is the real component and Voigt-Fara is the imaginary component. 
+'''
 
 # This function computes the H and L profiles.
 # The real part of w is H and the imaginary part is L (Landi p.163, eqs 5.45)
