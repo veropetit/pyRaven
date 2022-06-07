@@ -1,5 +1,28 @@
 import numpy as np
 
+
+def interpol_lin(v, x, u):
+# V: The input vector can be any type except string.
+
+# Irregular grids:
+# X: The absicissae values for V.  This vector must have same # of
+# elements as V.  The values MUST be monotonically ascending
+# or descending.
+#
+# U: The absicissae values for the result.  The result will have
+#  the same number of elements as U.  U does not need to be
+#  monotonic.  If U is outside the range of X, then the
+#  closest two endpoints of (X,V) are linearly extrapolated.
+
+    s = np.searchsorted(x,u)-1
+    s = np.clip(s, 0, v.size-2)
+    
+    p = (u-x[s])*(v[s+1]-v[s])/(x[s+1] - x[s]) + v[s]
+
+
+    return(p)
+
+
 def unno_local_out_IV(ub, ua, pattern, small_u, w, all_u, sin_theta, cos_theta, sin_2chi, cos_2chi, kappa, bnu, mu):
 
 
