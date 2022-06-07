@@ -46,17 +46,17 @@ def unno_local_out_IV(ub, ua, pattern, small_u, w, all_u, sin_theta, cos_theta, 
     nabla = (1+kI)**4 + (1+kI)**2 * (fQ**2 + fU**2 + fV**2 - kQ**2 - kU**2 - kV**2) - (kQ*fQ + kU*fU + kV*fV)**2
 
     # For IQUV
-    #local_out = np.zeros( hr.size,
-    #                     dtype=[('I', float), ('Q', float),('U', float),('V', float) ]  )
-    # For IV only
     local_out = np.zeros( hr.size,
-                          dtype=[('I', float),('V', float) ]  )
+                         dtype=[('I', float), ('Q', float),('U', float),('V', float) ]  )
+    # For IV only
+    #local_out = np.zeros( hr.size,
+    #                      dtype=[('I', float),('V', float) ]  )
 
 
     # Total
     local_out['I'] =  1.0 + bnu*mu * nabla**(-1) * (1.0+kI) * ( (1.0+kI)**2 + fQ**2 + fU**2 + fV**2)
-    #local_out['Q'] = -1*bnu*mu * nabla**(-1) * ( (1.0+kI)**2 * kQ - (1.0+kI) * (kU*fV - kV*fU) + fQ * (kQ*fQ + kU*fU + kV*fV) )
-    #local_out['U'] = -1*bnu*mu * nabla**(-1) * ( (1.0+kI)**2 * kU - (1.0+kI) * (kV*fQ - kQ*fV) + fU * (kQ*fQ + kU*fU + kV*fV) )
+    local_out['Q'] = -1*bnu*mu * nabla**(-1) * ( (1.0+kI)**2 * kQ - (1.0+kI) * (kU*fV - kV*fU) + fQ * (kQ*fQ + kU*fU + kV*fV) )
+    local_out['U'] = -1*bnu*mu * nabla**(-1) * ( (1.0+kI)**2 * kU - (1.0+kI) * (kV*fQ - kQ*fV) + fU * (kQ*fQ + kU*fU + kV*fV) )
     local_out['V'] = -1*bnu*mu * nabla**(-1) * ( (1.0+kI)**2 * kV + fV*(kQ*fQ + kU*fU + kV*fV) )
 
 
