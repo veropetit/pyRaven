@@ -9,6 +9,7 @@ Documentation for Raven and Crow
 
 .. toctree::
    Installation
+   Procedure
    :maxdepth: 1
    :caption: Contents:
 
