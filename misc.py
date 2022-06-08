@@ -57,5 +57,5 @@ def viz( ROT, c, cmap=None, title='' ):
 
     plt.tight_layout()
     
-    return
+    return(fig,ax)
     
