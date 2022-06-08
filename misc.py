@@ -2,6 +2,7 @@ from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 import matplotlib.colors as cl
 from scipy.special import erf
+import numpy as np
 
 
 def cm_plusmin():
