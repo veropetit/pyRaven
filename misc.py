@@ -44,7 +44,7 @@ def viz( ROT, c, cmap=None, title='' ):
     ax = fig.add_subplot(111, projection='3d')
     ax.view_init(elev=90, azim=90)
     if cmap == None:
-        cmap = get_cm_plusmin
+        cmap = get_cm_plusmin()
 
     sc = ax.scatter(ROT[0,:], ROT[1,:], ROT[2,:], s=30, c=c, cmap=cmap)
     cbar = plt.colorbar(sc)
