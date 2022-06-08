@@ -4,7 +4,7 @@ import matplotlib.colors as cl
 from scipy.special import erf
 
 
-def get_cm_plusmin():
+def cm_plusmin():
     cols = []
     for x in np.linspace(0,1, 256):
         rcol = 0.237 - 2.13*x + 26.92*x**2 - 65.5*x**3 + 63.5*x**4 - 22.36*x**5
