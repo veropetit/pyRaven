@@ -27,7 +27,7 @@ param = {
 
 '''
 
-def strong(param):
+def numerical(param):
     
     #diskint.strong models the line profile while taking into account Zeeman splitting. For cases where the B-field is weak and 
     #the splitting is not visible use diskint.weak
@@ -238,7 +238,7 @@ def strong(param):
     
     return(model, ROT, LOS, MAG)
     
-def weak(param):
+def analytical(param):
     
     #models the line profile by convolving the voigt fara function with the rotation profile
     
