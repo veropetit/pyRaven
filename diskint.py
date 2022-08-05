@@ -8,71 +8,99 @@ import pyRaven as rav
 '''
 The input for both diskint.strong and diskint.weak is of the form:
 
-param = {
-    'down':[0.5,0, 0.5],   # the s, j, l of the lower level
-    'up':[0.5, 1, 0.5],    # the s, j, l of the upper level
+genparam = {
     'lambda0':5811.969,    # the central wavelength of the transition
     'vsini':50.0,         # the projected rotational velocity
     'vdop':10.0,          # the thermal broadening
     'av':0.05,             # the damping coefficient of the Voigt profile
     'bnu':1.5,             # the slope of the source function with respect to vertical optical depth
     'kappa':0.98,          # the line strength parameter
-    'Bpole':0.0,         # the dipolar field strength
+    'Bpole':1.0e5,         # the dipolar field strength
     'incl':np.pi/4,      # the inclination of the rotational axis to the line of sight
     'beta':np.pi/4,      # the obliquity of the magnetic axis to the rotational axis
     'phase':0.0,     # the rotational phase
     'ndop':int(100),       # the number of sample point per doppler width for the wavelength array
-    'ngrid':1000           # the number of grid points at th surface of the star. 
+    'ngrid':1000           # the number of grid points at th surface of the star.
   }
+unnoparam = {
+    'down':[0.5,0, 0.5],   # the s, j, l of the lower level
+    'up':[0.5, 1, 0.5],    # the s, j, l of the upper level
+    }
+weakparam = {
+        'geff':1.0
+    }
+
+param={'general' : genparam,
+       'unno' : unnoparam,
+       'weak' : weakparam}
 
 '''
 
-def numerical(param):
+def numerical(param,unno):
+    if unno==False:
+        print('Evaluating with weak-field approximation...')
+    if unno==True:
+        print('Evaluating with unno method...')
     
-    #diskint.strong models the line profile while taking into account Zeeman splitting. For cases where the B-field is weak and 
-    #the splitting is not visible use diskint.weak
+
     
     const = { 'larmor' : 1.3996e6,\
-            'c' : 2.99792458e5 } #cgs units
+            'c' : 2.99792458e5,\
+            'a2cm' : 1.0e-8,\
+            'km2cm' : 1.0e5\
+    }
     
     # multiply by B(gauss) to get the Lorentz unit in units of vdop
-    value = { 'lorentz':param['lambda0']*1e-13*const['larmor']/param['vdop'] }
+    if unno==True:
+        value = { 'lorentz':param['general']['lambda0']*1e-13*const['larmor']/param['general']['vdop'] }
+    if unno==False:
+        geff=param['weak']['geff']
+        value = { 'lorentz':param['general']['bnu']*geff/np.sqrt(np.pi)\
+            *(const['a2cm']*param['general']['lambda0'])/(param['general']['vdop']*const['km2cm'])*const['larmor']}
     
-    # get the zeeman pattern
-    pattern = rav.pattern.zeeman_pattern(param['down'],param['up'])
+    max_b=0.0
+    if unno==True:
+        # get the zeeman pattern
+        pattern = rav.pattern.zeeman_pattern(param['unno']['down'],param['unno']['up'])
     
-    ## Doppler velocity grid setup
-    # Compute the Voigt functions only once. 
-    # Up to 11 vdop (keeping 1 vdop on each side to padd with zeros.
+        ## Doppler velocity grid setup
+        # Compute the Voigt functions only once.
+        # Up to 11 vdop (keeping 1 vdop on each side to padd with zeros.
+        small_u = np.linspace(-15,15,15*param['general']['ndop']*2)
     
+        # To calculate
+        w = rav.profileI.voigt_fara(small_u,param['general']['av'])
     
-    small_u = np.linspace(-15,15,15*param['ndop']*2)
+        # padding with zero on each ends
+        w[0:param['general']['ndop']]=0.0
+        w[w.size-param['general']['ndop']:w.size]=0.0
     
-    # To calculate
-    w = rav.profileI.voigt_fara(small_u,param['av'])
-    
-    # padding with zero on each ends
-    w[0:param['ndop']]=0.0
-    w[w.size-param['ndop']:w.size]=0.0
-    
-    
-    # Figure out the length of vector that we need for the velocity grid.
-    # Take the max of the Zeeman shift or the vsini, then add the 15vdop width. 
-    # to accomodate the whole w(small_u) array shifted to the maximum value possible
-    max1 = np.max(np.abs(pattern['sigma_r']['split']))
-    max2 = np.max(np.abs(pattern['pi']['split']))
-    max_b = np.max([max1,max2])*param['Bpole']*value['lorentz']
-    max_vsini = param['vsini']/param['vdop']
+        # Figure out the length of vector that we need for the velocity grid.
+        # Take the max of the Zeeman shift or the vsini, then add the 15vdop width.
+        # to accomodate the whole w(small_u) array shifted to the maximum value possible
+        max1 = np.max(np.abs(pattern['sigma_r']['split']))
+        max2 = np.max(np.abs(pattern['pi']['split']))
+        max_b = np.max([max1,max2])*param['general']['Bpole']*value['lorentz']
+    urot = param['general']['vsini']/param['general']['vdop']
     
     print('Max shift due to field: {} vdop'.format(max_b))
-    print('Max shift due to vsini: {} vdop'.format(max_vsini))
+    print('Max shift due to vsini: {} vdop'.format(urot))
     
-    vel_range = np.max( [max_b+15, max_vsini+15] )
+    vel_range = np.max( [max_b+15, urot+15] )
     vrange = np.round(vel_range+1)
     print('Max velocity needed: {} vdop'.format(vel_range))
     
-    all_u = np.linspace( -1*vrange,vrange,int(param['ndop']*vrange*2+1))
+    all_u = np.linspace( -1*vrange,vrange,int(param['general']['ndop']*vrange*2+1))
     print('Number of grid points: {}'.format(all_u.size))
+    
+    if unno==False:
+        w = rav.profileI.voigt_fara(all_u,param['general']['av'])
+        voigt = w.real
+        fara=w.imag
+        
+        shape_V = np.gradient(w.real, all_u)
+        profile_v_large = param['general']['bnu'] *param['general']['kappa']*geff*shape_V/np.pi**0.5 / (1+param['general']['kappa']/np.pi**0.5*w.real)**2
+        profile_i_large = param['general']['bnu']/(1.0+param['general']['kappa']*voigt/np.sqrt(np.pi))
     
     # Set up the model structure that will save the resulting spectrum
     model = np.zeros(all_u.size,
@@ -80,21 +108,21 @@ def numerical(param):
                             ('flux',float),('fluxnorm', float),('Q',float),('U',float),('V',float)])
                             
     model['vdop'] = all_u
-    model['vel'] = all_u * param['vdop']
-    model['wave'] = (model['vel']/const['c'])*param['lambda0']+param['lambda0']
+    model['vel'] = all_u * param['general']['vdop']
+    model['wave'] = (model['vel']/const['c'])*param['general']['lambda0']+param['general']['lambda0']
     
     ##Rotation Matrix Setup
     
     #rotation matrix that converts from LOS frame to ROT frame
-    los2rot = np.array( [[np.cos(param['phase']),
-                        np.cos(param['incl'])*np.sin(param['phase']),
-                        -1*np.sin(param['incl'])*np.sin(param['phase'])],
-                        [-1*np.sin(param['phase']),
-                        np.cos(param['incl'])*np.cos(param['phase']),
-                        -1*np.sin(param['incl'])*np.cos(param['phase'])],
+    los2rot = np.array( [[np.cos(param['general']['phase']),
+                        np.cos(param['general']['incl'])*np.sin(param['general']['phase']),
+                        -1*np.sin(param['general']['incl'])*np.sin(param['general']['phase'])],
+                        [-1*np.sin(param['general']['phase']),
+                        np.cos(param['general']['incl'])*np.cos(param['general']['phase']),
+                        -1*np.sin(param['general']['incl'])*np.cos(param['general']['phase'])],
                         [0.0,
-                        np.sin(param['incl']),
-                        np.cos(param['incl'])] ] )
+                        np.sin(param['general']['incl']),
+                        np.cos(param['general']['incl'])] ] )
 
     # the invert of a rotation matrix is the transpose
     #Converts from ROT to LOS frame
@@ -102,8 +130,8 @@ def numerical(param):
     
     #ROT frame to MAG frame
     rot2mag = np.array( [[ 1.0, 0.0, 0.0],
-                [ 0.0, np.cos(param['beta']),np.sin(param['beta'])],
-                [ 0.0, -1*np.sin(param['beta']),np.cos(param['beta'])] ] )
+                [ 0.0, np.cos(param['general']['beta']),np.sin(param['general']['beta'])],
+                [ 0.0, -1*np.sin(param['general']['beta']),np.cos(param['general']['beta'])] ] )
     
     #MAG to ROT frame
     mag2rot = np.transpose(rot2mag)
@@ -111,15 +139,15 @@ def numerical(param):
     ##Surface Grid Setup
     
     # We want elements with roughtly the same area
-    dA = (4*np.pi)/param['ngrid']
+    dA = (4*np.pi)/param['general']['ngrid']
     
-    dtheta = np.sqrt(4.0*np.pi/param['ngrid'])
+    dtheta = np.sqrt(4.0*np.pi/param['general']['ngrid'])
     ntheta = int(np.round(np.pi/dtheta)) #the number of anulus is an integer
     real_dtheta = np.pi/ntheta #the real dtheta
     theta = np.arange(real_dtheta/2.0,np.pi,real_dtheta)
     
     #array of desired dphi for each annulus
-    dphi = 4.0*np.pi/(param['ngrid']*np.sin(theta)*real_dtheta)
+    dphi = 4.0*np.pi/(param['general']['ngrid']*np.sin(theta)*real_dtheta)
     nphi = np.round(2*np.pi/dphi)#number of phases per annulus (integer)
     real_dphi = 2.0*np.pi/nphi#real dphi per annulus
     real_n=np.sum(nphi)
@@ -160,14 +188,18 @@ def numerical(param):
     A_LOS = A * mu_LOS
     A_LOS /= np.sum(A_LOS)# Normalized to unity so that the integral over projected area=1.
     
+    if unno==False:
+        A_LOS_V = A_LOS * mu_LOS #### VERO CHECK THIS
+        A_LOS_I = 1.0 * A_LOS # *1.0 is to force a copy
+    
     # value of the continuum intensity on each grid point 
     # conti_int = ( 1.+ mu_LOS*bnu )
     # scaled by the area
-    conti_int_area = A_LOS*(1.0+mu_LOS*param['bnu'])
+    conti_int_area = A_LOS*(1.0+mu_LOS*param['general']['bnu'])
     conti_flux = np.sum(conti_int_area)# continuum flux (for profile normalisation)
     
     # radial velocity in doppler units
-    uLOS = param['vsini']*LOS[0,:] / param['vdop']
+    uLOS = param['general']['vsini']*LOS[0,:] / param['general']['vdop']
     
     ##Surface B-Field
     
@@ -190,54 +222,69 @@ def numerical(param):
     # divide by the magnitude to get the unit vectors in the direction of the field in LOS
     for i in range(3):
         B_LOS[i,:] /= B_unit
-    # calcuate the angle necessary for the RT, mainly the angles between the field
-    # direction and the LOS direction (theta) and the reference direction in the
-    # plane of the sky (chi)
-    sintheta_temp = np.sqrt( B_LOS[0,:]**2+B_LOS[1,:]**2)
-    costheta_temp = 1.0*B_LOS[2,:]
-    sin2chi_temp = 2.0*B_LOS[2,:]*B_LOS[1,:]/sintheta_temp**2
-    cos2chi_temp = 2.0*B_LOS[0,:]**2/sintheta_temp**2-1.0
+        
+    if unno==True:
+        # calcuate the angle necessary for the RT, mainly the angles between the field
+        # direction and the LOS direction (theta) and the reference direction in the
+        # plane of the sky (chi)
+        sintheta_temp = np.sqrt( B_LOS[0,:]**2+B_LOS[1,:]**2)
+        costheta_temp = 1.0*B_LOS[2,:]
+        sin2chi_temp = 2.0*B_LOS[2,:]*B_LOS[1,:]/sintheta_temp**2
+        cos2chi_temp = 2.0*B_LOS[0,:]**2/sintheta_temp**2-1.0
     
     # Scale the unit vector by the field strength
     # to get the magnitude of the field
-    B = B_unit * param['Bpole']/2.0
+    B = B_unit * param['general']['Bpole']/2.0
     
     
     ##Disk Int time
     
-    # only iterating on the visible elements, to save calculations
-    for k in range(0,vis.size):
-        i = vis[k] # index in the grid (to save some typing)
-        out = rav.localV.unno_local_out_IV(
-                    B[i]*value['lorentz'],# uB
-                    uLOS[i],              # uLOS
-                    pattern,              # the zeeman pattern
-                    small_u,              # the uo array for the non-magnetic profile
-                    w,                    # th Voigt and Voigt-Fara profiles
-                    all_u,                # the complete uo array
-                    sintheta_temp[i], costheta_temp[i], # the angles of the field to the LOS
-                    sin2chi_temp[i], cos2chi_temp[i], # the angles of the field to the LOS
-                    param['kappa'], param['bnu'], # the line strenght parameter and the slope of the source function
-                    mu_LOS[i]             # the angle between the surface and the LOS
-                    )
+    if unno==True:
+        # only iterating on the visible elements, to save calculations
+        for k in range(0,vis.size):
+            i = vis[k] # index in the grid (to save some typing)
+            out = rav.localV.unno_local_out_IV(
+                        B[i]*value['lorentz'],# uB
+                        uLOS[i],              # uLOS
+                        pattern,              # the zeeman pattern
+                        small_u,              # the uo array for the non-magnetic profile
+                        w,                    # th Voigt and Voigt-Fara profiles
+                        all_u,                # the complete uo array
+                        sintheta_temp[i], costheta_temp[i], # the angles of the field to the LOS
+                        sin2chi_temp[i], cos2chi_temp[i], # the angles of the field to the LOS
+                        param['general']['kappa'], param['general']['bnu'], # the line strenght parameter and the slope of the source function
+                        mu_LOS[i]             # the angle between the surface and the LOS
+                        )
                     
-        model['flux'] += A_LOS[i]*out['I']
-        model['Q'] += A_LOS[i]*out['Q']
-        model['U'] += A_LOS[i]*out['U']
-        model['V'] += A_LOS[i]*out['V']
+            model['flux'] += A_LOS[i]*out['I']
+            model['Q'] += A_LOS[i]*out['Q']
+            model['U'] += A_LOS[i]*out['U']
+            model['V'] += A_LOS[i]*out['V']
     
-    # Normalize the spectra to the continuum. 
-    model['flux'] /= conti_flux
-    model['Q'] /= -1*conti_flux# sign flip to be consistent with Zeeman2
-    model['U'] /= -1*conti_flux# sign flip to be consistent with Zeeman2
-    model['V'] /= conti_flux
+        # Normalize the spectra to the continuum.
+        model['flux'] /= conti_flux
+        model['Q'] /= -1*conti_flux# sign flip to be consistent with Zeeman2
+        model['U'] /= -1*conti_flux# sign flip to be consistent with Zeeman2
+        model['V'] /= conti_flux
     
+    if unno==False:
+        for k in range(0,vis.size):
+            i = vis[k] # index in the grid (to save some typing)
+            prof_V = rav.localV.interpol_lin(profile_v_large,all_u+uLOS[i],model['vdop'])
+            model['V'] += A_LOS_V[i]*B_LOS[2,i]*prof_V*B[i]
+            prof_I = 1.0+ mu_LOS[i] * rav.localV.interpol_lin(profile_i_large,all_u+uLOS[i],model['vdop'])
+            model['flux'] += A_LOS_I[i]*prof_I
+        
     
-    norm=np.trapz(y=(1/model["flux"]-1),x=model["vel"])#finds the normalization constant
-    model['fluxnorm']=1/(1+(1/model["flux"]-1)/norm) #flux normalized to one
+        model['V'] = model['V']*value['lorentz']/conti_flux
+        model['V'] = model['V']*np.pi/2
+    
+        model['flux'] = model['flux']/conti_flux
     
     return(model, ROT, LOS, MAG)
-    
+
+
+#old
 def analytical(param):
     
     #models the line profile by convolving the voigt fara function with the rotation profile
