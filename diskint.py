@@ -422,7 +422,6 @@ def numerical(param,unno):
     return(model, ROT, LOS, MAG)
 
 
-#old
 def analytical(param):
     
     #models the line profile by convolving the voigt fara function with the rotation profile
@@ -430,8 +429,8 @@ def analytical(param):
     const = { 'larmor' : 1.3996e6,\
         'c' : 2.99792458e5 } #cgs units
     
-    varepsilon=1-(1/(1+param['bnu'])) #defines the limb darkening coefficient
-    urot = param['vsini'] / param['vdop'] #defines the doppler width of vsini
+    varepsilon=1-(1/(1+param['general']['bnu'])) #defines the limb darkening coefficient
+    urot = param['general']['vsini'] / param['general']['vdop'] #defines the doppler width of vsini
     
     #Defines the rotation profile
     def rotconv(u0, varepsilon, urot):
@@ -449,7 +448,7 @@ def analytical(param):
     vrange = np.round(vel_range+1)
     print('Max velocity needed: {} vdop'.format(vel_range))
     
-    all_u = np.linspace( -1*vrange,vrange,int(param['ndop']*vrange*2+1))
+    all_u = np.linspace( -1*vrange,vrange,int(param['general']['ndop']*vrange*2+1))
     
     #finds the rotation profile
     rotation=rotconv(all_u,varepsilon,urot)
@@ -457,7 +456,7 @@ def analytical(param):
         rotation=np.append(rotation,rotation[-1])
     
     #models the voigt fara function 
-    w = rav.profileI.voigt_fara(all_u,param['av']).real
+    w = rav.profileI.voigt_fara(all_u,param['general']['av']).real
     
     #Convolves the rotation profle and voigt fara
     rotk=con.CustomKernel(rotation)
@@ -469,8 +468,8 @@ def analytical(param):
                             ('flux',float),('fluxnorm',float)])
                 
     model['vdop'] = all_u
-    model['vel'] = all_u * param['vdop']
-    model['wave'] = (model['vel']/const['c'])*param['lambda0']+param['lambda0']
+    model['vel'] = all_u * param['general']['vdop']
+    model['wave'] = (model['vel']/const['c'])*param['general']['lambda0']+param['general']['lambda0']
     
     norm=np.trapz(y=rot,x=model["vel"])#finds the normalization constant
     model['flux']=1/(1+rot) #flux
