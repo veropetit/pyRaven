@@ -421,7 +421,6 @@ def numerical(param,unno):
     
     return(model, ROT, LOS, MAG)
 
-
 def analytical(param):
     
     #models the line profile by convolving the voigt fara function with the rotation profile
@@ -455,12 +454,13 @@ def analytical(param):
     if rotation.size%2 == 0:
         rotation=np.append(rotation,rotation[-1])
     
-    #models the voigt fara function 
-    w = rav.profileI.voigt_fara(all_u,param['general']['av']).real
-    
+    #models the voigt fara function
+    voigt = rav.profileI.voigt_fara(all_u,param['general']['av']).real
+    flux=(1.0+2.0*param['general']['bnu']/(3.0*(1.0+param['general']['kappa']*voigt/np.sqrt(np.pi))))/(1.0+2.0*param['general']['bnu']/3.0)
+
     #Convolves the rotation profle and voigt fara
     rotk=con.CustomKernel(rotation)
-    rot=convolve(w,rotk)
+    rot=convolve(flux,rotk)
     
     #sets up the model
     model = np.zeros(all_u.size,
@@ -471,9 +471,11 @@ def analytical(param):
     model['vel'] = all_u * param['general']['vdop']
     model['wave'] = (model['vel']/const['c'])*param['general']['lambda0']+param['general']['lambda0']
     
-    norm=np.trapz(y=rot,x=model["vel"])#finds the normalization constant
-    model['flux']=1/(1+rot) #flux
-    model['fluxnorm'] = 1/(1+(rot/norm)) #flux normalized to one
+    model['flux']=rot #flux
+
+    for i in range(len(model['flux'])):
+        if model['vel'][i]<=-2*param['general']['vsini'] or model['vel'][i]>=2*param['general']['vsini']:
+          model['flux'][i]=1.0
     
     return(model)
 
