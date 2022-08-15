@@ -7,20 +7,18 @@ import pyRaven as rav
 
 '''
 The input for both diskint.strong and diskint.weak is of the form:
-
 genparam = {
     'lambda0':5811.969,    # the central wavelength of the transition
     'vsini':50.0,         # the projected rotational velocity
     'vdop':10.0,          # the thermal broadening
     'av':0.05,             # the damping coefficient of the Voigt profile
     'bnu':1.5,             # the slope of the source function with respect to vertical optical depth
-    'kappa':0.98,          # the line strength parameter
+    'logkappa':10**0.98,          # the line strength parameter
     'Bpole':1.0e5,         # the dipolar field strength
     'incl':np.pi/4,      # the inclination of the rotational axis to the line of sight
     'beta':np.pi/4,      # the obliquity of the magnetic axis to the rotational axis
     'phase':0.0,     # the rotational phase
     'ndop':int(100),       # the number of sample point per doppler width for the wavelength array
-    'ngrid':1000           # the number of grid points at th surface of the star.
   }
 unnoparam = {
     'down':[0.5,0, 0.5],   # the s, j, l of the lower level
@@ -29,15 +27,15 @@ unnoparam = {
 weakparam = {
         'geff':1.0
     }
-
 param={'general' : genparam,
        'unno' : unnoparam,
        'weak' : weakparam}
-
 '''
 
 def numerical(param,unno):
-    
+    ngrid = 20*param['general']['vsini']
+    kappa = 10**param['general']['logkappa']    
+
     if unno==True:
         print('Evaluating with unno method...')
     
@@ -120,15 +118,15 @@ def numerical(param,unno):
         ##Surface Grid Setup
     
         # We want elements with roughtly the same area
-        dA = (4*np.pi)/param['general']['ngrid']
+        dA = (4*np.pi)/ngrid
     
-        dtheta = np.sqrt(4.0*np.pi/param['general']['ngrid'])
+        dtheta = np.sqrt(4.0*np.pi/ngrid)
         ntheta = int(np.round(np.pi/dtheta)) #the number of anulus is an integer
         real_dtheta = np.pi/ntheta #the real dtheta
         theta = np.arange(real_dtheta/2.0,np.pi,real_dtheta)
     
         #array of desired dphi for each annulus
-        dphi = 4.0*np.pi/(param['general']['ngrid']*np.sin(theta)*real_dtheta)
+        dphi = 4.0*np.pi/(ngrid*np.sin(theta)*real_dtheta)
         nphi = np.round(2*np.pi/dphi)#number of phases per annulus (integer)
         real_dphi = 2.0*np.pi/nphi#real dphi per annulus
         real_n=np.sum(nphi)
@@ -226,7 +224,7 @@ def numerical(param,unno):
                         all_u,                # the complete uo array
                         sintheta_temp[i], costheta_temp[i], # the angles of the field to the LOS
                         sin2chi_temp[i], cos2chi_temp[i], # the angles of the field to the LOS
-                        param['general']['kappa'], param['general']['bnu'], # the line strenght parameter and the slope of the source function
+                        kappa, param['general']['bnu'], # the line strenght parameter and the slope of the source function
                         mu_LOS[i]             # the angle between the surface and the LOS
                         )
                     
@@ -272,9 +270,9 @@ def numerical(param,unno):
         fara=w.imag
 
         shape_V = np.gradient(w.real, all_u)
-        profile_v_large = param['general']['bnu'] *param['general']['kappa']*geff*shape_V/np.pi**0.5 / (1+param['general']['kappa']/np.pi**0.5*w.real)**2
+        profile_v_large = param['general']['bnu'] *kappa*geff*shape_V/np.pi**0.5 / (1+kappa/np.pi**0.5*w.real)**2
 
-        profile_i_large = param['general']['bnu']/(1.0+param['general']['kappa']*voigt/np.sqrt(np.pi))
+        profile_i_large = param['general']['bnu']/(1.0+kappa*voigt/np.sqrt(np.pi))
 
 
         # Set up the model structure that will save the resulting spectrum
@@ -314,15 +312,15 @@ def numerical(param,unno):
         ##Surface Grid Setup
     
         # We want elements with roughtly the same area
-        dA = (4*np.pi)/param['general']['ngrid']
+        dA = (4*np.pi)/ngrid
     
-        dtheta = np.sqrt(4.0*np.pi/param['general']['ngrid'])
+        dtheta = np.sqrt(4.0*np.pi/ngrid)
         ntheta = int(np.round(np.pi/dtheta)) #the number of anulus is an integer
         real_dtheta = np.pi/ntheta #the real dtheta
         theta = np.arange(real_dtheta/2.0,np.pi,real_dtheta)
     
         #array of desired dphi for each annulus
-        dphi = 4.0*np.pi/(param['general']['ngrid']*np.sin(theta)*real_dtheta)
+        dphi = 4.0*np.pi/(ngrid*np.sin(theta)*real_dtheta)
         nphi = np.round(2*np.pi/dphi)#number of phases per annulus (integer)
         real_dphi = 2.0*np.pi/nphi#real dphi per annulus
         real_n=np.sum(nphi)
@@ -424,7 +422,10 @@ def numerical(param,unno):
 def analytical(param):
     
     #models the line profile by convolving the voigt fara function with the rotation profile
-    
+
+    ngrid = 20*param['general']['vsini']
+    kappa = 10**param['general']['logkappa'] 
+
     const = { 'larmor' : 1.3996e6,\
         'c' : 2.99792458e5 } #cgs units
     
@@ -444,7 +445,7 @@ def analytical(param):
     
     #sets up the u axis
     vel_range = np.max( [15, urot+15] )
-    vrange = np.round(vel_range+1)
+    vrange = np.round(vel_range+1+urot)
     print('Max velocity needed: {} vdop'.format(vel_range))
     
     all_u = np.linspace( -1*vrange,vrange,int(param['general']['ndop']*vrange*2+1))
@@ -454,13 +455,13 @@ def analytical(param):
     if rotation.size%2 == 0:
         rotation=np.append(rotation,rotation[-1])
     
-    #models the voigt fara function
+    #models the voigt fara function 
     voigt = rav.profileI.voigt_fara(all_u,param['general']['av']).real
-    flux=(1.0+2.0*param['general']['bnu']/(3.0*(1.0+param['general']['kappa']*voigt/np.sqrt(np.pi))))/(1.0+2.0*param['general']['bnu']/3.0)
+    flux=(1.0+2.0*param['general']['bnu']/(3.0*(1.0+kappa*voigt/np.sqrt(np.pi))))/(1.0+2.0*param['general']['bnu']/3.0)
 
     #Convolves the rotation profle and voigt fara
     rotk=con.CustomKernel(rotation)
-    rot=convolve(flux,rotk)
+    rot=convolve(flux,rotk,boundary='fill',fill_value=1.0)
     
     #sets up the model
     model = np.zeros(all_u.size,
@@ -472,13 +473,5 @@ def analytical(param):
     model['wave'] = (model['vel']/const['c'])*param['general']['lambda0']+param['general']['lambda0']
     
     model['flux']=rot #flux
-
-    for i in range(len(model['flux'])):
-        if model['vel'][i]<=-2*param['general']['vsini'] or model['vel'][i]>=2*param['general']['vsini']:
-          model['flux'][i]=1.0
     
-    return(model)
-
-
-
-
+    return(model,rotation,flux)
