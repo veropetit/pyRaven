@@ -33,7 +33,7 @@ param={'general' : genparam,
 '''
 
 def numerical(param,unno):
-    ngrid = 20*param['general']['vsini']
+    ngrid = 1000 + 20*param['general']['vsini']
     kappa = 10**param['general']['logkappa']    
 
     if unno==True:
