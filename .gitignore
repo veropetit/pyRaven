@@ -1,1 +1,7 @@
 docs-src/build
+__pycache__/__init__.cpython-38.pyc
+__pycache__/diskint.cpython-38.pyc
+__pycache__/localV.cpython-38.pyc
+__pycache__/misc.cpython-38.pyc
+__pycache__/pattern.cpython-38.pyc
+__pycache__/profileI.cpython-38.pyc
