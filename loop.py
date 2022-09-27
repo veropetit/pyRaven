@@ -34,7 +34,7 @@ param={'general' : genparam,
        }
 '''
 
-def loop(param,datapacket):
+def loop(param,datapacket, ax):
 
     #############################################
     ## Things that only need to be computed once
@@ -69,17 +69,10 @@ def loop(param,datapacket):
     w = rav.profileI.voigt_fara(all_u,param['general']['av'])
 
     shape_V = np.gradient(w.real, all_u)
-    profile_v_large = param['general']['bnu'] *kappa*geff*shape_V/np.pi**0.5 / (1+kappa/np.pi**0.5*w.real)**2
-    profile_i_large = param['general']['bnu']/(1.0+kappa*voigt/np.sqrt(np.pi))
+    profile_v_large = param['general']['bnu'] *param['general']['logkappa']*geff*shape_V/np.pi**0.5 / (1+param['general']['logkappa']/np.pi**0.5*w.real)**2
 
-
-    # Set up the model structure that will save the resulting spectrum
-    model = np.zeros(all_u.size,
-                    dtype=[('vel',float),('vdop',float),
-                        ('flux',float),('fluxnorm', float),('V',float)])
-                        
-    model['vdop'] = all_u
-    model['vel'] = all_u * param['general']['vdop']
+    # setup the velocity array for calculating the chi2 later.
+    model_vel = all_u * param['general']['vdop']
 
     ##Surface Grid Setup
 
@@ -121,15 +114,15 @@ def loop(param,datapacket):
 
     d2r = np.pi/180.0
 
-    for i, incl in param['grid']['igrid']:
-        for p, phase in param['grid']['phasegrid']:
+    for ind_i, incl in enumerate(param['grid']['igrid']):
+        for ind_p, phase in enumerate(param['grid']['phasegrid']):
 
             ##Rotation Matrix Setup
 
             #rotation matrix that converts from LOS frame to ROT frame
             los2rot = np.array( [[np.cos(phase*d2r),
                                 np.cos(incl*d2r)*np.sin(phase*d2r),
-                                -1*np.sin(param['general']['incl'])*np.sin(phase*d2r)],
+                                -1*np.sin(incl*d2r)*np.sin(phase*d2r)],
                                 [-1*np.sin(phase*d2r),
                                 np.cos(incl*d2r)*np.cos(phase*d2r),
                                 -1*np.sin(incl*d2r)*np.cos(phase*d2r)],
@@ -175,7 +168,7 @@ def loop(param,datapacket):
             # Loop over beta values
             ############################
 
-            for b, beta in param['grid']['betagrid']:
+            for ind_beta, beta in enumerate(param['grid']['betagrid']):
 
 
                 ##Surface B-Field
@@ -209,31 +202,52 @@ def loop(param,datapacket):
                 for i in range(3):
                     B_LOS[i,:] /= B_unit
 
-                # Scale the unit vector by the field strength
-                # to get the magnitude of the field
-                B = B_unit * param['general']['Bpole']/2.0
 
                 ##Disk Integration
+                
+                # setup the array to store the resulting Stokes V scaled model
+                # Still need to multiply by Bpole later on.
+                model_V = np.zeros(model_vel.size)
 
                 # only iterating on the visible elements, to save calculations
                 for k in range(0,vis.size):
                     i = vis[k] # index in the grid (to save some typing)
 
-                    prof_V = rav.localV.interpol_lin(profile_v_large,all_u+uLOS[i],model['vdop'])
-                    model['V'] += A_LOS_V[i]*B_LOS[2,i]*prof_V*B[i]
+                    prof_V = rav.localV.interpol_lin(profile_v_large,all_u+uLOS[i],all_u)
+                    model_V += A_LOS_V[i]*B_LOS[2,i]*prof_V*B_unit[i]
 
-                model['V'] = model['V']*value['lorentz']/conti_flux
-                model['V'] = model['V']*np.pi/2  #  WHAT IS THE PI/2 HERE?
+                model_V = model_V*value['lorentz']/conti_flux
+                model_V = model_V*np.pi/2  #  WHAT IS THE PI/2 HERE?
                 
-                # Loop over the observations in the Data Packet
+                ######
+                ######
+                # TODO: add necessary convolutions here
+                ######
                 
-                # convolve the model over the instrumental resolution
                 
-                # Interpolate the model to the dispersion of the data
+                ######################
+                # Loop on the Bpole values
+                ######################
                 
-                # calculate the chi square between data and model
+                for ind_bp, bpole in enumerate(param['grid']['Bgrid']):
                 
-                # Store the chi2 in the data cube.
+                    # Scale the unit vector by the field strength
+                    # to get the magnitude of the field
+                    model_V_scaled = model_V * bpole
+
+                
+                    ax.plot(model_vel,model_V_scaled, label='{},{},{},{}'.format(bpole, incl, beta, phase/360))
+                    
+
+                    # Loop over the observations in the Data Packet
+                    
+                    # convolve the model over the instrumental resolution
+                    
+                    # Interpolate the model to the dispersion of the data
+                    
+                    # calculate the chi square between data and model
+                    
+                    # Store the chi2 in the data cube.
 
 
     return
