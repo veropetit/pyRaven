@@ -49,6 +49,7 @@ def loop(param,datapacket, ax):
     }
 
     geff=param['weak']['geff']
+    kappa = 10**param['general']['logkappa']
 
     # multiply by B(gauss) to get the Lorentz unit in units of vdop
     value = { 'lorentz':param['general']['bnu']*geff/np.sqrt(np.pi)\
@@ -69,7 +70,7 @@ def loop(param,datapacket, ax):
     w = rav.profileI.voigt_fara(all_u,param['general']['av'])
 
     shape_V = np.gradient(w.real, all_u)
-    profile_v_large = param['general']['bnu'] *param['general']['logkappa']*geff*shape_V/np.pi**0.5 / (1+param['general']['logkappa']/np.pi**0.5*w.real)**2
+    profile_v_large = param['general']['bnu'] *kappa*geff*shape_V/np.pi**0.5 / (1+kappa/np.pi**0.5*w.real)**2
 
     # setup the velocity array for calculating the chi2 later.
     model_vel = all_u * param['general']['vdop']
