@@ -4,6 +4,8 @@ from astropy.convolution import Gaussian1DKernel, convolve
 import astropy.convolution as con
 import copy
 
+import time
+
 import pyRaven as rav
 
 '''
@@ -41,7 +43,8 @@ def numerical(param,unno):
     # Constants and zeeman pattern
     ###############################
 
-    ngrid = 1000 + 20*param['general']['vsini']
+    ngrid = 1000 + 40*param['general']['vsini']
+    print('Using {} grid point on the surface'.format(ngrid))
     kappa = 10**param['general']['logkappa']    
 
     ## This is e / (4 pi m_e c) into units of (km/s)/(G AA).
@@ -54,30 +57,37 @@ def numerical(param,unno):
         # get the zeeman pattern
         pattern = rav.pattern.zeeman_pattern(param['unno']['down'],param['unno']['up'])
         
+ 
+    perGaussLorentz = constLorentz * param['general']['lambda0'] / param['general']['vdop']
     # unno: This gets multiplied by B in the disk integration to get uB,i.
     # weak: This gets multiplied by geff*Bz and the Stokes V shape in the disk integration to get V(uo)
 
-    perGaussLorentz = constLorentz * param['general']['lambda0'] / param['general']['vdop']
 
     ###############################
     # Doppler velocity grid setup
     ###############################
 
     # Compute the Voigt functions only once.
-    # Up to 15 vdop (keeping 1 vdop on each side to padd with zeros.
-
-    small_u = np.linspace(-15,15,15*param['general']['ndop']*2)
+    # Up to 7 vdop (keeping 1 vdop on each side to padd with zeros.
+    sig = 10
+    small_u = np.linspace(-sig,sig,sig*param['general']['ndop']*2)
 
     # calculation the Voigt and Voigt-Faraday profiles
     w = rav.profileI.voigt_fara(small_u,param['general']['av'])
+    # for the weak field, need to multiply by 1/sqrt(pi) now
+    # in the unno this is done in the local profile function. 
+    w_weak = w.real/np.sqrt(np.pi)
+    dw_weak = np.gradient(w_weak, small_u)
 
     # padding with zero on each ends to help with the interpolation later. 
     w[0:param['general']['ndop']]=0.0
     w[w.size-param['general']['ndop']:w.size]=0.0
-
-    # for the weak field, need to multiply by 1/sqrt(pi) now
-    # in the unno this is done in the local profile function. 
-    shape_V = np.gradient(w.real, small_u)
+    # only padding for the weak, cause padding for the
+    # dispersion profile adds artefacts?
+    w_weak[0:param['general']['ndop']]=0.0
+    w_weak[w.size-param['general']['ndop']:w_weak.size]=0.0
+    dw_weak[0:param['general']['ndop']]=0.0
+    dw_weak[w.size-param['general']['ndop']:dw_weak.size]=0.0
 
     
     # Figure out the length of vector that we need for the velocity grid.
@@ -93,10 +103,10 @@ def numerical(param,unno):
         print('Max shift due to field: {} vdop'.format(max_b))
         print('Max shift due to vsini: {} vdop'.format(max_vsini))
     
-        vel_range = np.max( [max_b+15, max_vsini+15] )
+        vel_range = np.max( [max_b+sig, max_vsini+sig] )
 
     else:
-        vel_range = param['general']['vsini']/param['general']['vdop']
+        vel_range = param['general']['vsini']/param['general']['vdop']+sig
 
     # rounding up to a integer
     vrange = np.round(vel_range+1)
@@ -310,10 +320,8 @@ def numerical(param,unno):
                         )
 
             if i == 5:
-                #testI = A_LOS[vis][i]*out['I']
-                #testV = A_LOS[vis][i]*out['V']
-                testI = out['I']
-                testV = out['V']
+                testI = out['I'][:]
+                testV = out['V'][:]
                     
             model['flux'] += A_LOS[vis][i]*out['I']
             model['Q']    += A_LOS[vis][i]*out['Q']
@@ -322,36 +330,47 @@ def numerical(param,unno):
     
     else:
 
+        tic = time.time()
         for i in range(0,vis[vis].size):
 
-            # Shift the profiles to the right uLOS
-            prof_V_shift = rav.localV.interpol_lin(shape_V, small_u+uLOS[vis][i], all_u)/np.pi**0.5
-            prof_I_shift = rav.localV.interpol_lin(w.real,  small_u+uLOS[vis][i], all_u)/np.pi**0.5
+            # Shift the profiles to the right uLOS, and interpolate over the all_u velocity grid. 
+            w_weak_shift  = rav.localV.interpol_lin(w_weak,  small_u+uLOS[vis][i], all_u)
+            dw_weak_shift = rav.localV.interpol_lin(dw_weak, small_u+uLOS[vis][i], all_u)
 
-            model['flux'] += A_LOS[vis][i]*(1+(1+kappa*prof_I_shift)**(-1)*mu_LOS[vis][i]*param['general']['bnu'])
+            # See diskint2_doc.ipynb for details. 
+                # calculate the local intensity profile
+            local_I = 1 + mu_LOS[vis][i]*param['general']['bnu'] / (1+kappa*w_weak_shift)
+                # numerical integration (hence the projected area multiplication)
+            model['flux'] += A_LOS[vis][i]*local_I
 
-            # The value of geff*Bz in gauss
-            geffBz = param['weak']['geff'] * B_LOS[2,vis][i] * param['general']['Bpole']/2.0
-            # getting the profile scaled by the field. 
-            prof_V_shift = perGaussLorentz * geffBz * prof_V_shift
-            # scale by the source function slope (mu*bnu), kappa, and the projected area
-            model['V'] += A_LOS[vis][i]*(kappa*mu_LOS[vis][i]*param['general']['bnu'])*prof_V_shift
+            # These are the full expressions. 
+            # leaving them here to make the code more easy to understand
+            #geffBz = param['weak']['geff'] * B_LOS[2,vis][i] * param['general']['Bpole']/2.0 # The value of geff*Bz in gauss
+            #local_V = perGaussLorentz * geffBz * ( mu_LOS[vis][i]*param['general']['bnu']*kappa*dw_weak_shift/(1+kappa*w_weak_shift)**2 )
+            
+            # Now, I moved some of the multiplications out of the loop to shave down some time
+            local_V = B_LOS[2,vis][i] * ( mu_LOS[vis][i]*dw_weak_shift/(1+kappa*w_weak_shift)**2 )
 
+                # numerical integration (hence the projected area multiplication)
+            model['V'] += A_LOS[vis][i]*local_V
+
+            #just for debugging
             if i == 5:
-                #testI = A_LOS[vis][i]*(1+(1+kappa*prof_I_shift)*mu_LOS[vis][i]*param['general']['bnu'])
-                #testV = A_LOS[vis][i]*(kappa*mu_LOS[vis][i]*param['general']['bnu'])
-                testI = (1+(1+kappa*prof_I_shift)**(-1)*mu_LOS[vis][i]*param['general']['bnu'])
-                testV = (kappa*mu_LOS[vis][i]*param['general']['bnu'])*prof_V_shift
+                testI = local_I[:]
+                testV = local_V[:]* param['weak']['geff'] * param['general']['Bpole']/2.0 * perGaussLorentz * param['general']['bnu']*kappa
+
+        toc = time.time()
+        print(toc-tic)
 
             
-         
-    
-
- 
- 
  
     # Normalize the spectra to the continuum.
     model['flux'] /= conti_flux
+
+    if unno == False:
+        # constant stuff that I pulled out of the loop above
+        model['V'] = model['V'] * param['weak']['geff'] * param['general']['Bpole']/2.0 * perGaussLorentz * param['general']['bnu']*kappa
+
     model['V'] /= conti_flux
 
     if unno == True:
