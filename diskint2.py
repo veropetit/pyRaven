@@ -384,7 +384,7 @@ def analytical(param):
     
     #models the line profile by convolving the voigt fara function with the rotation profile
 
-    ngrid = 20*param['general']['vsini']
+    ngrid = 1000+20*param['general']['vsini']
     kappa = 10**param['general']['logkappa'] 
 
     const = { 'larmor' : 1.3996e6,\
