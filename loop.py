@@ -40,42 +40,73 @@ def loop(param,datapacket, ax):
     ## Things that only need to be computed once
     #############################################
     
-    ngrid = 1000 # set this based on the vsini later.
-    
-    const = { 'larmor' : 1.3996e6,\
-            'c' : 2.99792458e5,\
-            'a2cm' : 1.0e-8,\
-            'km2cm' : 1.0e5\
-    }
+    ###############################
+    # Constants and zeeman pattern
+    ###############################
 
-    geff=param['weak']['geff']
-    kappa = 10**param['general']['logkappa']
+    ngrid = 1000 + 40*param['general']['vsini']
+    print('Using {} grid point on the surface'.format(ngrid))
+    kappa = 10**param['general']['logkappa']    
 
-    # multiply by B(gauss) to get the Lorentz unit in units of vdop
-    value = { 'lorentz':param['general']['bnu']*geff/np.sqrt(np.pi)\
-        *(const['a2cm']*param['general']['lambda0'])/(param['general']['vdop']*const['km2cm'])*const['larmor']}
+    ## This is e / (4 pi m_e c) into units of (km/s)/(G AA).
+    ## See the disk integration demo notebook. 
+    constLorentz = 1.3996244936166518e-07
+    c_kms = 2.99792458e-5 # used to convert dispersion into wavelength
 
-    urot=param['general']['vsini']/param['general']['vdop']
+    perGaussLorentz = constLorentz * param['general']['lambda0'] / param['general']['vdop']
+    # weak: This gets multiplied by geff*Bz and the Stokes V shape in the disk integration to get V(uo)
 
-    ## Doppler velocity grid setup
+
+    ###############################
+    # Doppler velocity grid setup
+    ###############################
+
     # Compute the Voigt functions only once.
-    # Up to 11 vdop (keeping 1 vdop on each side to padd with zeros.
+    # Up to 7 vdop (keeping 1 vdop on each side to padd with zeros.
+    sig = 10
+    small_u = np.linspace(-sig,sig,sig*param['general']['ndop']*2)
 
-    vel_range = np.max( [15, urot+15] )
+    # calculation the Voigt and Voigt-Faraday profiles
+    w = rav.profileI.voigt_fara(small_u,param['general']['av'])
+    # for the weak field, need to multiply by 1/sqrt(pi) now
+    # in the unno this is done in the local profile function. 
+    w_weak = w.real/np.sqrt(np.pi)
+    dw_weak = np.gradient(w_weak, small_u)
+
+    # padding with zero on each ends to help with the interpolation later. 
+    w_weak[0:param['general']['ndop']]=0.0
+    w_weak[w.size-param['general']['ndop']:w_weak.size]=0.0
+    dw_weak[0:param['general']['ndop']]=0.0
+    dw_weak[w.size-param['general']['ndop']:dw_weak.size]=0.0
+
+    # Figure out the length of vector that we need for the velocity grid.
+    # Take the max of the Zeeman shift or the vsini, then add the 15vdop width.
+    # to accomodate the whole w(small_u) array shifted to the maximum value possible.
+
+    vel_range = param['general']['vsini']/param['general']['vdop']+sig
+
+    # rounding up to a integer
     vrange = np.round(vel_range+1)
     print('Max velocity needed: {} vdop'.format(vel_range))
-    
+
     all_u = np.linspace( -1*vrange,vrange,int(param['general']['ndop']*vrange*2+1))
+    print('Number of wavelength/velocity grid points: {}'.format(all_u.size))
 
-    w = rav.profileI.voigt_fara(all_u,param['general']['av'])
+    # If we are doing a weak field calculation, just save V
+    model = np.zeros(all_u.size,
+                    dtype=[('vel',float),('uo',float),
+                        ('flux',float),
+                        ('V',float)])
 
-    shape_V = np.gradient(w.real, all_u)
-    profile_v_large = param['general']['bnu'] *kappa*geff*shape_V/np.pi**0.5 / (1+kappa/np.pi**0.5*w.real)**2
+    # Saving the u, velocity, and wavelength arrays
+    # Note: this uses the astropy constant for c. 
+    model['uo'] = all_u
+    model['vel'] = all_u * param['general']['vdop'] # result in km/s
+   
 
-    # setup the velocity array for calculating the chi2 later.
-    model_vel = all_u * param['general']['vdop']
-
-    ##Surface Grid Setup
+    ##############################
+    # Surface Grid Setup
+    ##############################
 
     # We want elements with roughtly the same area
     dA = (4*np.pi)/ngrid
@@ -118,7 +149,9 @@ def loop(param,datapacket, ax):
     for ind_i, incl in enumerate(param['grid']['igrid']):
         for ind_p, phase in enumerate(param['grid']['phasegrid']):
 
-            ##Rotation Matrix Setup
+            ####################################
+            # LOS Rotation Matrix Setup for a given i phase
+            ####################################
 
             #rotation matrix that converts from LOS frame to ROT frame
             los2rot = np.array( [[np.cos(phase*d2r),
