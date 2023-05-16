@@ -4,6 +4,7 @@ from astropy.convolution import Gaussian1DKernel, convolve
 import astropy.convolution as con
 
 import pyRaven as rav
+import pyRaven.diskint2 as disk
 
 '''
 The input for both diskint.strong and diskint.weak is of the form:
@@ -35,38 +36,50 @@ param={'general' : genparam,
 '''
 
 def loop(param,datapacket, ax):
+    '''
+    Function to calculate the chi square between 
+    all of the LSD profiles in a pyRaven data packet and 
+    the Stokes V profiles for a grid of dipole paramters 
+    (inclination, beta, phase, and Bpole)
+
+    :param param: For now, see the documentation notebook for the content of the param dictionary.
+    :param datapacket: a pyRaven datapacket for a given set of observations
+    :param ax: TEMPORARY: an ax linked to a figure in the documentation notebook, for debugging purposes
+    '''
 
 
     ###############################
     # Intro material
     ###############################
 
-    #ngrid = get_ngrid(param['general']['vsini'], verbose=True)
-    ngrid = 50
+    ngrid = disk.get_ngrid(param['general']['vsini'], verbose=True)
+    #ngrid = 50
 
     kappa = 10**param['general']['logkappa']    
 
-    perGaussLorentz = get_perGaussLorentz(param['general']['lambda0'], param['general']['vdop'])
+    perGaussLorentz = disk.get_perGaussLorentz(param['general']['lambda0'], param['general']['vdop'])
     # unno: This gets multiplied by B in the disk integration to get uB,i.
     # weak: This gets multiplied by geff*Bz and the Stokes V shape in the disk integration to get V(uo)
     
     sig = 10 # the width of the Voigt profile. 10 sigma is usually enough
-    small_u = get_small_u(sig, param['general']['ndop'])
+    small_u = disk.get_small_u(sig, param['general']['ndop'])
 
 
     print('Evaluating with weak approximation...')
     # calculation the Voigt and Voigt-Faraday profiles
-    w_weak, dw_weak = get_w_weak(small_u, param['general']['av'], param['general']['ndop'])
+    w_weak, dw_weak = disk.get_w_weak(small_u, param['general']['av'], param['general']['ndop'])
     # Figure out the length of vector that we need for the velocity grid.
     vel_range = param['general']['vsini']/param['general']['vdop']+sig
       
     # Get the total dispersion array
-    all_u = get_all_u(vel_range, param['general']['ndop'], verbose=True)
+    all_u = disk.get_all_u(vel_range, param['general']['ndop'], verbose=True)
+    # create an array in kms unit, for the chi2 calculations
+    model_vel = all_u*param['general']['ndop']
     
     # Surface Grid Setup
     # cartesian coordinates of each grid points in ROT
     # and area of the grid element
-    ROT, A = grid_ROT(ngrid) 
+    ROT, A = disk.grid_ROT(ngrid) 
 
     
     #########################################
@@ -79,13 +92,13 @@ def loop(param,datapacket, ax):
         for ind_p, phase in enumerate(param['grid']['phasegrid']):
 
             #rotation matrix that converts from LOS frame to ROT frame
-            los2rot = get_los2rot(incl, phase)
+            los2rot = disk.get_los2rot(incl, phase)
             # the invert of a rotation matrix is the transpose
             rot2los = np.transpose(los2rot)
             # Get the grid coordinates in LOS and MAG systems. 
-            LOS = get_LOS(ROT, rot2los)
+            LOS = disk.get_LOS(ROT, rot2los)
             # get the necessary values for mu, the projected area, etc. 
-            mu_LOS, vis, A_LOS, uLOS, conti_flux = get_LOS_values(LOS, A, param['general']['bnu'], param['general']['vsini'], param['general']['vdop'])
+            mu_LOS, vis, A_LOS, uLOS, conti_flux = disk.get_LOS_values(LOS, A, param['general']['bnu'], param['general']['vsini'], param['general']['vdop'])
 
 
             #########################################
@@ -98,16 +111,16 @@ def loop(param,datapacket, ax):
 
                 # Rotation matrix betweeen the rot and the MAG frames
                 #ROT frame to MAG frame
-                rot2mag = get_rot2mag(beta) 
+                rot2mag = disk.get_rot2mag(beta) 
                 #MAG to ROT frame
                 mag2rot = np.transpose(rot2mag)
                 # Getting the grid coordinates in the mag frame. 
-                MAG = get_MAG(ROT, rot2mag)
+                MAG = disk.get_MAG(ROT, rot2mag)
 
                 # Get the field values in Bpole/2 units
-                B_MAG = get_B_MAG(MAG)
+                B_MAG = disk.get_B_MAG(MAG)
                 # Transformation to the LOS frame
-                B_LOS = get_B_LOS(B_MAG, mag2rot, rot2los)
+                B_LOS = disk.get_B_LOS(B_MAG, mag2rot, rot2los)
                 ## The the weak field, all we need is Bz, so B_LOS[z]*Bpole/2
 
                 #########################################
@@ -118,7 +131,7 @@ def loop(param,datapacket, ax):
  
                 modelV = np.zeros(all_u.size)
                 for i in range(0,vis[vis].size):
-                    local_I, local_V = get_local_weak_interp(small_u, w_weak, dw_weak, all_u,
+                    local_I, local_V = disk.get_local_weak_interp(small_u, w_weak, dw_weak, all_u,
                                                 uLOS[vis][i], mu_LOS[vis][i], 
                                                 param['general']['bnu'], kappa, 
                                                 B_LOS[2,vis][i]  )

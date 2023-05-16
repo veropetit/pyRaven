@@ -461,8 +461,8 @@ def numerical(param,unno):
     # Intro material
     ###############################
 
-    #ngrid = get_ngrid(param['general']['vsini'], verbose=True)
-    ngrid = 50
+    ngrid = get_ngrid(param['general']['vsini'], verbose=True)
+    #ngrid = 50
 
     kappa = 10**param['general']['logkappa']    
 
