@@ -42,6 +42,7 @@ param={'general' : genparam,
 constLorentz = 1.3996244936166518e-07
 
 def get_ngrid(vsini, verbose=False):
+    '''Function to calculate the number of spatial grid point necessary for a given vsini. '''
     ngrid = 1000 + 40*vsini
     if verbose:
         print('Using {} grid point on the surface'.format(ngrid))
@@ -49,17 +50,41 @@ def get_ngrid(vsini, verbose=False):
 
 
 def get_perGaussLorentz(lambda0, vdop):
+    '''
+    Function to calculate the perGaussLorentz (in 1/Gauss) constant for a given central wavelength and thermal broadening.
+
+    * For the unno calculation: This gets multiplied by B in the disk integration to get uB,i.
+    * For the weak-field approximation calculation: This gets multiplied by geff*Bz and the Stokes V shape in the disk integration to get V(uo)
+
+    :param lambda0: central wavelength in AA. 
+    :param vdop: thermal broadening in km/s
+    '''
     perGaussLorentz = constLorentz * lambda0 / vdop
     # unno: This gets multiplied by B in the disk integration to get uB,i.
     # weak: This gets multiplied by geff*Bz and the Stokes V shape in the disk integration to get V(uo)
     return(perGaussLorentz)    
 
 def get_small_u(sig, ndop):
+    '''
+    Function to return the small dispersion grid (in uo units) for the Voigt-Fara profile calculations
+
+    :param sig: number of sigmas from line center for the range (usually 8-10)
+    :param ndop: number of datapoints per sigma (usually 5-10)
+    '''
     small_u = np.linspace(-sig,sig,sig*ndop*2)
     return(small_u)
 
 def get_w_unno(small_u, av, ndop):
-    # calculation the Voigt and Voigt-Faraday profiles
+    '''
+    Function to calculate the Voigt and Voigt-Faraday profiles over the given dispersion grid (in uo units). 
+    It will also pad the array at both ends with zeros for one sigma. 
+    Note: the result is an array of complex numbers. The real part is the Voigt profile and the imaginary part is the Voigt-Faraday profile.
+    Note: Used by the unno solution. The profile is NOT normalized (so not mulitplied by 1/sqrt(pi), because this is done in the local profile function calculation)
+
+    :param small_u: the dispersion grid in uo units
+    :param av: the damping factor
+    :param ndop: the number of datapoint per sigma used in the creation of the dispersion array. 
+    '''
     w = rav.profileI.voigt_fara(small_u,av)
     # padding with zero on each ends to help with the interpolation later. 
     w[0:ndop]=0.0
@@ -67,6 +92,16 @@ def get_w_unno(small_u, av, ndop):
     return(w)
 
 def get_w_weak(small_u, av, ndop):
+    '''
+    Function to calculate the normalized (so mulitplied by 1/sqrt(pi)) local profile, and the derivative of the local profile, 
+    to be used in the the weak-field approximation. 
+    It will also pad the array at both ends with zeros for one sigma. 
+
+    :param small_u: the dispersion grid in uo units
+    :param av: the damping factor
+    :param ndop: the number of datapoint per sigma used in the creation of the dispersion array. 
+    '''
+
     # calculation the Voigt and Voigt-Faraday profiles
     w = rav.profileI.voigt_fara(small_u,av)
     # for the weak field, need to multiply by 1/sqrt(pi) now
@@ -82,9 +117,15 @@ def get_w_weak(small_u, av, ndop):
 
 def get_vel_range_unno(pattern, Bpole, perGaussLorentz, vsini_over_vdop, sig, verbose=False):
     '''
-    Figure out the length of vector that we need for the velocity grid.
-    Take the max of the Zeeman shift or the vsini, then add the sig*vdop widths.
+    Function to figure out the length of vector that we need for the velocity grid, for the Unno solution.
+    Takes the max of the Zeeman shift or the vsini, then add the sig*vdop widths.
     to accomodate the whole w(small_u) array shifted to the maximum value possible.
+
+    :param pattern: the zeeman pattern object
+    :param Bpole: the dipolar (or max) field strength
+    :perGaussLorentz: the perGaussLorentz constant for that specific central wavelenght and thermal broadening. 
+    :vsini_over_vdop: the rotational broadening in uo units. 
+    :sig: the width in sigma that was used to calculate the small dispersion array (the one used to calculated the Voigt profile)
     '''
     max1 = np.max(np.abs(pattern['sigma_r']['split']))
     max2 = np.max(np.abs(pattern['pi']['split']))
@@ -100,6 +141,12 @@ def get_vel_range_unno(pattern, Bpole, perGaussLorentz, vsini_over_vdop, sig, ve
     return(vel_range)
 
 def get_all_u(vel_range, ndop, verbose=False):
+    '''
+    Function to create the larger dispersion array (in uo units) that will accomodate the whole disk-integrated profile. 
+    
+    :param vel_range: the range needed to accomodate the profile in uo units. NOTE: the code with round up to a integer bound
+    :param ndop: the number of datapoints per sigma (use the same as for the small dispersion array, please)
+    '''
     # rounding up to a integer
     vrange = np.round(vel_range+1)
     all_u = np.linspace( -1*vrange,vrange,int(ndop*vrange*2+1))
@@ -110,10 +157,11 @@ def get_all_u(vel_range, ndop, verbose=False):
 
 def get_empty_model(all_u, vdop, lambda0, unno=True):
     '''
-    Create a structure to save the final model. If unno=True, IQUV, else, just IV. 
-    all_u: the total dispersion array in uo units
-    vdop: the thermal broadening in km/s
-    lambda0: rest wavelength of transition in AA. 
+    Function to create a structure to save the final model. If unno=True, IQUV, else, just IV. 
+
+    :param all_u: the total dispersion array in uo units
+    :param vdop: the thermal broadening in km/s
+    :param lambda0: rest wavelength of transition in AA. 
     '''
     c_kms = 2.99792458e-5 # used to convert dispersion into wavelength
 
@@ -139,8 +187,16 @@ def get_empty_model(all_u, vdop, lambda0, unno=True):
     return(model)
      
 def grid_ROT(ngrid):
-    '''Setting up the grid at the surface of the star, 
-    in the rotation frame of reference
+    '''
+    Function to set up the grid at the surface of the star,
+    in the rotation frame of reference. 
+    NOTE: the final number of grid point might be slightly different than the input,
+    as the code attempts to have grid points with roughtly the same surface area.
+    Returns:
+    * a (3, n_real) matrix for the x,y,z coordinates of each grid points
+    * a (n_real) array with the surface area of each grid point. 
+
+    :param ngrid: the number of spatial gridpoints on the sphere. 
     '''
 
     # We want elements with roughtly the same area
@@ -179,7 +235,11 @@ def grid_ROT(ngrid):
 
 def get_los2rot(incl, phase):
     '''
-    Rotation matrix that converts from LOS coordinates to ROT coordinates. The angles are passed in degrees. 
+    Function to get the rotation matrix that converts from LOS coordinates to ROT coordinates. 
+    NOTE: The angles are passed in degrees. 
+
+    :param incl: the inclination of the rotational axis to the line of sight
+    :param phase: the rotational phase (see documentation notebook for the rotation coordinate system conventions)
     '''
     i = incl * np.pi/180.0
     phi = phase * np.pi/180.0
@@ -195,7 +255,10 @@ def get_los2rot(incl, phase):
 
 def get_rot2mag(beta): 
     '''
-    Rotation matrix that converts from ROT coordinates to MAG coordinates. The angles are passed in degrees. 
+    Function to get the rotation matrix that converts from ROT coordinates to MAG coordinates. 
+    NOTE: The angles are passed in degrees. 
+
+    :param beta: the obliquity of the magnetic axis to the rotational axis
     '''    
     b = beta * np.pi/180.0
 
@@ -209,22 +272,28 @@ def get_rot2mag(beta):
 
 def get_LOS(ROT, rot2los):
     '''
-    Get the ROT grid in LOS coordinate
+    Function to convert a ROT grid coordinates into LOS coordinates
+
+    :param ROT: the (3, n_real) matrix for the x,y,z coordinates of each grid points
+    :param rot2los: the rotation matrix
     '''
     return(np.matmul(rot2los,ROT))
 
 def get_MAG(ROT, rot2mag):
     '''
-    Get the ROT grid in MAG coordinate
+    Function to convert a ROT grid coordinates into MAG coordinates
+
+    :param ROT: the (3, n_real) matrix for the x,y,z coordinates of each grid points
+    :param rot2mag: the rotation matrix
     '''
     return(np.matmul(rot2mag,ROT))
 
 def get_LOS_values(LOS, A, S1, vsini, vdop):
     '''
-    Give the mu angle, a bolean value for visibility, the projected area and velocity of each grid point, 
+    Function to calculate the mu angle, a bolean value for visibility, the projected area and velocity of each grid point, 
     along with the integrated continuum flux for profile normalization
 
-    :param LOS: The grid coordinates in LOS coordinates
+    :param LOS: The (3, n_real) grid coordinates in LOS coordinates
     :param A: the area of each grid point
     :param S1: the slope of the source function
     :param vsini: projected rotational equatorial velocity (in km/s)
@@ -277,10 +346,10 @@ def get_LOS_values(LOS, A, S1, vsini, vdop):
 
 def get_B_MAG(MAG):
     '''
-    Returns the field values on the MAG grid in (Bpole/2) units
+    Function to calculate the field values on the MAG grid in (Bpole/2) units
 
-    :param MAG: the MAG coordinate grid
-    :return B_MAG: Bx, By, Bz of the grid points in the MAG coordinate. 
+    :param MAG: the MAG (3, n_real) coordinate grid
+    :return B_MAG: a (3, n_real) matric with Bx, By, Bz of the grid points in the MAG coordinate. 
     '''
     # check for sinthetab =0
     # to avoid dividing by zero in the B_MAG calculations below.
@@ -296,6 +365,13 @@ def get_B_MAG(MAG):
     return(B_MAG)
 
 def get_B_LOS(B_MAG, mag2rot, rot2los):
+    '''
+    Function to convert the magnetic field vectors in the MAG coordinate system to the LOS coordinate system
+
+    :param B_MAG: the (3, n_real) matric with Bx, By, Bz of the grid points in the MAG coordinate
+    :param mag2rot: the mag to rot rotation matrix
+    :param rot2los: the rot to los rotation matrix
+    '''
  
     # Get the field components in LOS (in Bp/2 units)
     B_LOS = np.matmul(rot2los,np.matmul(mag2rot,B_MAG))
@@ -303,6 +379,13 @@ def get_B_LOS(B_MAG, mag2rot, rot2los):
     return(B_LOS)
 
 def get_unno_angles(B_LOS, Bpole):
+    '''
+    Function to calculate for each grid point:
+    1. The angles between the magnetic field vectors and the line of sight (cos(theta), sin(theta), cos(2*chi), sin(2*chi))
+    2. The magnitude of the magnetic field 
+
+    :param B_LOS: the (3, n_real) matric with Bx, By, Bz of the grid points in the LOS coordinate system
+    '''
 
     # For unno, we need some of the angles
 
@@ -332,17 +415,18 @@ def get_unno_angles(B_LOS, Bpole):
 
 def get_local_weak_interp(small_u, w_weak, dw_weak, all_u, uLOS, mu_LOS, bnu, kappa, Bz):
     '''
-    Get the local I and V from the weak field approximation, by using an interpolation of a 
+    Function to get the local I and V from the weak field approximation, by using an interpolation of a 
     fixed profile function in the rest frame. 
-    small_u: the uo grid on which the profile is defined
-    w_weak: the voigt profile (already divided by sqrt(2pi))
-    dw_weak: the derivative of the voigt profile with respect to uo
-    all_u: the (larger) wavelength grid on which to interpolate (enough to encompase the vsini) in uo units
-    uLOS: the (rotational) radial velocity of the grid point in uo units
-    mu_LOS: the mu angle of the grid point (angle between LOS and normal to surface)
-    bnu: the slope of the source function with respect to tau_z (the vertical optical depth, the change in slope because of the mu angle is coded in)
-    kappa: the line strenght parameter
-    Bz: the Bz of that grid point (in Bpole/2 units)
+
+    :param small_u: the uo grid on which the profile is defined
+    :param w_weak: the voigt profile (already divided by sqrt(2pi))
+    :param dw_weak: the derivative of the voigt profile with respect to uo
+    :param all_u: the (larger) dispersion grid on which to interpolate (enough to encompase the vsini) in uo units
+    :param uLOS: the (rotational) radial velocity of the grid point in uo units
+    :param mu_LOS: the mu angle of the grid point (angle between LOS and normal to surface)
+    :param bnu: the slope of the source function with respect to tau_z (the vertical optical depth, the change in slope because of the mu angle is coded in)
+    :param kappa: the line strenght parameter
+    :param Bz: the Bz of that grid point (in Bpole/2 units)
 
     returns: the local_I and local_V profiles, used for disk integration. 
     The local_I and local_V need to be multiplied by the projected area (A_LOS) of the grid point during the integration.
@@ -516,6 +600,11 @@ def numerical(param,unno):
         model['U'] /= -1*conti_flux# sign flip to be consistent with Zeeman2
 
     return(model)
+
+
+
+
+
 
 
 
