@@ -2,9 +2,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 import h5py
 import specpolFlow as pol
+import copy
+import matplotlib.pyplot as plt
 
-
-# class for a collection of LSD profiles (let's call it a LSDprofs object), with meta information for the star, and also for each individual LSD profiles.
+# class for a collection of LSD profiles 
+# with meta information for the star, 
+# and also for each individual LSD profiles.
 ## meta information for the class
 # star name
 # number of LSD profiles
@@ -16,42 +19,84 @@ import specpolFlow as pol
 
 class LSDprofs:
   """
-  Holds a list of LSD profiles, including metainfo about each star and profile.
+  Holds a list of LSD profiles
 
-  star_name: Name of the star
-  nobs: Number of observations
-  fname: List of the file names for each lsd profile.
-  vrad: List of the vrads for each lsd profile.
-  ic: List of the Ics for each lsd profile.
-  lsds: List of the lsd profiles.
+  :param lsds: List of lsd profiles objects
   """
-  def __init__(self, star_name, nobs, fname, vrad, ic, lsds = [], **kwargs):
+  def __init__(self, lsds):
     """
     Initialization method for LSDprofs.
 
     :param self: object being initialized
-    :param star_name: star name
-    :param nobs: number of observations
-    :param fname: names of the lsd data files
-    :param vrad: list of vrads of the lsd profiles
-    :param ic: list of Ics for the lsd profiles
-    :param lsds: list of lsd profiles
+    :param lsds: list of lsd profiles objects
     """
-    self.star_name = star_name
-    self.nobs = nobs
-    self.fname = fname
-    self.vrad = vrad
-    self.Ic = ic
+    self.lsds = lsds
 
-    #self.lsds = []
-    #as i've just learned, empty lists are considered false!
-    if (not lsds):
-      for name in fname:
-        self.lsds = []
-        new_lsd = pol.iolsd.read_lsd(name)
-        self.lsds.append(new_lsd)
-    else:
-      self.lsds = lsds
+  def write(self, f, name):
+    """
+    Helper function that writes the contents of an LSDProfs object to an h5 file
+
+    :param f: h5 file being written
+    :param lsds: LSDprofs object being stored in the file
+    :param name: name of the LSDprofs object
+
+    :rtype: none
+    """
+
+    def write_lsd(lsd, f, name):
+      """
+      Helper function that writes the contents of an lsd_prof to an h5 file
+
+      :param f: h5 file being written
+      :param lsd: lsd_prof being stored in the file
+      :param name: name of the LSDprofs object and the index of the lsd_prof in the LSDprofs' list.
+
+      :rtype: none
+      """
+      f.create_dataset(name + '_vel', data = lsd.vel)
+      f.create_dataset(name + '_specI', data = lsd.specI)
+      f.create_dataset(name + '_specSigI', data = lsd.specSigI)
+      f.create_dataset(name + '_specV', data = lsd.specV)
+      f.create_dataset(name + '_specSigV', data = lsd.specSigV)
+      f.create_dataset(name + '_specN1', data = lsd.specN1)
+      f.create_dataset(name + '_specSigN1', data = lsd.specSigN1)
+      f.create_dataset(name + '_specN2', data = lsd.specN2)
+      f.create_dataset(name + '_specSigN2', data = lsd.specSigN2)
+      f.create_dataset(name + '_header', data = lsd.header)
+
+    for i in range(0, len(self.lsds)):
+      write_lsd(self.lsds[i], f, name + '_' + str(i))
+
+  def scale(self, vrad, Ic, wint_data, wpol_data, wint_rav, wpol_rav):
+
+    lsd_scaled = copy.deepcopy(self)
+    for i in range(0,len(lsd_scaled.lsds)):
+      # Radial velocity correction
+      lsd_scaled.lsds[i] = lsd_scaled.lsds[i].vshift(vrad[i])
+      # Renormalization to the continuum. 
+      lsd_scaled.lsds[i] = lsd_scaled.lsds[i].norm(Ic[i])
+      # scaling to the desired LSD weigth for raven computation
+      lsd_scaled.lsds[i] = lsd_scaled.lsds[i].set_weights(wint_data[i], wpol_data[i], wint_rav, wpol_rav)
+
+    return(lsd_scaled)
+
+  def cut(self, fitrange):
+    lsd_cut = copy.deepcopy(self)
+    for i in range(0,len(lsd_cut.lsds)):
+      inline = np.logical_and(lsd_cut.lsds[i].vel>=-1*fitrange, lsd_cut.lsds[i].vel<=fitrange)
+      lsd_cut.lsds[i] = lsd_cut.lsds[i][inline]
+    return(lsd_cut)
+
+  def plotI(self, ax, label=[]):
+    for i in range(0,len(self.lsds)):
+      if not(label):
+        ax.plot(self.lsds[i].vel, self.lsds[i].specI)
+      else:
+        ax.plot(self.lsds[i].vel, self.lsds[i].specI,label=label[i])
+    ax.set_xlabel('Velocity (km/s)')
+    ax.set_ylabel('I / Ic')
+    return(ax)
+
 
 # class for a 'DataPacket'
 ## meta information
@@ -75,96 +120,132 @@ class DataPacket:
   scaled:
   cutfit:
   """
-  def __init__(self, fitrange, vsini,
-               wint_data, wpol_data, wint_rav, wpol_rav,
-               original, scaled, cutfit):
+  def __init__(self, star_name, nobs, fname,
+              vrad, Ic, wint_data, wpol_data, wint_rav, wpol_rav,
+              fitrange, vsini,
+              original):
     """
     Initialization method for DataPacket
     :param self: The object being initialized
     :param fitrange: fitrange for the packet
     :param vsini:
-    :param wint_data:
-    :param wpol_data:
     :param wint_rav:
     :param wpol_rav:
     :param original:
     :param scaled:
     :param cutfit:
     """
-    self.fitrange = fitrange
-    self.vsini = vsini
+
+    self.star_name = star_name
+    self.nobs = nobs
+    self.fname = fname
+    self.vrad = vrad
+    self.Ic = Ic
     self.wint_data = wint_data
     self.wpol_data = wpol_data
     self.wint_rav = wint_rav
     self.wpol_rav = wpol_rav
+    self.fitrange = fitrange
+    self.vsini = vsini
 
     self.original = original
-    self.scaled = scaled
-    self.cutfit = cutfit
+    self.scaled = original.scale(vrad, Ic, wint_data, wpol_data, wint_rav, wpol_rav)
+    self.cutfit = self.scaled.cut(fitrange)
 
-## I need a write method to store a DataPacket object (including the data themselved and the meta data as attributed) into a h5 file.
 
-## From Vero to Robin: maybe this function would be bettwr as a method of the DataPacket class?
-## e.g. Packet.write(file)?
-def write_packet(packet, fname):
-  """
-  Method that writes a data packet to an h5 file.
+  def write(self, fname):
+    """
+    Method that writes a data packet to an h5 file.
 
-  :param packet: DataPacket object being stored in the file
-  :param fname: name of the file to be written
+    :param packet: DataPacket object being stored in the file
+    :param fname: name of the file to be written
 
-  :rtype: none
-  """
-  with h5py.File(fname,'w') as f:
-    f.create_dataset('fitrange', data = packet.fitrange)
-    f.create_dataset('vsini', data = packet.vsini)
-    f.create_dataset('wint_data', data = packet.wint_data)
-    f.create_dataset('wpol_data', data = packet.wpol_data)
-    f.create_dataset('wint_rav', data = packet.wint_rav)
-    f.create_dataset('wpol_pol', data = packet.wpol_rav)
+    :rtype: none
+    """
 
-    write_lsds(f, packet.original, 'original')
-    write_lsds(f, packet.scaled, 'scaled')
-    write_lsds(f, packet.cutfit, 'cutfit')
+    with h5py.File(fname,'w') as f:
+      f.create_dataset('star_name', data = self.fstar_name)
+      f.create_dataset('nobs', data = self.nobs)
+      f.create_dataset('fname', data = self.fname)
+      f.create_dataset('vrad', data = self.vrad)
+      f.create_dataset('Ic', data = self.Ic)
+      f.create_dataset('wint_data', data='wint_data')
+      f.create_dataset('wpol_data', data='wpol_data')
 
-def write_lsds(f, lsds, name):
-  """
-  Helper function that writes the contents of an LSDProfs object to an h5 file
+      f.create_dataset('fitrange', data = self.fitrange)
+      f.create_dataset('vsini', data = self.vsini)
 
-  :param f: h5 file being written
-  :param lsds: LSDprofs object being stored in the file
-  :param name: name of the LSDprofs object
+      self.original.write(f, 'original')
+      self.scaled.write(f, 'scaled')
+      self.cutfit.write(f, 'cutfit')
 
-  :rtype: none
-  """
-  for i in range(0, lsds.nobs):
-    write_lsd(f, lsds.lsds[i], name + '_' + str(i))
-  f.create_dataset(name+'_nobs', data=lsds.nobs)
-  f.create_dataset(name+'_star_name', data=lsds.star_name)
-  f.create_dataset(name+'_fname', data=lsds.fname)
-  f.create_dataset(name+'_vrad', data=lsds.vrad)
-  f.create_dataset(name+'_Ic', data=lsds.Ic)
+  def plotI(self):
+    # Patrick Stanley
 
-def write_lsd(f, lsd, name):
-  """
-  Helper function that writes the contents of an lsd_prof to an h5 file
+    fig, ax = plt.subplots(1,3, figsize=(30,10))
 
-  :param f: h5 file being written
-  :param lsd: lsd_prof being stored in the file
-  :param name: name of the LSDprofs object and the index of the lsd_prof in the LSDprofs' list.
+    #Set titles
+    ax[0].set_title('Original')
+    ax[1].set_title('Velocity corrected and normalized')
+    ax[2].set_title('Data Cut to Fitting region')
+    
+    #Loops over each observation
+    for i in range(0, self.nobs):
+      vrad=self.vrad[i]
+      Ic=self.Ic[i]
+      lsd=self.original.lsds[i]
+      color = next(ax[0]._get_lines.prop_cycler)['color']
 
-  :rtype: none
-  """
-  f.create_dataset(name + '_vel', data = lsd.vel)
-  f.create_dataset(name + '_specI', data = lsd.specI)
-  f.create_dataset(name + '_specSigI', data = lsd.specSigI)
-  f.create_dataset(name + '_specV', data = lsd.specV)
-  f.create_dataset(name + '_specSigV', data = lsd.specSigV)
-  f.create_dataset(name + '_specN1', data = lsd.specN1)
-  f.create_dataset(name + '_specSigN1', data = lsd.specSigN1)
-  f.create_dataset(name + '_specN2', data = lsd.specN2)
-  f.create_dataset(name + '_specSigN2', data = lsd.specSigN2)
-  f.create_dataset(name + '_header', data = lsd.header)
+      ax[0].plot(lsd.vel, lsd.specI, c=color,
+                label='Obs: {}, vrad: {}, Ic: {}'.format(i+1, vrad, Ic))
+      ax[0].axhline(y=float(Ic), c=color, ls='--') #horizonatal line at Ic
+      ax[0].axvline(x=vrad, ls='--', c=color) #vertical line at vrad
+
+      #repeat for the scaled plot
+      lsd_scaled=self.scaled.lsds[i]
+      ax[1].plot(lsd_scaled.vel, lsd_scaled.specI, c=color)
+
+      #repeat for the cutfit plot
+      lsd_cutfit=self.cutfit.lsds[i]
+      ax[2].plot(lsd_cutfit.vel, lsd_cutfit.specI, c=color)
+
+    ax[1].axhline(y=1.0, c='k', ls='--')
+    ax[1].axvline(x=0.0, ls='--', c='k')
+    ax[2].axhline(y=1.0, c='k', ls='--')
+    ax[2].axvline(x=0.0, ls='--', c='k')
+
+    ax[1].axhline(y=1.0, ls='--', c='k') #horizonal line at 1
+    #vertical lines at +/- fitrange
+    ax[1].axvline(x=float(self.fitrange), ls='--', c='k',label='Fitrange: {}'.format(self.fitrange))
+    ax[1].axvline(x=-1*float(self.fitrange), ls='--', c='k')
+    #vertical lines at +/- vsini
+    ax[1].axvline(x=float(self.vsini), ls='-.', c='k',label='vsini: {}'.format(self.vsini))
+    ax[1].axvline(x=-1*float(self.vsini), ls='-.', c='k')
+
+    #repeat for cutfit graph
+    ax[2].axhline(y=1.0, ls='--', c='k')
+    ax[2].axvline(x=float(self.fitrange), ls='--', c='k',label='Fitrange: {}'.format(self.fitrange))
+    ax[2].axvline(x=-1*float(self.fitrange), ls='--', c='k')
+    ax[2].axvline(x=float(self.vsini), ls='-.', c='k',label='vsini: {}'.format(self.vsini))
+    ax[2].axvline(x=-1*float(self.vsini), ls='-.', c='k')
+
+    #make labels and vertical line at x=0
+    for item in ax:
+      item.set_xlabel('Velocity (km/s)')
+      item.set_ylabel('I/Ic')
+
+    #show legends
+    ax[0].legend(loc=0)
+    ax[1].legend(loc=0)
+
+    return(fig, ax)
+
+def read_lsds_from_sfiles(fnames):
+  lsds = []
+  for fname in fnames:
+    lsds.append(pol.iolsd.read_lsd(fname))
+  return(LSDprofs(lsds))
+
 
 ## I will also need a read method to get a h5 file back into a DataPacket object.
 
