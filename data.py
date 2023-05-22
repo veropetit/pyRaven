@@ -164,7 +164,7 @@ class DataPacket:
     """
 
     with h5py.File(fname,'w') as f:
-      f.create_dataset('star_name', data = self.fstar_name)
+      f.create_dataset('star_name', data = self.star_name)
       f.create_dataset('nobs', data = self.nobs)
       f.create_dataset('fname', data = self.fname)
       f.create_dataset('vrad', data = self.vrad)
