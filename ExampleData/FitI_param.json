@@ -1,0 +1,11 @@
+{
+    "general":{
+        "av":0.05,
+        "bnu":1.5,
+        "lambda0":5000,
+        "logkappa":0.98,
+        "ndop":10,
+        "vdop":10.0,
+        "vsini":50.0
+    }
+}
