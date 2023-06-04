@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Data preparation &mdash; Raven  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/nbsphinx-code-cells.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Fit of the intensity profiles for single stars" href="fit_intensity_example.html" />
+    <link rel="prev" title="Installation" href="Installation.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Raven
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="Installation.html">Installation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Data preparation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#Importing-the-necessary-packages">Importing the necessary packages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Explanation-of-the-structure-of-the-data-for-this-example">Explanation of the structure of the data for this example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Creating-a-data-packet">Creating a data packet</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="fit_intensity_example.html">Fit of the intensity profiles for single stars</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Documentation:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="diskint2_doc.html">Documentation for diskint2</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API documentation:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="API.html">pyRaven Package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Raven</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Data preparation</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/data_example.nblink.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="Data-preparation">
+<h1>Data preparation<a class="headerlink" href="#Data-preparation" title="Permalink to this heading"></a></h1>
+<p>In this notebook, we demonstrate how to setup data packets that will then be used for the Bayesian analysis</p>
+<section id="Importing-the-necessary-packages">
+<h2>Importing the necessary packages<a class="headerlink" href="#Importing-the-necessary-packages" title="Permalink to this heading"></a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">display</span>
+<span class="kn">import</span> <span class="nn">pyRaven</span> <span class="k">as</span> <span class="nn">rav</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">h5py</span> <span class="k">as</span> <span class="nn">h5</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+loading specpolFlow package
+</pre></div></div>
+</div>
+</section>
+<section id="Explanation-of-the-structure-of-the-data-for-this-example">
+<h2>Explanation of the structure of the data for this example<a class="headerlink" href="#Explanation-of-the-structure-of-the-data-for-this-example" title="Permalink to this heading"></a></h2>
+<p>For this example, let’s assume that we have a sample of stars for which we would like to perform the bayesian analysis, and for each star there are a certain number of observations.</p>
+<p>There are three different types of information that the code needs * Information that is linked to the star itself * Information that is linked to each observations * Information about the choice made for the bayesian analysis itself.</p>
+<p>During the data preparation, we will store the data (the LSD profiles) into a data structure (a python class) that will contain all of the above meta-information. These ‘data packets’ can be written to files in the h5 format, so that the meta-information is retained (more explanations below).</p>
+<p>We assumed that researcher will be likely to keep a database of stars and observations in a spreadsheet format, as these are very user-friendly, easily sharable, and easy to import in python through the Pandas package. Therefore for this example, we have prepared a Google spreadsheet (accessible here: <a class="reference external" href="https://docs.google.com/spreadsheets/d/1fHcSEr-hUV-VQ1bH9DjDppJQvZ-K9PzX5DRjnpKPbUk/edit?usp=sharing">https://docs.google.com/spreadsheets/d/1fHcSEr-hUV-VQ1bH9DjDppJQvZ-K9PzX5DRjnpKPbUk/edit?usp=sharing</a>) which contains two spreadsheets: one with the information about the stars, and another with
+information about the observations.</p>
+<p>Note that this data setup steps could also be performed with different structures in place for storing the information e.g. ascii files, etc. and this process can be customize to suit your needs. Once the data is stored into the ‘Data Packets’, then all that is left is to setup loops in your prefered way to perform the analysis (the bayesian code will use the information stored in the meta-data).</p>
+<p>In the cell below, we are demonstrating how to open these spreadsheet with Pandas</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sheet_id</span> <span class="o">=</span> <span class="s2">&quot;1fHcSEr-hUV-VQ1bH9DjDppJQvZ-K9PzX5DRjnpKPbUk&quot;</span>
+<span class="n">sheet_name</span> <span class="o">=</span> <span class="s2">&quot;Stars&quot;</span>
+<span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;https://docs.google.com/spreadsheets/d/</span><span class="si">{</span><span class="n">sheet_id</span><span class="si">}</span><span class="s2">/gviz/tq?tqx=out:csv&amp;sheet=</span><span class="si">{</span><span class="n">sheet_name</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="n">df_stars</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+
+<span class="n">sheet_name</span> <span class="o">=</span> <span class="s2">&quot;Observations&quot;</span>
+<span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;https://docs.google.com/spreadsheets/d/</span><span class="si">{</span><span class="n">sheet_id</span><span class="si">}</span><span class="s2">/gviz/tq?tqx=out:csv&amp;sheet=</span><span class="si">{</span><span class="n">sheet_name</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="n">df_obs</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>In the two cells below, we display the two Pandas data frames</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df_stars</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>StarName</th>
+      <th>nobs</th>
+      <th>fitrange</th>
+      <th>vsini</th>
+      <th>vmac</th>
+      <th>logkappa</th>
+      <th>B_max</th>
+      <th>Unnamed: 7</th>
+      <th>Unnamed: 8</th>
+      <th>Unnamed: 9</th>
+      <th>...</th>
+      <th>Unnamed: 14</th>
+      <th>Unnamed: 15</th>
+      <th>Unnamed: 16</th>
+      <th>Unnamed: 17</th>
+      <th>Unnamed: 18</th>
+      <th>Unnamed: 19</th>
+      <th>Unnamed: 20</th>
+      <th>Unnamed: 21</th>
+      <th>Unnamed: 22</th>
+      <th>Unnamed: 23</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>hd13745</td>
+      <td>3</td>
+      <td>250</td>
+      <td>100</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>5000</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>hd12345</td>
+      <td>2</td>
+      <td>100</td>
+      <td>100</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>5000</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+<p>2 rows × 24 columns</p>
+</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df_obs</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>StarName</th>
+      <th>obs</th>
+      <th>file</th>
+      <th>vrad</th>
+      <th>Ic</th>
+      <th>wint_data</th>
+      <th>wpol_data</th>
+      <th>Unnamed: 7</th>
+      <th>Unnamed: 8</th>
+      <th>Unnamed: 9</th>
+      <th>...</th>
+      <th>Unnamed: 16</th>
+      <th>Unnamed: 17</th>
+      <th>Unnamed: 18</th>
+      <th>Unnamed: 19</th>
+      <th>Unnamed: 20</th>
+      <th>Unnamed: 21</th>
+      <th>Unnamed: 22</th>
+      <th>Unnamed: 23</th>
+      <th>Unnamed: 24</th>
+      <th>Unnamed: 25</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>hd13745</td>
+      <td>1</td>
+      <td>hd13745_21aug12pn.s_Ic_lsd_cln_twk_reg0.2</td>
+      <td>-24.10</td>
+      <td>1</td>
+      <td>0.2</td>
+      <td>120</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>hd13745</td>
+      <td>2</td>
+      <td>hd13745_22aug12pn.s_Ic_lsd_cln_twk_reg0.2</td>
+      <td>-20.39</td>
+      <td>1</td>
+      <td>0.2</td>
+      <td>120</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>hd13745</td>
+      <td>3</td>
+      <td>hd13745_23aug12pn.s_Ic_lsd_cln_twk_reg0.2</td>
+      <td>-17.91</td>
+      <td>1</td>
+      <td>0.2</td>
+      <td>120</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>hd12345</td>
+      <td>1</td>
+      <td>toto</td>
+      <td>0.00</td>
+      <td>1</td>
+      <td>0.2</td>
+      <td>120</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>hd12345</td>
+      <td>2</td>
+      <td>toto</td>
+      <td>0.00</td>
+      <td>1</td>
+      <td>0.2</td>
+      <td>120</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+<p>5 rows × 26 columns</p>
+</div></div>
+</div>
+<p>The way the data is organized in the two tables, we can find the rows in the observation spreadsheet that belongs to a specific star by doing something like:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df_obs</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df_obs</span><span class="p">[</span><span class="s2">&quot;StarName&quot;</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;hd13745&#39;</span><span class="p">]</span>
+<span class="kn">import</span> <span class="nn">astropy.units</span> <span class="k">as</span> <span class="nn">u</span>
+
+<span class="n">mask</span> <span class="o">=</span> <span class="n">df_obs</span><span class="p">[</span><span class="s2">&quot;vrad&quot;</span><span class="p">]</span><span class="o">&gt;-</span><span class="mi">10</span> <span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">km</span>
+
+<span class="nb">type</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span>
+<span class="n">mask</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+0    False
+1    False
+2    False
+3     True
+4     True
+Name: vrad, dtype: bool
+</pre></div></div>
+</div>
+<p>Also, a very useful thing is how to loop over all of the stars, and then inside that loop, loop over all of the observations for that star, using the ‘itertool’ package:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># iteration over all of the rows in the star dataframe</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">star</span> <span class="ow">in</span> <span class="n">df_stars</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+    <span class="c1"># selecting the rows in the observation dataframe where the star name matches</span>
+    <span class="n">obs</span> <span class="o">=</span> <span class="n">df_obs</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df_obs</span><span class="p">[</span><span class="s2">&quot;StarName&quot;</span><span class="p">]</span><span class="o">==</span><span class="n">star</span><span class="p">[</span><span class="s2">&quot;StarName&quot;</span><span class="p">]]</span>
+    <span class="n">display</span><span class="p">(</span><span class="n">obs</span><span class="p">)</span>
+    <span class="c1"># making a loop over all of the observations for that star, and printing the file</span>
+    <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">obs</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="s2">&quot;file&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>StarName</th>
+      <th>obs</th>
+      <th>file</th>
+      <th>vrad</th>
+      <th>Ic</th>
+      <th>wint_data</th>
+      <th>wpol_data</th>
+      <th>Unnamed: 7</th>
+      <th>Unnamed: 8</th>
+      <th>Unnamed: 9</th>
+      <th>...</th>
+      <th>Unnamed: 16</th>
+      <th>Unnamed: 17</th>
+      <th>Unnamed: 18</th>
+      <th>Unnamed: 19</th>
+      <th>Unnamed: 20</th>
+      <th>Unnamed: 21</th>
+      <th>Unnamed: 22</th>
+      <th>Unnamed: 23</th>
+      <th>Unnamed: 24</th>
+      <th>Unnamed: 25</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>hd13745</td>
+      <td>1</td>
+      <td>hd13745_21aug12pn.s_Ic_lsd_cln_twk_reg0.2</td>
+      <td>-24.10</td>
+      <td>1</td>
+      <td>0.2</td>
+      <td>120</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>hd13745</td>
+      <td>2</td>
+      <td>hd13745_22aug12pn.s_Ic_lsd_cln_twk_reg0.2</td>
+      <td>-20.39</td>
+      <td>1</td>
+      <td>0.2</td>
+      <td>120</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>hd13745</td>
+      <td>3</td>
+      <td>hd13745_23aug12pn.s_Ic_lsd_cln_twk_reg0.2</td>
+      <td>-17.91</td>
+      <td>1</td>
+      <td>0.2</td>
+      <td>120</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+<p>3 rows × 26 columns</p>
+</div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+hd13745_21aug12pn.s_Ic_lsd_cln_twk_reg0.2
+hd13745_22aug12pn.s_Ic_lsd_cln_twk_reg0.2
+hd13745_23aug12pn.s_Ic_lsd_cln_twk_reg0.2
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>StarName</th>
+      <th>obs</th>
+      <th>file</th>
+      <th>vrad</th>
+      <th>Ic</th>
+      <th>wint_data</th>
+      <th>wpol_data</th>
+      <th>Unnamed: 7</th>
+      <th>Unnamed: 8</th>
+      <th>Unnamed: 9</th>
+      <th>...</th>
+      <th>Unnamed: 16</th>
+      <th>Unnamed: 17</th>
+      <th>Unnamed: 18</th>
+      <th>Unnamed: 19</th>
+      <th>Unnamed: 20</th>
+      <th>Unnamed: 21</th>
+      <th>Unnamed: 22</th>
+      <th>Unnamed: 23</th>
+      <th>Unnamed: 24</th>
+      <th>Unnamed: 25</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>3</th>
+      <td>hd12345</td>
+      <td>1</td>
+      <td>toto</td>
+      <td>0.0</td>
+      <td>1</td>
+      <td>0.2</td>
+      <td>120</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>hd12345</td>
+      <td>2</td>
+      <td>toto</td>
+      <td>0.0</td>
+      <td>1</td>
+      <td>0.2</td>
+      <td>120</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+<p>2 rows × 26 columns</p>
+</div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+toto
+toto
+</pre></div></div>
+</div>
+</section>
+<section id="Creating-a-data-packet">
+<h2>Creating a data packet<a class="headerlink" href="#Creating-a-data-packet" title="Permalink to this heading"></a></h2>
+<p>A LSDprofs object is a collection of LSD profiles (for a given star) that will be analyzed together with Raven. More specifically, it wil be a python list of LSD objects (from the specpolflow package). Usually, we will create a LSDprof object for the original LSD profile. The object can be initialized direction with a list of LSD profiles (<code class="docutils literal notranslate"><span class="pre">lsds</span> <span class="pre">=</span> <span class="pre">LSDprof(list)</span></code>), but it will be more convinient most of the time to use the function that will create a LSDprof object from a list of filenames for
+.s format LSD profiles, as shown in the example below. This class contains some methods to manipulate and plot a LSDprofs object</p>
+<p>A DataPacket object contains the following meta information: * name of the star (string) * the number of observations (an integer) * a list of strings containing the desired ID for the LSD profiles (could be the filenames, or an ID of your choice) * a list of radial velocities for each observation * a list of continnum normalization values for each observation * a list of LSD objects (from the specpolflow LSD class) for each observation * the region used for fitting (a 2 element array) in
+the star’s rest frame * a list of the intensity weigth used to calculate the LSD profiles used * a list of the intensity weigth used to calculate the LSD profiles used * the unique polarization weigth that will be used to scale the LSD profile for pyRaven * the unique intensity weigth that will be used to scale the LSD profile for pyRaven as well as 3 LDSprofs object that contains 3 different versions of the LSD profiles: * ‘original’: the LSDprof object containing the original LSD profiles
+(passed to the function at initialization) * ‘scaled’: the LSDprof object containing the LSD profiles that have been corrected for radial velocity, normalized to the continuum, and re-scaled to a common LSD weigth. This calculation is done during initialization, using the meta information provided * ‘cutfit’: the re-scaled LSD profiles that have been cut to only contain the velocity region to be fitted by pyRaven (for ease of computation). This calculation is done during initialization, using
+the meta information provided.</p>
+<p>Therefore, to access the velocity array of the scaled LSD profile for the second observation, it would look like this: <code class="docutils literal notranslate"><span class="pre">packet.scaled.lsd[1].vel</span></code></p>
+<p>The DataPacket class has a write function that will safe a DataPacket to a h5 file, and a read function to read back that h5 file into a DataPacket object.</p>
+<p>In the cell below, we do the following:</p>
+<ol class="arabic simple">
+<li><p>We extract the relevant rows for HD 13745 in the dataframes that we are using for this example</p></li>
+<li><p>We create a LSDprof object for the original LSD profiles</p></li>
+</ol>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># In the example dataset above, we have the information about the stars in Google spreadsheets,</span>
+<span class="c1"># loaded into Pandas dataframes. So we will use this here</span>
+
+<span class="c1"># Star contains the row for HD 13745</span>
+<span class="n">star</span> <span class="o">=</span> <span class="n">df_stars</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df_stars</span><span class="p">[</span><span class="s2">&quot;StarName&quot;</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;hd13745&#39;</span><span class="p">]</span>
+
+<span class="c1"># selecting the rows in the observation dataframe where the star name matches</span>
+<span class="n">obs</span> <span class="o">=</span> <span class="n">df_obs</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df_obs</span><span class="p">[</span><span class="s2">&quot;StarName&quot;</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;hd13745&#39;</span><span class="p">]</span>
+<span class="c1"># the size of the dataframe gives us the number of observations.</span>
+<span class="n">nobs</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">obs</span><span class="p">)</span>
+
+<span class="c1"># Using a read function to create a LSDprof object with the original profiles</span>
+<span class="c1"># creating an array of filenames from the file column in the dataframe</span>
+<span class="n">fnames</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ExampleData/</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">obs</span><span class="p">[</span><span class="s1">&#39;file&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span> <span class="p">]</span>
+<span class="n">lsds_original</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">read_lsds_from_sfiles</span><span class="p">(</span><span class="n">fnames</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>The LSDProfs class provides a quick way to overplot all of the LSD profiles in the LSDProf object (you need to define a figure and pass the method an existing matplotlib ax)</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">lsds_original</span><span class="o">.</span><span class="n">plotI</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Original&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Text(0.5, 1.0, &#39;Original&#39;)
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/data_example_20_1.png" src="_images/data_example_20_1.png" />
+</div>
+</div>
+<p>Now that we have our LSDprof object with the original LSD profiles, we can create a DataPacket object with the <code class="docutils literal notranslate"><span class="pre">create_Packet</span></code> function, with all of the necessary meta information.</p>
+<p>Here, we have some of the required meta data as columns in the spreadsheet – so we will use that to create some of the arrays.</p>
+<p>If you need to determine e.g. the radial velocities or the continnum normalization, this is something that can be done by some utility functions of the LSDprof class, and then you can pass the result during the DataPacket creation (TODO!)</p>
+<p>For more clarity in the example below, we create a variable for each of the item required to create a DataPacket – of course in your own implementation you can pass e.g. columns of a dataframe directly.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">star_name</span> <span class="o">=</span> <span class="s1">&#39;hd13745&#39;</span>
+<span class="n">nobs</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">lsds_original</span><span class="o">.</span><span class="n">lsds</span><span class="p">)</span>
+<span class="n">fname</span> <span class="o">=</span> <span class="n">obs</span><span class="p">[</span><span class="s2">&quot;file&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_list</span><span class="p">()</span>
+<span class="n">vrad</span> <span class="o">=</span> <span class="n">obs</span><span class="p">[</span><span class="s2">&quot;vrad&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+<span class="n">Ic</span> <span class="o">=</span> <span class="n">obs</span><span class="p">[</span><span class="s2">&quot;Ic&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+<span class="n">wint_data</span> <span class="o">=</span> <span class="n">obs</span><span class="p">[</span><span class="s2">&quot;wint_data&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+<span class="n">wpol_data</span> <span class="o">=</span> <span class="n">obs</span><span class="p">[</span><span class="s2">&quot;wpol_data&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+<span class="n">wint_rav</span> <span class="o">=</span> <span class="mf">0.1</span>
+<span class="n">wpol_rav</span> <span class="o">=</span> <span class="mf">60.0</span>
+<span class="n">fitrange</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">star</span><span class="p">[</span><span class="s1">&#39;fitrange&#39;</span><span class="p">])</span>
+<span class="n">vsini</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">star</span><span class="p">[</span><span class="s1">&#39;vsini&#39;</span><span class="p">])</span>
+
+<span class="n">Packet</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">create_Packet</span><span class="p">(</span><span class="n">star_name</span><span class="p">,</span> <span class="n">nobs</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span>
+                    <span class="n">vrad</span><span class="p">,</span> <span class="n">Ic</span><span class="p">,</span> <span class="n">wint_data</span><span class="p">,</span> <span class="n">wpol_data</span><span class="p">,</span>
+                    <span class="n">wint_rav</span><span class="p">,</span> <span class="n">wpol_rav</span><span class="p">,</span> <span class="n">fitrange</span><span class="p">,</span> <span class="n">vsini</span><span class="p">,</span>
+                    <span class="n">lsds_original</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>During the creation of a DataPacket, <code class="docutils literal notranslate"><span class="pre">Packet.original</span></code> is the original LSDprof object, and the <code class="docutils literal notranslate"><span class="pre">Packet.scaled</span></code> and <code class="docutils literal notranslate"><span class="pre">Packet.cutfit</span></code> LSDprof objects are created from the meta information.</p>
+<p>The DataPacket class provides a diagnostic plot that shows the comparison between the 3 LSDprof objects, that you can check to make sure that the normalization, radial velocity shift, LSD weigth scaling, and the choice of fitting range are all correct.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">Packet</span><span class="o">.</span><span class="n">plotI</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/data_example_24_0.png" src="_images/data_example_24_0.png" />
+</div>
+</div>
+<p>Now that our DataPacket has been created, we will write it to an h5 file for later use in the pyRaven process.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Packet</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;ExampleData/ExamplePacket.h5&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>In the cell below, we just illustrate the structure of the h5 file, in case you would like to access the content directly, or in a another coding language. As you can see, the meta information is written directly as datasets (as opposed to attributes), because most of them are lists.</p>
+<p>When used in the context of pyRaven, a DataPacket can be read directly from file using the <code class="docutils literal notranslate"><span class="pre">packet</span> <span class="pre">=</span> <span class="pre">read_packet(Filename)</span></code> function.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">path</span> <span class="o">=</span> <span class="s1">&#39;ExampleData/ExamplePacket.h5&#39;</span>
+
+<span class="c1"># From StackOverflow: https://stackoverflow.com/questions/43371438/how-to-inspect-h5-file-in-python</span>
+<span class="k">def</span> <span class="nf">scan_hdf5</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">recursive</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">tab_step</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">scan_node</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">tabs</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39; &#39;</span> <span class="o">*</span> <span class="n">tabs</span><span class="p">,</span> <span class="n">g</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">g</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">h5</span><span class="o">.</span><span class="n">Dataset</span><span class="p">):</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39; &#39;</span> <span class="o">*</span> <span class="n">tabs</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">*</span> <span class="n">tab_step</span> <span class="o">+</span> <span class="s1">&#39; -&#39;</span><span class="p">,</span> <span class="n">v</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">h5</span><span class="o">.</span><span class="n">Group</span><span class="p">)</span> <span class="ow">and</span> <span class="n">recursive</span><span class="p">:</span>
+                <span class="n">scan_node</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">tabs</span><span class="o">=</span><span class="n">tabs</span> <span class="o">+</span> <span class="n">tab_step</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">h5</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">scan_node</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+<span class="n">scan_hdf5</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+ /
+   - /Ic
+   /cutfit
+     /cutfit/hd13745_21aug12pn.s_Ic_lsd_cln_twk_reg0.2
+       - /cutfit/hd13745_21aug12pn.s_Ic_lsd_cln_twk_reg0.2/header
+       - /cutfit/hd13745_21aug12pn.s_Ic_lsd_cln_twk_reg0.2/specI
+       - /cutfit/hd13745_21aug12pn.s_Ic_lsd_cln_twk_reg0.2/specN1
+       - /cutfit/hd13745_21aug12pn.s_Ic_lsd_cln_twk_reg0.2/specN2
+       - /cutfit/hd13745_21aug12pn.s_Ic_lsd_cln_twk_reg0.2/specSigI
+       - /cutfit/hd13745_21aug12pn.s_Ic_lsd_cln_twk_reg0.2/specSigN1
+       - /cutfit/hd13745_21aug12pn.s_Ic_lsd_cln_twk_reg0.2/specSigN2
+       - /cutfit/hd13745_21aug12pn.s_Ic_lsd_cln_twk_reg0.2/specSigV
+       - /cutfit/hd13745_21aug12pn.s_Ic_lsd_cln_twk_reg0.2/specV
+       - /cutfit/hd13745_21aug12pn.s_Ic_lsd_cln_twk_reg0.2/vel
+     /cutfit/hd13745_22aug12pn.s_Ic_lsd_cln_twk_reg0.2
+       - /cutfit/hd13745_22aug12pn.s_Ic_lsd_cln_twk_reg0.2/header
+       - /cutfit/hd13745_22aug12pn.s_Ic_lsd_cln_twk_reg0.2/specI
+       - /cutfit/hd13745_22aug12pn.s_Ic_lsd_cln_twk_reg0.2/specN1
+       - /cutfit/hd13745_22aug12pn.s_Ic_lsd_cln_twk_reg0.2/specN2
+       - /cutfit/hd13745_22aug12pn.s_Ic_lsd_cln_twk_reg0.2/specSigI
+       - /cutfit/hd13745_22aug12pn.s_Ic_lsd_cln_twk_reg0.2/specSigN1
+       - /cutfit/hd13745_22aug12pn.s_Ic_lsd_cln_twk_reg0.2/specSigN2
+       - /cutfit/hd13745_22aug12pn.s_Ic_lsd_cln_twk_reg0.2/specSigV
+       - /cutfit/hd13745_22aug12pn.s_Ic_lsd_cln_twk_reg0.2/specV
+       - /cutfit/hd13745_22aug12pn.s_Ic_lsd_cln_twk_reg0.2/vel
+     /cutfit/hd13745_23aug12pn.s_Ic_lsd_cln_twk_reg0.2
+       - /cutfit/hd13745_23aug12pn.s_Ic_lsd_cln_twk_reg0.2/header
+       - /cutfit/hd13745_23aug12pn.s_Ic_lsd_cln_twk_reg0.2/specI
+       - /cutfit/hd13745_23aug12pn.s_Ic_lsd_cln_twk_reg0.2/specN1
+       - /cutfit/hd13745_23aug12pn.s_Ic_lsd_cln_twk_reg0.2/specN2
+       - /cutfit/hd13745_23aug12pn.s_Ic_lsd_cln_twk_reg0.2/specSigI
+       - /cutfit/hd13745_23aug12pn.s_Ic_lsd_cln_twk_reg0.2/specSigN1
+       - /cutfit/hd13745_23aug12pn.s_Ic_lsd_cln_twk_reg0.2/specSigN2
+       - /cutfit/hd13745_23aug12pn.s_Ic_lsd_cln_twk_reg0.2/specSigV
+       - /cutfit/hd13745_23aug12pn.s_Ic_lsd_cln_twk_reg0.2/specV
+       - /cutfit/hd13745_23aug12pn.s_Ic_lsd_cln_twk_reg0.2/vel
+   - /fitrange
+   - /nobs
+   - /obs_names
+   /original
+     /original/hd13745_21aug12pn.s_Ic_lsd_cln_twk_reg0.2
+       - /original/hd13745_21aug12pn.s_Ic_lsd_cln_twk_reg0.2/header
+       - /original/hd13745_21aug12pn.s_Ic_lsd_cln_twk_reg0.2/specI
+       - /original/hd13745_21aug12pn.s_Ic_lsd_cln_twk_reg0.2/specN1
+       - /original/hd13745_21aug12pn.s_Ic_lsd_cln_twk_reg0.2/specN2
+       - /original/hd13745_21aug12pn.s_Ic_lsd_cln_twk_reg0.2/specSigI
+       - /original/hd13745_21aug12pn.s_Ic_lsd_cln_twk_reg0.2/specSigN1
+       - /original/hd13745_21aug12pn.s_Ic_lsd_cln_twk_reg0.2/specSigN2
+       - /original/hd13745_21aug12pn.s_Ic_lsd_cln_twk_reg0.2/specSigV
+       - /original/hd13745_21aug12pn.s_Ic_lsd_cln_twk_reg0.2/specV
+       - /original/hd13745_21aug12pn.s_Ic_lsd_cln_twk_reg0.2/vel
+     /original/hd13745_22aug12pn.s_Ic_lsd_cln_twk_reg0.2
+       - /original/hd13745_22aug12pn.s_Ic_lsd_cln_twk_reg0.2/header
+       - /original/hd13745_22aug12pn.s_Ic_lsd_cln_twk_reg0.2/specI
+       - /original/hd13745_22aug12pn.s_Ic_lsd_cln_twk_reg0.2/specN1
+       - /original/hd13745_22aug12pn.s_Ic_lsd_cln_twk_reg0.2/specN2
+       - /original/hd13745_22aug12pn.s_Ic_lsd_cln_twk_reg0.2/specSigI
+       - /original/hd13745_22aug12pn.s_Ic_lsd_cln_twk_reg0.2/specSigN1
+       - /original/hd13745_22aug12pn.s_Ic_lsd_cln_twk_reg0.2/specSigN2
+       - /original/hd13745_22aug12pn.s_Ic_lsd_cln_twk_reg0.2/specSigV
+       - /original/hd13745_22aug12pn.s_Ic_lsd_cln_twk_reg0.2/specV
+       - /original/hd13745_22aug12pn.s_Ic_lsd_cln_twk_reg0.2/vel
+     /original/hd13745_23aug12pn.s_Ic_lsd_cln_twk_reg0.2
+       - /original/hd13745_23aug12pn.s_Ic_lsd_cln_twk_reg0.2/header
+       - /original/hd13745_23aug12pn.s_Ic_lsd_cln_twk_reg0.2/specI
+       - /original/hd13745_23aug12pn.s_Ic_lsd_cln_twk_reg0.2/specN1
+       - /original/hd13745_23aug12pn.s_Ic_lsd_cln_twk_reg0.2/specN2
+       - /original/hd13745_23aug12pn.s_Ic_lsd_cln_twk_reg0.2/specSigI
+       - /original/hd13745_23aug12pn.s_Ic_lsd_cln_twk_reg0.2/specSigN1
+       - /original/hd13745_23aug12pn.s_Ic_lsd_cln_twk_reg0.2/specSigN2
+       - /original/hd13745_23aug12pn.s_Ic_lsd_cln_twk_reg0.2/specSigV
+       - /original/hd13745_23aug12pn.s_Ic_lsd_cln_twk_reg0.2/specV
+       - /original/hd13745_23aug12pn.s_Ic_lsd_cln_twk_reg0.2/vel
+   /scaled
+     /scaled/hd13745_21aug12pn.s_Ic_lsd_cln_twk_reg0.2
+       - /scaled/hd13745_21aug12pn.s_Ic_lsd_cln_twk_reg0.2/header
+       - /scaled/hd13745_21aug12pn.s_Ic_lsd_cln_twk_reg0.2/specI
+       - /scaled/hd13745_21aug12pn.s_Ic_lsd_cln_twk_reg0.2/specN1
+       - /scaled/hd13745_21aug12pn.s_Ic_lsd_cln_twk_reg0.2/specN2
+       - /scaled/hd13745_21aug12pn.s_Ic_lsd_cln_twk_reg0.2/specSigI
+       - /scaled/hd13745_21aug12pn.s_Ic_lsd_cln_twk_reg0.2/specSigN1
+       - /scaled/hd13745_21aug12pn.s_Ic_lsd_cln_twk_reg0.2/specSigN2
+       - /scaled/hd13745_21aug12pn.s_Ic_lsd_cln_twk_reg0.2/specSigV
+       - /scaled/hd13745_21aug12pn.s_Ic_lsd_cln_twk_reg0.2/specV
+       - /scaled/hd13745_21aug12pn.s_Ic_lsd_cln_twk_reg0.2/vel
+     /scaled/hd13745_22aug12pn.s_Ic_lsd_cln_twk_reg0.2
+       - /scaled/hd13745_22aug12pn.s_Ic_lsd_cln_twk_reg0.2/header
+       - /scaled/hd13745_22aug12pn.s_Ic_lsd_cln_twk_reg0.2/specI
+       - /scaled/hd13745_22aug12pn.s_Ic_lsd_cln_twk_reg0.2/specN1
+       - /scaled/hd13745_22aug12pn.s_Ic_lsd_cln_twk_reg0.2/specN2
+       - /scaled/hd13745_22aug12pn.s_Ic_lsd_cln_twk_reg0.2/specSigI
+       - /scaled/hd13745_22aug12pn.s_Ic_lsd_cln_twk_reg0.2/specSigN1
+       - /scaled/hd13745_22aug12pn.s_Ic_lsd_cln_twk_reg0.2/specSigN2
+       - /scaled/hd13745_22aug12pn.s_Ic_lsd_cln_twk_reg0.2/specSigV
+       - /scaled/hd13745_22aug12pn.s_Ic_lsd_cln_twk_reg0.2/specV
+       - /scaled/hd13745_22aug12pn.s_Ic_lsd_cln_twk_reg0.2/vel
+     /scaled/hd13745_23aug12pn.s_Ic_lsd_cln_twk_reg0.2
+       - /scaled/hd13745_23aug12pn.s_Ic_lsd_cln_twk_reg0.2/header
+       - /scaled/hd13745_23aug12pn.s_Ic_lsd_cln_twk_reg0.2/specI
+       - /scaled/hd13745_23aug12pn.s_Ic_lsd_cln_twk_reg0.2/specN1
+       - /scaled/hd13745_23aug12pn.s_Ic_lsd_cln_twk_reg0.2/specN2
+       - /scaled/hd13745_23aug12pn.s_Ic_lsd_cln_twk_reg0.2/specSigI
+       - /scaled/hd13745_23aug12pn.s_Ic_lsd_cln_twk_reg0.2/specSigN1
+       - /scaled/hd13745_23aug12pn.s_Ic_lsd_cln_twk_reg0.2/specSigN2
+       - /scaled/hd13745_23aug12pn.s_Ic_lsd_cln_twk_reg0.2/specSigV
+       - /scaled/hd13745_23aug12pn.s_Ic_lsd_cln_twk_reg0.2/specV
+       - /scaled/hd13745_23aug12pn.s_Ic_lsd_cln_twk_reg0.2/vel
+   - /star_name
+   - /vrad
+   - /vsini
+   - /wint_data
+   - /wint_rav
+   - /wpol_data
+   - /wpol_rav
+</pre></div></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Installation.html" class="btn btn-neutral float-left" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="fit_intensity_example.html" class="btn btn-neutral float-right" title="Fit of the intensity profiles for single stars" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, V. Petit.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

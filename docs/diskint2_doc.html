@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Documentation for diskint2 &mdash; Raven  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/nbsphinx-code-cells.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="pyRaven Package" href="API.html" />
+    <link rel="prev" title="Fit of the intensity profiles for single stars" href="fit_intensity_example.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Raven
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="Installation.html">Installation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="data_example.html">Data preparation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fit_intensity_example.html">Fit of the intensity profiles for single stars</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Documentation:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Documentation for diskint2</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#1.-Notes-on-the-hardcoded-constants-in-the-code">1. Notes on the hardcoded constants in the code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#2.-The-weak-solution-derived-from-the-Unno-solution">2. The weak solution derived from the Unno solution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#3.-RT-angles">3. RT angles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Testing-the-code">Testing the code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Is-it-quick-to-interpolate-or-to-recalculate-w?">Is it quick to interpolate or to recalculate w?</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API documentation:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="API.html">pyRaven Package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Raven</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Documentation for diskint2</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/diskint2_doc.nblink.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="Documentation-for-diskint2">
+<h1>Documentation for diskint2<a class="headerlink" href="#Documentation-for-diskint2" title="Permalink to this heading"></a></h1>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">astropy.units</span> <span class="k">as</span> <span class="nn">u</span>
+<span class="kn">import</span> <span class="nn">astropy.constants</span> <span class="k">as</span> <span class="nn">const</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="kn">import</span> <span class="nn">pyRaven</span> <span class="k">as</span> <span class="nn">rav</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+loading specpolFlow package
+</pre></div></div>
+</div>
+<section id="1.-Notes-on-the-hardcoded-constants-in-the-code">
+<h2>1. Notes on the hardcoded constants in the code<a class="headerlink" href="#1.-Notes-on-the-hardcoded-constants-in-the-code" title="Permalink to this heading"></a></h2>
+<p><strong>For the Unno calculation:</strong></p>
+<p>The profile functions that needs to be calculated are</p>
+<div class="math notranslate nohighlight">
+\[\frac{1}{\sqrt{\pi}}\sum_i S_i H(u_o+u_{B,i} - u_\mathrm{LOS}),\]</div>
+<p>where</p>
+<div class="math notranslate nohighlight">
+\[u_{B,i}=\left[ \frac{\Delta \lambda_B}{\lambda_B}\right] * u_B.\]</div>
+<p>The term in bracket is what is returned by the Zeeman pattern function:</p>
+<div class="math notranslate nohighlight">
+\[u_B = \frac{\lambda_B}{\Delta\lambda_D}= \frac{\frac{\lambda_o^2}{c} \left[\frac{e_oB}{4\pi m_e c}\right]}{\frac{\lambda_o v_D}{c}}\]</div>
+<p>In the rightmost equation, the first <span class="math notranslate nohighlight">\(c\)</span> is in the units that matches the wavelength (<span class="math notranslate nohighlight">\(Å\)</span>/s) and the bracket terms is the Larmor frequency (Hz) so the <span class="math notranslate nohighlight">\(c\)</span> in the bracket is in cm/s. This makes the whole numerator to be in wavelength unit.</p>
+<p>The denominator also needs to be in wavelength units. So the <span class="math notranslate nohighlight">\(c\)</span> in the denominator must match the units of <span class="math notranslate nohighlight">\(v_D\)</span>, so here km/s.</p>
+<p>In the disk integration, <span class="math notranslate nohighlight">\(B\)</span> will change from cell to cell, but <span class="math notranslate nohighlight">\(\lambda_o\)</span> and <span class="math notranslate nohighlight">\(v_D\)</span> are set for a given model. So we can re-write this as:</p>
+<div class="math notranslate nohighlight">
+\[u_B = B[\mathrm{G}] ~~ \frac{\lambda_o[Å]}{v_D[\mathrm{km/s}]}~~ \frac{c[\mathrm{km/s}]}{c[\mathrm{Å/s}]} ~~\left[\frac{e_o[\mathrm{esu}]}{4\pi m_e[\mathrm{g}] ~~c[\mathrm{cm/s}]}\right]\]</div>
+<p>or</p>
+<div class="math notranslate nohighlight">
+\[u_B = B[\mathrm{G}] ~~ \frac{\lambda_o[Å]}{v_D[\mathrm{km/s}]} ~~\left[\frac{e_o}{4\pi m_e ~~c}\right] = 1.399624\times10^{-7}~~ B[\mathrm{G}] ~~ \frac{\lambda_o[Å]}{v_D[\mathrm{km/s}]}\]</div>
+<p>where we ask the astropy unit package below to give us the term in bracket in explicit units of <span class="math notranslate nohighlight">\(\frac{\mathrm{km/s}}{\mathrm{G}~ Å}\)</span>, so that <span class="math notranslate nohighlight">\(\lambda_o\)</span>, <span class="math notranslate nohighlight">\(v_D\)</span> and later on <span class="math notranslate nohighlight">\(B\)</span> will be entered with numerical values in <span class="math notranslate nohighlight">\(Å\)</span>, km/s, and G.</p>
+<p>In the code, it is setup this way:</p>
+<div class="math notranslate nohighlight">
+\[u_B =  \left[1.399624\times10^{-7}\frac{\lambda_o[Å]}{v_D[\mathrm{km/s}]}\right] ~~ B[\mathrm{G}],\]</div>
+<p>where the constant is <code class="docutils literal notranslate"><span class="pre">constLorentz</span></code> and the term in parenthesis is calculated early on as <code class="docutils literal notranslate"><span class="pre">perGaussLorentz</span></code>.</p>
+<p><strong>For the weak-field calculation:</strong></p>
+<p>The expression for Stokes V is:</p>
+<div class="math notranslate nohighlight">
+\[V(\lambda) = -\lambda_B g_\mathrm{eff} \cos\theta \frac{dI}{d\lambda}\]</div>
+<p>However, in our calculations we like to work in Doppler units (<span class="math notranslate nohighlight">\(u_o\)</span>). So we can first change the derivative from wavelength to velocity (in km/s):</p>
+<div class="math notranslate nohighlight">
+\[V(v) = -\lambda_B g_\mathrm{eff} \cos\theta \frac{dI}{dv} \frac{c[\mathrm{km/s}]}{\lambda_o[Å]}\]</div>
+<p>where the units of <span class="math notranslate nohighlight">\(c\)</span> matches the units of the velocity.</p>
+<p>Next, we can make the transformation to the thermal Doppler velocity unit (<span class="math notranslate nohighlight">\(u_o = v/v_D\)</span>):</p>
+<div class="math notranslate nohighlight">
+\[V(u_o) = -\lambda_B g_\mathrm{eff} \cos\theta \frac{dI}{du_o} \frac{c[\mathrm{km/s}]}{v_D[\mathrm{km/s}]\lambda_o[Å]}\]</div>
+<p>Now we can expand <span class="math notranslate nohighlight">\(\lambda_B\)</span> like above:</p>
+<div class="math notranslate nohighlight">
+\[V(u_o) = - \frac{\lambda_o^2}{c[\mathrm{Å/s}]} \left[\frac{e_oB}{4\pi m_e c[\mathrm{cm/s}]}\right] g_\mathrm{eff} \cos\theta \frac{dI}{du_o} \frac{c[\mathrm{km/s}]}{v_D[\mathrm{km/s}]\lambda_o[Å]}\]</div>
+<p>We can now re-organize a bit, noting that <span class="math notranslate nohighlight">\(B\)</span> and <span class="math notranslate nohighlight">\(\cos\theta\)</span> will be different on the surface, but <span class="math notranslate nohighlight">\(\lambda_o\)</span> and <span class="math notranslate nohighlight">\(g_\mathrm{eff}\)</span> will be the same for a given model:</p>
+<div class="math notranslate nohighlight">
+\[V(u_o) = - B \cos\theta ~~ g_\mathrm{eff} \frac{\lambda_o}{v_D} ~~ \frac{c[\mathrm{km/s}]}{c[\mathrm{Å/s}]} ~~\left[\frac{e_o[\mathrm{esu}]}{4\pi m_e[\mathrm{g}] ~~c[\mathrm{cm/s}]}\right] \frac{dI}{du_o}\]</div>
+<p>or</p>
+<div class="math notranslate nohighlight">
+\[V(u_o) =  1.399624\times10^{-7}~~ B[\mathrm{G}] \cos\theta ~~ g_\mathrm{eff}\frac{\lambda_o[Å]}{v_D[\mathrm{km/s}]}  \frac{dI}{du_o}\]</div>
+<p>As can be seen, for both the Unno and Weak-field method, we can hardcode the same constant.</p>
+<p>In the codes, it is setup this way:</p>
+<div class="math notranslate nohighlight">
+\[V(u_o) =  \left[1.399624\times10^{-7}~\frac{\lambda_o[Å]}{v_D[\mathrm{km/s}]} \right] g_\mathrm{eff} \cos\theta ~~ B[\mathrm{G}]  \frac{dI}{du_o}\]</div>
+<p>where the constant is <code class="docutils literal notranslate"><span class="pre">constLorentz</span></code> and the term in parenthesis is calculated early on as <code class="docutils literal notranslate"><span class="pre">perGaussLorentz</span></code>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">G_cgs</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">def_unit</span><span class="p">(</span><span class="s1">&#39;G_cgs&#39;</span><span class="p">,</span> <span class="mi">1</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">g</span><span class="o">**</span><span class="mf">0.5</span><span class="o">/</span><span class="n">u</span><span class="o">.</span><span class="n">cm</span><span class="o">**</span><span class="mf">0.5</span><span class="o">/</span><span class="n">u</span><span class="o">.</span><span class="n">s</span><span class="p">)</span>
+
+<span class="n">constant</span> <span class="o">=</span> <span class="p">(</span> <span class="n">const</span><span class="o">.</span><span class="n">e</span><span class="o">.</span><span class="n">esu</span> <span class="o">/</span> <span class="p">(</span><span class="mi">4</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">const</span><span class="o">.</span><span class="n">m_e</span><span class="o">*</span><span class="n">const</span><span class="o">.</span><span class="n">c</span><span class="p">)</span> <span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">km</span><span class="o">/</span><span class="n">u</span><span class="o">.</span><span class="n">s</span><span class="o">/</span><span class="p">(</span><span class="n">G_cgs</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">AA</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">constant</span><span class="p">)</span>
+
+
+<span class="c1"># Just checking that muB is what it&#39;s supposed to be</span>
+<span class="c1"># This is typical values for NGC 1624-2 CIV lines.</span>
+<span class="n">B</span> <span class="o">=</span> <span class="mf">20e3</span><span class="o">*</span><span class="n">G_cgs</span>
+<span class="n">vdop</span> <span class="o">=</span> <span class="mf">6.44</span> <span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">km</span><span class="o">/</span><span class="n">u</span><span class="o">.</span><span class="n">s</span> <span class="c1"># for carbon at 30000K</span>
+<span class="n">wave0</span> <span class="o">=</span> <span class="mf">5811.98</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">AA</span>
+
+<span class="n">muB</span> <span class="o">=</span> <span class="n">B</span><span class="o">*</span><span class="n">wave0</span><span class="o">/</span><span class="n">vdop</span> <span class="o">*</span> <span class="n">constant</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">muB</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">const</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">km</span><span class="o">/</span><span class="n">u</span><span class="o">.</span><span class="n">s</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+1.3996244936166518e-07 km / (Angstrom G_cgs s)
+2.526270051059039
+299792.458 km / s
+</pre></div></div>
+</div>
+</section>
+<section id="2.-The-weak-solution-derived-from-the-Unno-solution">
+<h2>2. The weak solution derived from the Unno solution<a class="headerlink" href="#2.-The-weak-solution-derived-from-the-Unno-solution" title="Permalink to this heading"></a></h2>
+<p>The weak-field local profile should be the same as the unno local profile when the field strength is set to zero.</p>
+<p>If <span class="math notranslate nohighlight">\(B=0\)</span>, then <span class="math notranslate nohighlight">\(\phi_p = \phi_r = \phi_b = \phi\)</span>. All of the elements of the propagation matrix therefore goes to zero, except <span class="math notranslate nohighlight">\(\eta_I = 1+\kappa\phi\)</span>. Also, <span class="math notranslate nohighlight">\(\Delta=\eta_I^4\)</span>.</p>
+<p>In the emerging intensity for the Unno solution reduces to:</p>
+<div class="math notranslate nohighlight">
+\[I(0) = S_0 + \frac{\eta^3}{\Delta} S_1 = 1 + \frac{1}{\eta} \mu S_1\]</div>
+<p>In the latter equality, I have made the intercept of the source function unity, and the slope of the source function <span class="math notranslate nohighlight">\(S_1\)</span> (<code class="docutils literal notranslate"><span class="pre">bnu</span></code> variable in the code) is the vertical slope which needs to be multiply by the cos of the angle between the local ray and the normal to the surface (<span class="math notranslate nohighlight">\(\mu\)</span>). Replacing the <span class="math notranslate nohighlight">\(\eta_I\)</span> with its value above yields:</p>
+<div class="math notranslate nohighlight">
+\[I(0) = 1 + \frac{1}{1+\kappa \phi}\mu S_1.\]</div>
+<p>Now, in the case of a purely longitudinal field: we can set <span class="math notranslate nohighlight">\(\theta=0\)</span> in the definitions of the propagation matrix elements. We also know that <span class="math notranslate nohighlight">\(\phi_r\)</span> and <span class="math notranslate nohighlight">\(\phi_b\)</span> will be the same as <span class="math notranslate nohighlight">\(\phi_p\)</span> but with a tiny tiny shift to the red and blue (we are here using a triplet approximation already). Here are the elements of the matrix that are not zero:</p>
+<div class="math notranslate nohighlight">
+\[\eta_I = 1 + \kappa \frac{\phi_b-\phi_r}{2} \simeq 1 + \kappa \phi\]</div>
+<p>where for the last approximation, we are telling ourselves that the mean of <span class="math notranslate nohighlight">\(\phi_r\)</span> and <span class="math notranslate nohighlight">\(\phi_b\)</span> is basically just <span class="math notranslate nohighlight">\(\phi\)</span> is the shift is very small.</p>
+<div class="math notranslate nohighlight">
+\[\eta_V = \frac{\kappa}{2}\left[\phi_b-\phi_r\right] = \frac{\kappa}{2}\left[\phi(u+g_\mathrm{eff}u_B)-\phi(u-g_\mathrm{eff}u_B)\right].\]</div>
+<p>Using the fact that <span class="math notranslate nohighlight">\(f(x+a)-f(x-a) = 2a \frac{f(x)}{dx}\)</span>, yields:</p>
+<div class="math notranslate nohighlight">
+\[\eta_V  \simeq \kappa g_\mathrm{eff}u_B\frac{d\phi(u)}{du}\]</div>
+<p>Similarly,</p>
+<div class="math notranslate nohighlight">
+\[\rho_V \simeq \kappa g_\mathrm{eff}u_B\frac{d\psi(u)}{du}\]</div>
+<p>Using only the non-zero elements, we can write</p>
+<div class="math notranslate nohighlight">
+\[\Delta = \eta_I^2(\eta_I^2-\eta_V^2+\rho_V^2) - (\eta_V\rho_V)^2\]</div>
+<p>and</p>
+<div class="math notranslate nohighlight">
+\[V(0) = -\frac{1}{\Delta} [\eta_I^2\eta_V + \rho_V(\eta_V\rho_V)]\mu S_1\]</div>
+<p>Combining together (and leaving the <span class="math notranslate nohighlight">\(-\mu S_1\)</span> term on the left side for a moment)</p>
+<div class="math notranslate nohighlight">
+\[\frac{-V(0)}{\mu S_1} = \frac{\eta_I^2\eta_V+\eta_V\rho_V^2}{\eta_I^4 - \eta_I^2\eta_V^2 + (\eta_I^2-\eta_V^2)\rho_V^2}\]</div>
+<p>(Intuitively, I know that the weak field approximation we use for e.g. the Bz calculation does not depends on the dispersion profile <span class="math notranslate nohighlight">\(\psi\)</span>, so the <span class="math notranslate nohighlight">\(\rho_V\)</span> element must cancel out, and the best way is with factorization)</p>
+<div class="math notranslate nohighlight">
+\[\frac{-V(0)}{\mu S_1} = \frac{\eta_V(\eta_I^2+\rho_V^2)}{(\eta_I^2-\eta_V^2)\eta_I^2+(\eta_I^2-\eta_V^2)\rho_V^2} = \frac{\eta_V(\eta_I^2+\rho_V^2)}{(\eta_I^2-\eta_V^2)(\eta_I^2+\rho_V^2)}=\frac{\eta_V}{(\eta_I^2-\eta_V^2)}\]</div>
+<p>or</p>
+<div class="math notranslate nohighlight">
+\[V(0)=-\mu S_1~\frac{\eta_V}{(\eta_I^2-\eta_V^2)}\]</div>
+<p>Before we replace with the elements of the propagation matrix, there is another approximation that is, I believe, justified. In the bottom term, we could ignore <span class="math notranslate nohighlight">\(\eta_V^2\)</span> if <span class="math notranslate nohighlight">\(\eta_V^2 &lt;&lt; \eta_I^2\)</span>. So let’s have a quick look at that.</p>
+<blockquote>
+<div><p>As a reminder:</p>
+<p><span class="math notranslate nohighlight">\(\eta_I = 1 + \kappa \phi\)</span></p>
+<p><span class="math notranslate nohighlight">\(\eta_V = \kappa g_\mathrm{eff}u_B\frac{d\phi(u)}{du}\)</span></p>
+</div></blockquote>
+<p>The figure below shows that <span class="math notranslate nohighlight">\(\phi\)</span> and <span class="math notranslate nohighlight">\(\frac{d\phi(u)}{du}\)</span> are both of the order of unity. The dashed line shows that a <span class="math notranslate nohighlight">\(u_B\)</span> of about 0.1 would still (barely) satisfy our requirement that the shift between <span class="math notranslate nohighlight">\(\sigma_r\)</span> and <span class="math notranslate nohighlight">\(\sigma_b\)</span> is much smaller than the width of the profile.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[55]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">u</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">300</span><span class="p">)</span>
+<span class="n">phi</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">profileI</span><span class="o">.</span><span class="n">voigt_fara</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">)</span><span class="o">.</span><span class="n">real</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+<span class="n">dphi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">phi</span><span class="p">,</span> <span class="n">u</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;phi&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">u</span><span class="o">-</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;phi_b (uB=0.1)&#39;</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">dphi</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;dphi/du&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;u&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Fig. 1&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[55]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Text(0.5, 1.0, &#39;Fig. 1&#39;)
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/diskint2_doc_7_1.png" src="_images/diskint2_doc_7_1.png" />
+</div>
+</div>
+<p><span class="math notranslate nohighlight">\(\eta_I\)</span> will be either be of the order of 1.0 if <span class="math notranslate nohighlight">\(\kappa &lt;&lt; 1\)</span> and of the order of <span class="math notranslate nohighlight">\(\kappa\)</span> if <span class="math notranslate nohighlight">\(\kappa &gt;&gt; 1\)</span> (inside of the spectral line, that is).</p>
+<p>Now looking at <span class="math notranslate nohighlight">\(\eta_V\)</span>, <span class="math notranslate nohighlight">\(g_\mathrm{eff}\)</span> is usually of order of unity, and as we said above, <span class="math notranslate nohighlight">\(u_B &lt;&lt; 1\)</span> as per our previous approximation.</p>
+<p>If <span class="math notranslate nohighlight">\(\kappa\)</span> is small compared to unity, then combined with a small <span class="math notranslate nohighlight">\(uB\)</span>, <span class="math notranslate nohighlight">\(\eta_V\)</span> will be smaller than <span class="math notranslate nohighlight">\(\eta_I\)</span>. Even when <span class="math notranslate nohighlight">\(\kappa\)</span> is large, this is also be the case as long as <span class="math notranslate nohighlight">\(u_B\)</span> is small.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[64]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">fig_eta</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">kappa</span><span class="p">,</span> <span class="n">geff</span><span class="p">,</span> <span class="n">uB</span><span class="p">):</span> <span class="c1"># u phi and dphi are defined in cell above.</span>
+    <span class="n">etaI</span> <span class="o">=</span> <span class="mi">1</span><span class="o">+</span><span class="n">kappa</span><span class="o">*</span><span class="n">phi</span>
+    <span class="n">etaV</span> <span class="o">=</span> <span class="n">kappa</span> <span class="o">*</span> <span class="n">geff</span> <span class="o">*</span> <span class="n">uB</span> <span class="o">*</span> <span class="n">dphi</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">etaI</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;etaI**2&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">etaV</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;etaV**2&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;u&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;kappa = </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">kappa</span><span class="p">))</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span><span class="p">()</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+<span class="n">fig_eta</span><span class="p">(</span><span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)</span>
+<span class="n">fig_eta</span><span class="p">(</span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">10</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[64]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+()
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/diskint2_doc_9_1.png" src="_images/diskint2_doc_9_1.png" />
+</div>
+</div>
+<p>So we can use this approximation to simplify as such:</p>
+<div class="math notranslate nohighlight">
+\[V(0)=-\mu S_1~\frac{\eta_V}{(\eta_I^2-\eta_V^2)} \simeq -\mu S_1~\frac{\eta_V}{\eta_I^2}\]</div>
+<p>The figure below checks that this is a fine approximation under the approximations above.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[80]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">fig_V</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">kappa</span><span class="p">,</span> <span class="n">geff</span><span class="p">,</span> <span class="n">uB</span><span class="p">,</span> <span class="n">muS1</span><span class="p">):</span> <span class="c1"># u phi and dphi are defined in cell above.</span>
+    <span class="n">etaI</span> <span class="o">=</span> <span class="mi">1</span><span class="o">+</span><span class="n">kappa</span><span class="o">*</span><span class="n">phi</span>
+    <span class="n">etaV</span> <span class="o">=</span> <span class="n">kappa</span> <span class="o">*</span> <span class="n">geff</span> <span class="o">*</span> <span class="n">uB</span> <span class="o">*</span> <span class="n">dphi</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="o">-</span><span class="n">muS1</span> <span class="o">*</span> <span class="n">etaV</span> <span class="o">/</span> <span class="p">(</span><span class="n">etaI</span><span class="o">**</span><span class="mi">2</span><span class="o">-</span><span class="n">etaV</span><span class="o">**</span><span class="mi">2</span><span class="p">),</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;full form&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="o">-</span><span class="n">muS1</span> <span class="o">*</span> <span class="n">etaV</span> <span class="o">/</span> <span class="p">(</span><span class="n">etaI</span><span class="o">**</span><span class="mi">2</span><span class="p">),</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;approximation&#39;</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;u&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;kappa = </span><span class="si">{}</span><span class="s1">, uB=</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">kappa</span><span class="p">,</span> <span class="n">uB</span><span class="p">))</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span><span class="p">()</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+<span class="n">fig_V</span><span class="p">(</span><span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+<span class="n">fig_V</span><span class="p">(</span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">10</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+<span class="n">fig_V</span><span class="p">(</span><span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">10.1</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+<span class="n">fig_V</span><span class="p">(</span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">10</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[80]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+()
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/diskint2_doc_11_1.png" src="_images/diskint2_doc_11_1.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/diskint2_doc_11_2.png" src="_images/diskint2_doc_11_2.png" />
+</div>
+</div>
+<p>To be more explicit, as long as <span class="math notranslate nohighlight">\(u_B\)</span> is small, it is OK no matter what <span class="math notranslate nohighlight">\(\kappa\)</span> is.</p>
+<p>But if <span class="math notranslate nohighlight">\(u_B\)</span> is not so small, you can get away with more as far as the specific approximation above is concerned. The bottom row shows that at large kappa, you are still constrained to have a <span class="math notranslate nohighlight">\(u_B\)</span> small enough because <span class="math notranslate nohighlight">\(\eta_I\)</span> will be of the order of <span class="math notranslate nohighlight">\(\kappa\)</span>. But for a small <span class="math notranslate nohighlight">\(\kappa\)</span>, <span class="math notranslate nohighlight">\(\eta_I\)</span> is of the order of 1, and <span class="math notranslate nohighlight">\(\eta_V\)</span> is of the order of <span class="math notranslate nohighlight">\(u_B \kappa\)</span>. So is <span class="math notranslate nohighlight">\(\kappa\)</span> is small, you can get away with a larger <span class="math notranslate nohighlight">\(u_B\)</span> and the
+approximation above is still valid. &gt; However, such a large <span class="math notranslate nohighlight">\(u_B\)</span> would NOT satisfy our previous approximation that the <span class="math notranslate nohighlight">\(\sigma_{rb}\)</span> are only shifted a tiny bit with respect to the width of the profile.</p>
+<p>We can now get an expression as a function of <span class="math notranslate nohighlight">\(\phi\)</span> by replacing the metric elements, which yields</p>
+<div class="math notranslate nohighlight">
+\[V(0) = -\mu S_1 \frac{\kappa g_\mathrm{eff}u_B\frac{d\phi(u)}{du}}{(1 + \kappa \phi)^2} = g_\mathrm{eff}u_B \left[ \frac{- \mu S_1\kappa\frac{d\phi(u)}{du}}{(1 + \kappa \phi)^2} \right]\]</div>
+<p>The second equality is just a re-arrangement of terms, because the term in bracket is equivalent to <span class="math notranslate nohighlight">\(\frac{d}{du}\left[ 1 + \frac{\mu S_1}{(1+\kappa\phi)} \right]=\frac{dI(0)}{du}\)</span>. So that we can also write instead:</p>
+<div class="math notranslate nohighlight">
+\[V(0) = g_\mathrm{eff}u_B \frac{dI(0)}{du}\]</div>
+<p>If ones expand <span class="math notranslate nohighlight">\(u_B\)</span>, and backtracks from <span class="math notranslate nohighlight">\(u\)</span> to wavelength, nothing that at the start of this discussion we assumed a purely longitudinal field, which can be seen as “what is the contribution to Stokes V of the longitudinal component of a given field”, when if one replaces <span class="math notranslate nohighlight">\(B\)</span> in the <span class="math notranslate nohighlight">\(u_B\)</span> expression with <span class="math notranslate nohighlight">\(B\cos\theta\)</span>, we recover the weak field expression that was originally given in the section about the hardcoded units (section 1).</p>
+<div class="math notranslate nohighlight">
+\[V(0) =  \left[1.399624\times10^{-7}\frac{\lambda_o[Å]}{v_D[\mathrm{km/s}]}\right] ~~  B_z[\mathrm{G}] ~g_\mathrm{eff}~ \frac{dI(0)}{du},\]</div>
+<p>where the constant is <code class="docutils literal notranslate"><span class="pre">constLorentz</span></code> and the term in parenthesis is calculated early on as <code class="docutils literal notranslate"><span class="pre">perGaussLorentz</span></code>.</p>
+<p>Finally, this means that computationally we can take the derivative (e.g. numerically) of the local intensity profile at every grid point (because the local profile will change because <span class="math notranslate nohighlight">\(\mu\)</span> changes). Alternatively, we can compute the derivative of <span class="math notranslate nohighlight">\(\phi\)</span>, which does not change, then use the first expression.</p>
+<p>The figure below shows that both expressions are identical indeed.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[83]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">fig_Vout</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">kappa</span><span class="p">,</span> <span class="n">geff</span><span class="p">,</span> <span class="n">uB</span><span class="p">,</span> <span class="n">muS1</span><span class="p">):</span> <span class="c1"># u phi and dphi are defined in cell above.</span>
+    <span class="n">I</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">muS1</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">kappa</span><span class="o">*</span><span class="n">phi</span><span class="p">)</span>
+    <span class="n">dI</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">I</span><span class="p">,</span> <span class="n">u</span><span class="p">)</span>
+    <span class="n">V1</span> <span class="o">=</span> <span class="o">-</span><span class="n">muS1</span> <span class="o">*</span> <span class="n">kappa</span> <span class="o">*</span> <span class="n">geff</span> <span class="o">*</span> <span class="n">uB</span> <span class="o">*</span> <span class="n">dphi</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">kappa</span><span class="o">*</span><span class="n">phi</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+    <span class="n">V2</span> <span class="o">=</span> <span class="n">geff</span> <span class="o">*</span> <span class="n">uB</span> <span class="o">*</span> <span class="n">dI</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">V1</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;using dphi&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">V2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;using dI&#39;</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;u&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;kappa = </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">kappa</span><span class="p">))</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span><span class="p">()</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+<span class="n">fig_Vout</span><span class="p">(</span><span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+<span class="n">fig_Vout</span><span class="p">(</span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">10</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[83]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+()
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/diskint2_doc_14_1.png" src="_images/diskint2_doc_14_1.png" />
+</div>
+</div>
+<p>Finally to conclude this section, we can make a comparison with the local profile from the full unno solution for the local profiles (in the <code class="docutils literal notranslate"><span class="pre">profileV</span></code> module).</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[92]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">comp_unno</span><span class="p">(</span><span class="n">kappa</span><span class="p">,</span> <span class="n">uB</span><span class="p">):</span>
+    <span class="n">u</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">300</span><span class="p">)</span>
+    <span class="n">phi</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">profileI</span><span class="o">.</span><span class="n">voigt_fara</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">)</span><span class="o">.</span><span class="n">real</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">profileI</span><span class="o">.</span><span class="n">voigt_fara</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">)</span>
+    <span class="c1"># the np.sqrt(np.pi) is taken into account inside the local_out function</span>
+    <span class="n">dphi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">phi</span><span class="p">,</span> <span class="n">u</span><span class="p">)</span>
+
+
+    <span class="n">geff</span><span class="o">=</span><span class="mf">1.0</span>
+    <span class="n">muS1</span> <span class="o">=</span> <span class="mf">1.0</span>
+
+
+    <span class="n">I</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">muS1</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">kappa</span><span class="o">*</span><span class="n">phi</span><span class="p">)</span>
+    <span class="n">V</span> <span class="o">=</span> <span class="o">-</span><span class="n">muS1</span> <span class="o">*</span> <span class="n">kappa</span> <span class="o">*</span> <span class="n">geff</span> <span class="o">*</span> <span class="n">uB</span> <span class="o">*</span> <span class="n">dphi</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">kappa</span><span class="o">*</span><span class="n">phi</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="c1"># Using the dphi expression.</span>
+
+    <span class="c1"># Getting a triplet zeeman pattern with a geff=1</span>
+    <span class="n">pat</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">pattern</span><span class="o">.</span><span class="n">zeeman_pattern</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span> <span class="c1">#zeeman pattern with geff=1</span>
+    <span class="c1"># setting the ua=0, sintheta=0, costheta=1, and mu=1, S1(=bnu)=1</span>
+    <span class="n">unno</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">localV</span><span class="o">.</span><span class="n">unno_local_out_IV</span><span class="p">(</span><span class="n">uB</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">pat</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">kappa</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+    <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">I</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;weak&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">unno</span><span class="p">[</span><span class="s1">&#39;I&#39;</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;unno&#39;</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;kappa=</span><span class="si">{}</span><span class="s1">, uB=</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">kappa</span><span class="p">,</span> <span class="n">uB</span><span class="p">))</span>
+    <span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">u</span><span class="p">,</span><span class="n">V</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;weak&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">u</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="o">*</span><span class="n">unno</span><span class="p">[</span><span class="s1">&#39;V&#39;</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;unno&#39;</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">)</span> <span class="c1">#-1* to follow Doanti&#39;s convention</span>
+    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">ax</span><span class="p">:</span>
+        <span class="n">item</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;u&#39;</span><span class="p">)</span>
+        <span class="n">item</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+
+<span class="n">comp_unno</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)</span>
+<span class="n">comp_unno</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)</span>
+<span class="n">comp_unno</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span>
+<span class="n">comp_unno</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/diskint2_doc_16_0.png" src="_images/diskint2_doc_16_0.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/diskint2_doc_16_1.png" src="_images/diskint2_doc_16_1.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/diskint2_doc_16_2.png" src="_images/diskint2_doc_16_2.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/diskint2_doc_16_3.png" src="_images/diskint2_doc_16_3.png" />
+</div>
+</div>
+<p>The last two rows show what happens when the <span class="math notranslate nohighlight">\(u_B\)</span> gets too large.</p>
+</section>
+<section id="3.-RT-angles">
+<h2>3. RT angles<a class="headerlink" href="#3.-RT-angles" title="Permalink to this heading"></a></h2>
+<p>We obtained the B field vectors in LOS coordinates (B_LOS) with the rotation matrix.</p>
+<p>For the weak field, we only need the component of the field in the line of sign (the zLOS direction), so we only need the z component of B_LOS (<code class="docutils literal notranslate"><span class="pre">B_LOS[2,:]</span></code>).</p>
+<p>For the Unno solution, we need two values: * <span class="math notranslate nohighlight">\(\cos(\theta)\)</span> and <span class="math notranslate nohighlight">\(\sin(\theta)\)</span>, where <span class="math notranslate nohighlight">\(\theta\)</span> is the angle between the B-field vector and the z axis and * <span class="math notranslate nohighlight">\(\cos(2\phi)\)</span> and <span class="math notranslate nohighlight">\(\sin(2\phi)\)</span>, where <span class="math notranslate nohighlight">\(\phi\)</span> is the angle between the projection of the Bfield vector in the plane of the sky (xy) and the reference direction (here we’ll use the x-axis)</p>
+<p>If we use the unit vector in the direction of B, then <span class="math notranslate nohighlight">\(\cos(\theta)\)</span> is straightfowardly the z component of B_LOS (<code class="docutils literal notranslate"><span class="pre">B_LOS[2,:]</span></code>).</p>
+<p>We can get <span class="math notranslate nohighlight">\(\sin(\theta) = \sqrt{1-\cos^2(\theta)}\)</span>. This is also the projection of the Bfield vector on the xy plane (i.e. <span class="math notranslate nohighlight">\(\sqrt{\hat{B}_x^2+\hat{B}_y^2}\)</span>).</p>
+<p>Now, <span class="math notranslate nohighlight">\(\cos{\phi}\)</span> is <span class="math notranslate nohighlight">\(\frac{\hat{B}_x}{\sin(\theta)}\)</span></p>
+<p>We can use trig identity to get the cos and sin of the double angles:</p>
+<div class="math notranslate nohighlight">
+\[\cos(2\phi) = 2\cos^2\phi - 1 = 2 \frac{\hat{B}_x^2}{\sin^2(\theta)} - 1\]</div>
+<div class="math notranslate nohighlight">
+\[\sin(2\phi) = 2\sin\phi\cos\phi = 2 \frac{\hat{B}_x}{\sin(\theta)} \frac{\hat{B}_y}{\sin(\theta)} = 2 \frac{\hat{B}_x\hat{B}_y}{\sin^2(\theta)}\]</div>
+</section>
+<section id="Testing-the-code">
+<h2>Testing the code<a class="headerlink" href="#Testing-the-code" title="Permalink to this heading"></a></h2>
+<p>In the cell below, I prepared a model that can be passed to diskint.</p>
+<p>The pattern for Unno is a triplet with a geff of 1.0.</p>
+<p>In addition to returning the final result itself, I added a line in the disk integration look that returns one of the local profile (e.g. the fifth one in the loop), which was useful for debugging.</p>
+<p>NOTE that once everything is debug, this will be commented out in diskint, so the graph cells below will not work anymore.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">genparam</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;lambda0&#39;</span><span class="p">:</span><span class="mi">5000</span><span class="p">,</span>    <span class="c1"># the central wavelength of the transition</span>
+    <span class="s1">&#39;vsini&#39;</span><span class="p">:</span><span class="mf">30.0</span><span class="p">,</span>         <span class="c1"># the projected rotational velocity</span>
+    <span class="s1">&#39;vdop&#39;</span><span class="p">:</span><span class="mf">10.0</span><span class="p">,</span>          <span class="c1"># the thermal broadening</span>
+    <span class="s1">&#39;av&#39;</span><span class="p">:</span><span class="mf">0.05</span><span class="p">,</span>             <span class="c1"># the damping coefficient of the Voigt profile</span>
+    <span class="s1">&#39;bnu&#39;</span><span class="p">:</span><span class="mf">1.5</span><span class="p">,</span>             <span class="c1"># the slope of the source function with respect to vertical optical depth</span>
+    <span class="s1">&#39;logkappa&#39;</span><span class="p">:</span><span class="mf">0.0</span><span class="p">,</span>          <span class="c1"># the line strength parameter</span>
+    <span class="s1">&#39;ndop&#39;</span><span class="p">:</span><span class="nb">int</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span>       <span class="c1"># the number of sample point per doppler width for the wavelength array</span>
+    <span class="s1">&#39;Bpole&#39;</span><span class="p">:</span><span class="mi">500</span><span class="p">,</span>
+    <span class="s1">&#39;incl&#39;</span><span class="p">:</span><span class="mi">90</span><span class="p">,</span> <span class="c1">#not necessary for loop</span>
+    <span class="s1">&#39;beta&#39;</span><span class="p">:</span><span class="mi">90</span><span class="p">,</span> <span class="c1">#not necessary for loop</span>
+    <span class="s1">&#39;phase&#39;</span><span class="p">:</span><span class="mi">90</span> <span class="c1">#not necessary for loop</span>
+  <span class="p">}</span>
+
+<span class="n">unnoparam</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;down&#39;</span><span class="p">:[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>   <span class="c1"># the s, j, l of the lower level</span>
+    <span class="s1">&#39;up&#39;</span><span class="p">:[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>    <span class="c1"># the s, j, l of the upper level</span>
+    <span class="p">}</span>
+
+<span class="n">weakparam</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;geff&#39;</span><span class="p">:</span><span class="mf">1.0</span>
+    <span class="p">}</span>
+
+<span class="n">param</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;general&#39;</span> <span class="p">:</span> <span class="n">genparam</span><span class="p">,</span>
+       <span class="s1">&#39;weak&#39;</span> <span class="p">:</span> <span class="n">weakparam</span><span class="p">,</span>
+       <span class="s1">&#39;unno&#39;</span><span class="p">:</span> <span class="n">unnoparam</span> <span class="c1"># no necessary for loop</span>
+       <span class="p">}</span>
+
+<span class="n">pat</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">pattern</span><span class="o">.</span><span class="n">zeeman_pattern</span><span class="p">(</span><span class="n">unnoparam</span><span class="p">[</span><span class="s1">&#39;down&#39;</span><span class="p">],</span> <span class="n">unnoparam</span><span class="p">[</span><span class="s1">&#39;up&#39;</span><span class="p">])</span>
+<span class="c1">#rav.pattern.plot_zeeman_pattern(pat)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
+
+<span class="n">tic</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="c1">#model_unno, testI_unno, testV_unno = rav.diskint2.numerical(param, unno=True)</span>
+<span class="n">model_unno</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">diskint2</span><span class="o">.</span><span class="n">numerical</span><span class="p">(</span><span class="n">param</span><span class="p">,</span> <span class="n">unno</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">toc</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">toc</span> <span class="o">-</span> <span class="n">tic</span><span class="p">)</span>
+
+<span class="n">tic</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="c1">#model_weak, testI_weak, testV_weak = rav.diskint2.numerical(param, unno=False)</span>
+<span class="n">model_weak</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">diskint2</span><span class="o">.</span><span class="n">numerical</span><span class="p">(</span><span class="n">param</span><span class="p">,</span> <span class="n">unno</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">toc</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">toc</span> <span class="o">-</span> <span class="n">tic</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Evaluating with unno method...
+Max shift due to field: 0.0349906123404163 vdop
+Max shift due to vsini: 3.0 vdop
+Max velocity needed: 13.0 vdop
+Number of wavelength/velocity grid points: 281
+0.012964963912963867
+Evaluating with weak approximation...
+Max velocity needed: 13.0 vdop
+Number of wavelength/velocity grid points: 281
+0.0026750564575195312
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#fig, ax = plt.subplots(1,1)</span>
+
+<span class="c1">#ax.plot(model_unno[&#39;uo&#39;], testV_unno, label=&#39;unno&#39;)</span>
+<span class="c1">#ax.scatter(model_weak[&#39;uo&#39;], testV_weak, label=&#39;weak&#39;)</span>
+<span class="c1">#ax.legend(loc=0)</span>
+
+<span class="c1">#fig, ax = plt.subplots(1,1)</span>
+
+<span class="c1">#ax.plot(model_unno[&#39;uo&#39;], testI_unno, label=&#39;unno&#39;)</span>
+<span class="c1">#ax.scatter(model_weak[&#39;uo&#39;], testI_weak, label=&#39;weak&#39;)</span>
+<span class="c1">#ax.legend(loc=0)</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">model_unno</span><span class="p">[</span><span class="s1">&#39;vel&#39;</span><span class="p">],</span> <span class="n">model_unno</span><span class="p">[</span><span class="s1">&#39;V&#39;</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;unno&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">model_weak</span><span class="p">[</span><span class="s1">&#39;vel&#39;</span><span class="p">],</span> <span class="n">model_weak</span><span class="p">[</span><span class="s1">&#39;V&#39;</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;weak&#39;</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">model_unno</span><span class="p">[</span><span class="s1">&#39;vel&#39;</span><span class="p">],</span> <span class="n">model_unno</span><span class="p">[</span><span class="s1">&#39;flux&#39;</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;unno&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">model_weak</span><span class="p">[</span><span class="s1">&#39;vel&#39;</span><span class="p">],</span> <span class="n">model_weak</span><span class="p">[</span><span class="s1">&#39;flux&#39;</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;weak&#39;</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;matplotlib.legend.Legend at 0x7fb132a38a90&gt;
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/diskint2_doc_25_1.png" src="_images/diskint2_doc_25_1.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/diskint2_doc_25_2.png" src="_images/diskint2_doc_25_2.png" />
+</div>
+</div>
+</section>
+<section id="Is-it-quick-to-interpolate-or-to-recalculate-w?">
+<h2>Is it quick to interpolate or to recalculate w?<a class="headerlink" href="#Is-it-quick-to-interpolate-or-to-recalculate-w?" title="Permalink to this heading"></a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
+
+<span class="c1">#for vsini = 250, -32 to 32, with 6600 points</span>
+
+<span class="n">all_u</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">32</span><span class="p">,</span><span class="mi">32</span><span class="p">,</span><span class="mi">6600</span><span class="p">)</span>
+<span class="n">small_u</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">7</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span> <span class="mi">10</span><span class="o">*</span><span class="mi">2</span><span class="o">*</span><span class="mi">7</span><span class="p">)</span>
+
+<span class="n">tic</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1000</span><span class="p">):</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">profileI</span><span class="o">.</span><span class="n">voigt_fara</span><span class="p">(</span><span class="n">all_u</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">)</span>
+<span class="n">toc</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">toc</span> <span class="o">-</span> <span class="n">tic</span><span class="p">)</span>
+
+
+<span class="n">w</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">profileI</span><span class="o">.</span><span class="n">voigt_fara</span><span class="p">(</span><span class="n">small_u</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">)</span><span class="o">.</span><span class="n">real</span>
+
+<span class="n">tic</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1000</span><span class="p">):</span>
+    <span class="n">toto</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">localV</span><span class="o">.</span><span class="n">interpol_lin</span><span class="p">(</span><span class="n">w</span><span class="p">,</span>  <span class="n">small_u</span><span class="p">,</span> <span class="n">all_u</span><span class="p">)</span>
+<span class="n">toc</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">toc</span> <span class="o">-</span> <span class="n">tic</span><span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">KeyboardInterrupt</span>                         Traceback (most recent call last)
+Cell <span class="ansi-green-fg">In[15], line 10</span>
+<span class="ansi-green-intense-fg ansi-bold">      8</span> tic = time.time()
+<span class="ansi-green-intense-fg ansi-bold">      9</span> for i in range(0,1000):
+<span class="ansi-green-fg">---&gt; 10</span>     w = rav.profileI.voigt_fara(all_u, 0.05)
+<span class="ansi-green-intense-fg ansi-bold">     11</span> toc = time.time()
+<span class="ansi-green-intense-fg ansi-bold">     12</span> print(toc - tic)
+
+File <span class="ansi-green-fg">~/ASTRO/programme/pyRaven/profileI.py:34</span>, in <span class="ansi-cyan-fg">voigt_fara</span><span class="ansi-blue-fg">(u, a)</span>
+<span class="ansi-green-intense-fg ansi-bold">     30</span> else:
+<span class="ansi-green-intense-fg ansi-bold">     31</span>     if (s[i] &gt;= 5.5):
+<span class="ansi-green-intense-fg ansi-bold">     32</span>         #region 2
+<span class="ansi-green-intense-fg ansi-bold">     33</span>         #print i, &#39;region 2&#39;
+<span class="ansi-green-fg">---&gt; 34</span>         w[i] = t*(1.410474 + 0.5641896*t**2)/((3.0 + t**2)*t**2 + 0.75)
+<span class="ansi-green-intense-fg ansi-bold">     35</span>     else:
+<span class="ansi-green-intense-fg ansi-bold">     36</span>         if (z[i].imag &gt;= (0.195*abs(z[i].real) - 0.176) ):
+<span class="ansi-green-intense-fg ansi-bold">     37</span>             # region 3
+<span class="ansi-green-intense-fg ansi-bold">     38</span>             #print i, &#39;région 3&#39;
+
+<span class="ansi-red-fg">KeyboardInterrupt</span>:
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="fit_intensity_example.html" class="btn btn-neutral float-left" title="Fit of the intensity profiles for single stars" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="API.html" class="btn btn-neutral float-right" title="pyRaven Package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, V. Petit.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
