@@ -5,7 +5,6 @@ class MyJSONEncoder(json.JSONEncoder):
     '''Utility class to convert numpy arrays to list when using the json encoding
     
     From https://python-forum.io/thread-35245.html
-    https://github.com/thepushkarp/til/blob/main/python/store-dictionary-with-numpy-arrays-as-json.md
     '''   
     def default(self, obj):
         if isinstance(obj, np.ndarray):

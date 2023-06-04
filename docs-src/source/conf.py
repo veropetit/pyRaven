@@ -32,7 +32,7 @@ extensions = ['myst_parser',
                 'sphinx.ext.autodoc',
                 'sphinx.ext.autosummary',
                 'nbsphinx',
-                'nbsphinx_link','sphinx_idl.domain', 'sphinx_idl.auto'
+                'nbsphinx_link'
 ]
 
 # Add any paths that contain templates here, relative to this directory.
