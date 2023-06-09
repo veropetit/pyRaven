@@ -57,9 +57,12 @@
 <p class="caption" role="heading"><span class="caption-text">Documentation:</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Documentation for diskint2</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#1.-Notes-on-the-hardcoded-constants-in-the-code">1. Notes on the hardcoded constants in the code</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#2.-The-weak-solution-derived-from-the-Unno-solution">2. The weak solution derived from the Unno solution</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#3.-RT-angles">3. RT angles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#0.-Importing-the-necessary-packages">0. Importing the necessary packages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#1.-Notes-on-the-hardcoded-constants-in-the-codes">1. Notes on the hardcoded constants in the codes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#2.-The-weak-solution-derived-from-the-Unno-solution-(and-illustration-of-when-the-Weak-solution-is-not-valid)">2. The weak solution derived from the Unno solution (and illustration of when the Weak solution is not valid)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#3.-The-expressions-for-the-angles-used-in-the-Unno-solution">3. The expressions for the angles used in the Unno solution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#4.-The-correspondance-between-the-slope-of-the-source-function-and-the-\epsilon-limb-darkening-parameter-from-Grey">4. The correspondance between the slope of the source function and the <span class="math notranslate nohighlight">\(\epsilon\)</span> limb-darkening parameter from Grey</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#5.-The-analytical-rotation-broadened-profile">5. The analytical rotation-broadened profile</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#Testing-the-code">Testing the code</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#Is-it-quick-to-interpolate-or-to-recalculate-w?">Is it quick to interpolate or to recalculate w?</a></li>
 </ul>
@@ -96,6 +99,10 @@
              
   <section id="Documentation-for-diskint2">
 <h1>Documentation for diskint2<a class="headerlink" href="#Documentation-for-diskint2" title="Permalink to this heading"></a></h1>
+<p>In this notebook, we provide some derivations of the equations used in the calculation of the synthetic profiles.</p>
+<p>Table of content: 1. Notes on the hardcoded constants in the codes 2. The weak solution derived from the Unno solution (and illustration of when the Weak solution is not valid) 3. The expressions for the angles used in the Unno solution</p>
+<section id="0.-Importing-the-necessary-packages">
+<h2>0. Importing the necessary packages<a class="headerlink" href="#0.-Importing-the-necessary-packages" title="Permalink to this heading"></a></h2>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
@@ -117,8 +124,9 @@
 loading specpolFlow package
 </pre></div></div>
 </div>
-<section id="1.-Notes-on-the-hardcoded-constants-in-the-code">
-<h2>1. Notes on the hardcoded constants in the code<a class="headerlink" href="#1.-Notes-on-the-hardcoded-constants-in-the-code" title="Permalink to this heading"></a></h2>
+</section>
+<section id="1.-Notes-on-the-hardcoded-constants-in-the-codes">
+<h2>1. Notes on the hardcoded constants in the codes<a class="headerlink" href="#1.-Notes-on-the-hardcoded-constants-in-the-codes" title="Permalink to this heading"></a></h2>
 <p><strong>For the Unno calculation:</strong></p>
 <p>The profile functions that needs to be calculated are</p>
 <div class="math notranslate nohighlight">
@@ -168,7 +176,7 @@ loading specpolFlow package
 \[V(u_o) =  \left[1.399624\times10^{-7}~\frac{\lambda_o[Å]}{v_D[\mathrm{km/s}]} \right] g_\mathrm{eff} \cos\theta ~~ B[\mathrm{G}]  \frac{dI}{du_o}\]</div>
 <p>where the constant is <code class="docutils literal notranslate"><span class="pre">constLorentz</span></code> and the term in parenthesis is calculated early on as <code class="docutils literal notranslate"><span class="pre">perGaussLorentz</span></code>.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">G_cgs</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">def_unit</span><span class="p">(</span><span class="s1">&#39;G_cgs&#39;</span><span class="p">,</span> <span class="mi">1</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">g</span><span class="o">**</span><span class="mf">0.5</span><span class="o">/</span><span class="n">u</span><span class="o">.</span><span class="n">cm</span><span class="o">**</span><span class="mf">0.5</span><span class="o">/</span><span class="n">u</span><span class="o">.</span><span class="n">s</span><span class="p">)</span>
@@ -202,8 +210,8 @@ loading specpolFlow package
 </pre></div></div>
 </div>
 </section>
-<section id="2.-The-weak-solution-derived-from-the-Unno-solution">
-<h2>2. The weak solution derived from the Unno solution<a class="headerlink" href="#2.-The-weak-solution-derived-from-the-Unno-solution" title="Permalink to this heading"></a></h2>
+<section id="2.-The-weak-solution-derived-from-the-Unno-solution-(and-illustration-of-when-the-Weak-solution-is-not-valid)">
+<h2>2. The weak solution derived from the Unno solution (and illustration of when the Weak solution is not valid)<a class="headerlink" href="#2.-The-weak-solution-derived-from-the-Unno-solution-(and-illustration-of-when-the-Weak-solution-is-not-valid)" title="Permalink to this heading"></a></h2>
 <p>The weak-field local profile should be the same as the unno local profile when the field strength is set to zero.</p>
 <p>If <span class="math notranslate nohighlight">\(B=0\)</span>, then <span class="math notranslate nohighlight">\(\phi_p = \phi_r = \phi_b = \phi\)</span>. All of the elements of the propagation matrix therefore goes to zero, except <span class="math notranslate nohighlight">\(\eta_I = 1+\kappa\phi\)</span>. Also, <span class="math notranslate nohighlight">\(\Delta=\eta_I^4\)</span>.</p>
 <p>In the emerging intensity for the Unno solution reduces to:</p>
@@ -247,7 +255,7 @@ loading specpolFlow package
 </div></blockquote>
 <p>The figure below shows that <span class="math notranslate nohighlight">\(\phi\)</span> and <span class="math notranslate nohighlight">\(\frac{d\phi(u)}{du}\)</span> are both of the order of unity. The dashed line shows that a <span class="math notranslate nohighlight">\(u_B\)</span> of about 0.1 would still (barely) satisfy our requirement that the shift between <span class="math notranslate nohighlight">\(\sigma_r\)</span> and <span class="math notranslate nohighlight">\(\sigma_b\)</span> is much smaller than the width of the profile.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[55]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">u</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">300</span><span class="p">)</span>
@@ -265,7 +273,7 @@ loading specpolFlow package
 </div>
 </div>
 <div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[55]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -277,14 +285,14 @@ Text(0.5, 1.0, &#39;Fig. 1&#39;)
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="_images/diskint2_doc_7_1.png" src="_images/diskint2_doc_7_1.png" />
+<img alt="_images/diskint2_doc_9_1.png" src="_images/diskint2_doc_9_1.png" />
 </div>
 </div>
 <p><span class="math notranslate nohighlight">\(\eta_I\)</span> will be either be of the order of 1.0 if <span class="math notranslate nohighlight">\(\kappa &lt;&lt; 1\)</span> and of the order of <span class="math notranslate nohighlight">\(\kappa\)</span> if <span class="math notranslate nohighlight">\(\kappa &gt;&gt; 1\)</span> (inside of the spectral line, that is).</p>
 <p>Now looking at <span class="math notranslate nohighlight">\(\eta_V\)</span>, <span class="math notranslate nohighlight">\(g_\mathrm{eff}\)</span> is usually of order of unity, and as we said above, <span class="math notranslate nohighlight">\(u_B &lt;&lt; 1\)</span> as per our previous approximation.</p>
 <p>If <span class="math notranslate nohighlight">\(\kappa\)</span> is small compared to unity, then combined with a small <span class="math notranslate nohighlight">\(uB\)</span>, <span class="math notranslate nohighlight">\(\eta_V\)</span> will be smaller than <span class="math notranslate nohighlight">\(\eta_I\)</span>. Even when <span class="math notranslate nohighlight">\(\kappa\)</span> is large, this is also be the case as long as <span class="math notranslate nohighlight">\(u_B\)</span> is small.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[64]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">fig_eta</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">kappa</span><span class="p">,</span> <span class="n">geff</span><span class="p">,</span> <span class="n">uB</span><span class="p">):</span> <span class="c1"># u phi and dphi are defined in cell above.</span>
@@ -304,7 +312,7 @@ Text(0.5, 1.0, &#39;Fig. 1&#39;)
 </div>
 </div>
 <div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[64]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -316,7 +324,7 @@ Text(0.5, 1.0, &#39;Fig. 1&#39;)
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="_images/diskint2_doc_9_1.png" src="_images/diskint2_doc_9_1.png" />
+<img alt="_images/diskint2_doc_11_1.png" src="_images/diskint2_doc_11_1.png" />
 </div>
 </div>
 <p>So we can use this approximation to simplify as such:</p>
@@ -324,7 +332,7 @@ Text(0.5, 1.0, &#39;Fig. 1&#39;)
 \[V(0)=-\mu S_1~\frac{\eta_V}{(\eta_I^2-\eta_V^2)} \simeq -\mu S_1~\frac{\eta_V}{\eta_I^2}\]</div>
 <p>The figure below checks that this is a fine approximation under the approximations above.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[80]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">fig_V</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">kappa</span><span class="p">,</span> <span class="n">geff</span><span class="p">,</span> <span class="n">uB</span><span class="p">,</span> <span class="n">muS1</span><span class="p">):</span> <span class="c1"># u phi and dphi are defined in cell above.</span>
@@ -347,7 +355,7 @@ Text(0.5, 1.0, &#39;Fig. 1&#39;)
 </div>
 </div>
 <div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[80]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -359,14 +367,14 @@ Text(0.5, 1.0, &#39;Fig. 1&#39;)
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="_images/diskint2_doc_11_1.png" src="_images/diskint2_doc_11_1.png" />
+<img alt="_images/diskint2_doc_13_1.png" src="_images/diskint2_doc_13_1.png" />
 </div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="_images/diskint2_doc_11_2.png" src="_images/diskint2_doc_11_2.png" />
+<img alt="_images/diskint2_doc_13_2.png" src="_images/diskint2_doc_13_2.png" />
 </div>
 </div>
 <p>To be more explicit, as long as <span class="math notranslate nohighlight">\(u_B\)</span> is small, it is OK no matter what <span class="math notranslate nohighlight">\(\kappa\)</span> is.</p>
@@ -385,7 +393,7 @@ approximation above is still valid. &gt; However, such a large <span class="math
 <p>Finally, this means that computationally we can take the derivative (e.g. numerically) of the local intensity profile at every grid point (because the local profile will change because <span class="math notranslate nohighlight">\(\mu\)</span> changes). Alternatively, we can compute the derivative of <span class="math notranslate nohighlight">\(\phi\)</span>, which does not change, then use the first expression.</p>
 <p>The figure below shows that both expressions are identical indeed.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[83]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">fig_Vout</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">kappa</span><span class="p">,</span> <span class="n">geff</span><span class="p">,</span> <span class="n">uB</span><span class="p">,</span> <span class="n">muS1</span><span class="p">):</span> <span class="c1"># u phi and dphi are defined in cell above.</span>
@@ -407,7 +415,7 @@ approximation above is still valid. &gt; However, such a large <span class="math
 </div>
 </div>
 <div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[83]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -419,12 +427,12 @@ approximation above is still valid. &gt; However, such a large <span class="math
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="_images/diskint2_doc_14_1.png" src="_images/diskint2_doc_14_1.png" />
+<img alt="_images/diskint2_doc_16_1.png" src="_images/diskint2_doc_16_1.png" />
 </div>
 </div>
 <p>Finally to conclude this section, we can make a comparison with the local profile from the full unno solution for the local profiles (in the <code class="docutils literal notranslate"><span class="pre">profileV</span></code> module).</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[92]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">comp_unno</span><span class="p">(</span><span class="n">kappa</span><span class="p">,</span> <span class="n">uB</span><span class="p">):</span>
@@ -469,34 +477,34 @@ approximation above is still valid. &gt; However, such a large <span class="math
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="_images/diskint2_doc_16_0.png" src="_images/diskint2_doc_16_0.png" />
+<img alt="_images/diskint2_doc_18_0.png" src="_images/diskint2_doc_18_0.png" />
 </div>
 </div>
 <div class="nboutput docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="_images/diskint2_doc_16_1.png" src="_images/diskint2_doc_16_1.png" />
+<img alt="_images/diskint2_doc_18_1.png" src="_images/diskint2_doc_18_1.png" />
 </div>
 </div>
 <div class="nboutput docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="_images/diskint2_doc_16_2.png" src="_images/diskint2_doc_16_2.png" />
+<img alt="_images/diskint2_doc_18_2.png" src="_images/diskint2_doc_18_2.png" />
 </div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="_images/diskint2_doc_16_3.png" src="_images/diskint2_doc_16_3.png" />
+<img alt="_images/diskint2_doc_18_3.png" src="_images/diskint2_doc_18_3.png" />
 </div>
 </div>
 <p>The last two rows show what happens when the <span class="math notranslate nohighlight">\(u_B\)</span> gets too large.</p>
 </section>
-<section id="3.-RT-angles">
-<h2>3. RT angles<a class="headerlink" href="#3.-RT-angles" title="Permalink to this heading"></a></h2>
+<section id="3.-The-expressions-for-the-angles-used-in-the-Unno-solution">
+<h2>3. The expressions for the angles used in the Unno solution<a class="headerlink" href="#3.-The-expressions-for-the-angles-used-in-the-Unno-solution" title="Permalink to this heading"></a></h2>
 <p>We obtained the B field vectors in LOS coordinates (B_LOS) with the rotation matrix.</p>
 <p>For the weak field, we only need the component of the field in the line of sign (the zLOS direction), so we only need the z component of B_LOS (<code class="docutils literal notranslate"><span class="pre">B_LOS[2,:]</span></code>).</p>
 <p>For the Unno solution, we need two values: * <span class="math notranslate nohighlight">\(\cos(\theta)\)</span> and <span class="math notranslate nohighlight">\(\sin(\theta)\)</span>, where <span class="math notranslate nohighlight">\(\theta\)</span> is the angle between the B-field vector and the z axis and * <span class="math notranslate nohighlight">\(\cos(2\phi)\)</span> and <span class="math notranslate nohighlight">\(\sin(2\phi)\)</span>, where <span class="math notranslate nohighlight">\(\phi\)</span> is the angle between the projection of the Bfield vector in the plane of the sky (xy) and the reference direction (here we’ll use the x-axis)</p>
@@ -509,6 +517,265 @@ approximation above is still valid. &gt; However, such a large <span class="math
 <div class="math notranslate nohighlight">
 \[\sin(2\phi) = 2\sin\phi\cos\phi = 2 \frac{\hat{B}_x}{\sin(\theta)} \frac{\hat{B}_y}{\sin(\theta)} = 2 \frac{\hat{B}_x\hat{B}_y}{\sin^2(\theta)}\]</div>
 </section>
+<section id="4.-The-correspondance-between-the-slope-of-the-source-function-and-the-\epsilon-limb-darkening-parameter-from-Grey">
+<h2>4. The correspondance between the slope of the source function and the <span class="math notranslate nohighlight">\(\epsilon\)</span> limb-darkening parameter from Grey<a class="headerlink" href="#4.-The-correspondance-between-the-slope-of-the-source-function-and-the-\epsilon-limb-darkening-parameter-from-Grey" title="Permalink to this heading"></a></h2>
+<p>For a semi-infinite flat atmosphere, the intensity along an outgoing ray is:</p>
+<div class="math notranslate nohighlight">
+\[I(\tau_z,u&gt;0) = \int_{\tau_z'=\tau_z}^{\tau_z'=\infty} S(\tau_z')~ \mathrm{e}^{\frac{\tau_z-\tau_z'}{u}} ~ \frac{d\tau_z}{u}\]</div>
+<p>where <span class="math notranslate nohighlight">\(u\)</span> is the cosine of the angle between the ray and the normal to the surface, <span class="math notranslate nohighlight">\(S\)</span> is the source function, and <span class="math notranslate nohighlight">\(\tau_z\)</span> is the vertical optical depth (with <span class="math notranslate nohighlight">\(\tau_z=0\)</span> at the surface).</p>
+<p>If we assume that the source function is a linar function of the optical depth:</p>
+<div class="math notranslate nohighlight">
+\[S(\tau_z) = S_{0} + S_{1} ~\tau_z\]</div>
+<p>then the emergent intensity (<span class="math notranslate nohighlight">\(I(\tau_z=0\)</span>) becomes</p>
+<div class="math notranslate nohighlight">
+\[I(\tau_z=0,~u&gt;0) = S_{0} + S_{1} ~u\]</div>
+<p>We can normalize the intensity by the intensity at the center of the stellar disk ($u=0):</p>
+<div class="math notranslate nohighlight">
+\[\frac{I_\mathrm{obs}(u)}{I_\mathrm{obs}(u=1)} = \frac{S_{0} + S_{1} ~u}{S_{0} + S_{1}}\]</div>
+<p>And we can also express this by parametrizing it with the slope/intercept, instead of having both be independent quantities:</p>
+<div class="math notranslate nohighlight">
+\[\frac{I_\mathrm{obs}(u)}{I_\mathrm{obs}(u=1)} = \frac{1 + \frac{S_{1}}{S_0} ~u}{1 + \frac{S_{1}}{S_0}}\]</div>
+<p>Finally, we can also quantify the limb-darkening by a value which represents the ratio of the limb intensity (<span class="math notranslate nohighlight">\(u=0\)</span>) and the center of the disk intensity (<span class="math notranslate nohighlight">\(u=1\)</span>):</p>
+<div class="math notranslate nohighlight">
+\[\alpha = \frac{I_\mathrm{obs}(u=0)}{I_\mathrm{obs}(u=1)} = \frac{1 }{1 + \frac{S_{1}}{S_0}}\]</div>
+<p>and its inverse:</p>
+<div class="math notranslate nohighlight">
+\[\frac{S_1}{S_0} = \frac{1}{\alpha} -1 = \frac{1-\alpha}{\alpha}\]</div>
+<p>The graph below shows that for example, a slope parameter of unity yields a limb-darkening ratio of <span class="math notranslate nohighlight">\(\alpha=0.5\)</span>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">eps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span><span class="mf">1.0</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+
+<span class="n">S</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="n">eps</span> <span class="o">-</span> <span class="mi">1</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">eps</span><span class="p">,</span> <span class="n">S</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;$S_1/S_0$&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;$\alpha=\frac{I_\mathrm</span><span class="si">{obs}</span><span class="s1">(u=0)}{I_\mathrm</span><span class="si">{obs}</span><span class="s1">(u=1)}$&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Text(0.5, 0, &#39;$\\alpha=\\frac{I_\\mathrm{obs}(u=0)}{I_\\mathrm{obs}(u=1)}$&#39;)
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/diskint2_doc_24_1.png" src="_images/diskint2_doc_24_1.png" />
+</div>
+</div>
+<p>We can also re-express our expression for <span class="math notranslate nohighlight">\(\frac{I_\mathrm{obs}(u)}{I_\mathrm{obs}(u=1)}\)</span> in terms of this <span class="math notranslate nohighlight">\(\epsilon\)</span> ratio, instead of the source function slope parameter:</p>
+<div class="math notranslate nohighlight">
+\[\frac{I_\mathrm{obs}(u)}{I_\mathrm{obs}(u=1)} = \frac{1+ \left[\frac{1}{\alpha}-1\right]u}{1+\left[\frac{1}{\alpha}-1\right]}\]</div>
+<div class="math notranslate nohighlight">
+\[=\alpha + (1-\alpha)u.\]</div>
+<p>But in the textbooks and papers, they instead use a quantity called the ‘limb-darkening’ coefficient, which is <span class="math notranslate nohighlight">\(\epsilon=1-\alpha\)</span>, and the equation above becomes</p>
+<div class="math notranslate nohighlight">
+\[\frac{I_\mathrm{obs}(u)}{I_\mathrm{obs}(u=1)}  =(1-\epsilon) + \epsilon u.\]</div>
+<p>So the bottom line is that if e.g. the limb-darkening ratio <span class="math notranslate nohighlight">\(\alpha\)</span> is 0.4, then the limb-darkening coefficient <span class="math notranslate nohighlight">\(\epsilon\)</span> is 0.6, and the source function slope parameter <span class="math notranslate nohighlight">\(S\)</span> is 1.5.</p>
+</section>
+<section id="5.-The-analytical-rotation-broadened-profile">
+<h2>5. The analytical rotation-broadened profile<a class="headerlink" href="#5.-The-analytical-rotation-broadened-profile" title="Permalink to this heading"></a></h2>
+<p>Let’s start with an analytical expression for the non-rotating disk-integrated intensity line profile.</p>
+<p>From section XX, we know that the local intensity profiles are</p>
+<div class="math notranslate nohighlight">
+\[I(\mu)=1+\frac{1}{1+\kappa\phi}S_1 \mu\]</div>
+<p>and</p>
+<div class="math notranslate nohighlight">
+\[I_c(\mu)=1+\mu S_1\]</div>
+<p>A reminder that the wavelength dependence is inside of the <span class="math notranslate nohighlight">\(\phi\)</span> profile function (which is the Voigt function divided by <span class="math notranslate nohighlight">\(\sqrt{\pi}\)</span>).</p>
+<p>The most straigthforward disk integration is to use the <span class="math notranslate nohighlight">\(\mu\)</span> integral form (with azimuthal symmetry).</p>
+<div class="math notranslate nohighlight">
+\[F=2\pi\int_{\mu=o}^{+1} I(\mu)\mu d\mu\]</div>
+<p>This leads to</p>
+<div class="math notranslate nohighlight">
+\[F = \pi \left[1+\frac{2}{3} \frac{S_1}{1+\kappa\phi}\right]\]</div>
+<p>We can also compute the continnum surface flux in the same way</p>
+<div class="math notranslate nohighlight">
+\[F_\mathrm{surf}=2\pi\int_{\mu=o}^{+1} I_c(\mu)\mu d\mu\]</div>
+<p>which yields</p>
+<div class="math notranslate nohighlight">
+\[F_\mathrm{surf}=\pi \left[1+\frac{2}{3} S_1\right]\]</div>
+<p>Thus we can expressed the line flux normalized to the continnum flux as</p>
+<div class="math notranslate nohighlight">
+\[\frac{F}{F_c}=\frac{1+\frac{2}{3} \frac{S_1}{1+\kappa\phi}}{1+\frac{2}{3} S_1}\]</div>
+<p>This is equivalent to the local itensity line profile normalized to the local continuum, aka</p>
+<div class="math notranslate nohighlight">
+\[\frac{I(\mu)}{I_c(\mu)}=\frac{1+\mu \frac{S_1}{1+\kappa\phi}}{1+\mu S_1}\]</div>
+<p>evaluated at <span class="math notranslate nohighlight">\(\mu=2/3\)</span>.</p>
+<p>In the cell below, we show the agreement between the analytical solution and the numerical disk integration (under the weak field approximation). We also show the local intensity profile normalized to the local continuum at the center of the stellar disk for an array of <span class="math notranslate nohighlight">\(\mu\)</span> values.</p>
+<p>Of course as shown above, the normalize flux corresponds to the local locally-normalized intensity at <span class="math notranslate nohighlight">\(\mu=2/3\)</span>. But I also want to emphasis here that the local profiles are not the same across the stellar disk.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">param</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get_def_param_weak</span><span class="p">()</span>
+<span class="n">param</span><span class="p">[</span><span class="s2">&quot;general&quot;</span><span class="p">][</span><span class="s2">&quot;vsini&quot;</span><span class="p">]</span><span class="o">=</span><span class="mf">0.0</span>
+
+<span class="n">model_num</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">diskint2</span><span class="o">.</span><span class="n">numerical</span><span class="p">(</span><span class="n">param</span><span class="p">,</span><span class="n">unno</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="n">phi</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">profileI</span><span class="o">.</span><span class="n">voigt_fara</span><span class="p">(</span><span class="n">model_num</span><span class="p">[</span><span class="s2">&quot;uo&quot;</span><span class="p">],</span> <span class="n">param</span><span class="p">[</span><span class="s2">&quot;general&quot;</span><span class="p">][</span><span class="s2">&quot;av&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">real</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">**</span><span class="mf">0.5</span>
+<span class="n">S1</span> <span class="o">=</span> <span class="n">param</span><span class="p">[</span><span class="s2">&quot;general&quot;</span><span class="p">][</span><span class="s2">&quot;bnu&quot;</span><span class="p">]</span>
+<span class="n">kappa</span> <span class="o">=</span> <span class="mi">10</span><span class="o">**</span><span class="n">param</span><span class="p">[</span><span class="s2">&quot;general&quot;</span><span class="p">][</span><span class="s2">&quot;logkappa&quot;</span><span class="p">]</span>
+<span class="n">model_ana</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="mi">2</span><span class="o">/</span><span class="mi">3</span><span class="o">*</span><span class="n">S1</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">kappa</span><span class="o">*</span><span class="n">phi</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="mi">2</span><span class="o">/</span><span class="mi">3</span><span class="o">*</span><span class="n">S1</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">I_Ic</span><span class="p">(</span><span class="n">mu</span><span class="p">):</span>
+    <span class="k">return</span><span class="p">(</span> <span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">mu</span><span class="o">*</span><span class="n">S1</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">kappa</span><span class="o">*</span><span class="n">phi</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">mu</span><span class="o">*</span><span class="n">S1</span><span class="p">)</span> <span class="p">)</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">model_num</span><span class="p">[</span><span class="s1">&#39;vel&#39;</span><span class="p">],</span> <span class="n">model_num</span><span class="p">[</span><span class="s1">&#39;flux&#39;</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;numerical&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">model_num</span><span class="p">[</span><span class="s1">&#39;vel&#39;</span><span class="p">],</span> <span class="n">model_ana</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;analytical&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">model_num</span><span class="p">[</span><span class="s1">&#39;vel&#39;</span><span class="p">],</span> <span class="n">I_Ic</span><span class="p">(</span><span class="mf">1.0</span><span class="p">),</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;dotted&#39;</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;$I(\mu=1)/Ic$&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">model_num</span><span class="p">[</span><span class="s1">&#39;vel&#39;</span><span class="p">],</span> <span class="n">I_Ic</span><span class="p">(</span><span class="mi">2</span><span class="o">/</span><span class="mi">3</span><span class="p">),</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;dotted&#39;</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;$I(\mu=2/3)/Ic$&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">model_num</span><span class="p">[</span><span class="s1">&#39;vel&#39;</span><span class="p">],</span> <span class="n">I_Ic</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="mi">3</span><span class="p">),</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;dotted&#39;</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;$I(\mu=1/3)/Ic$&#39;</span><span class="p">)</span>
+
+
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Using 1000.0 grid point on the surface
+Evaluating with weak approximation...
+Max velocity needed: 10.0 vdop
+Number of wavelength/velocity grid points: 221
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;matplotlib.legend.Legend at 0x7ff27a0f2bb0&gt;
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/diskint2_doc_29_2.png" src="_images/diskint2_doc_29_2.png" />
+</div>
+</div>
+<p>Now, let’s make the star rotate. Following the Grey textbook, we define the direction that is perpendicular to the plane subtended by the LOS and the rotational axis as <span class="math notranslate nohighlight">\(\hat{x}\)</span>. ADD FIGURE Therefore positions on the stellar disk with the same x-coordinate all have the same rotational projected velocity. The local profile at these location will be doppler shifted by <span class="math notranslate nohighlight">\(v_z=x~v\sin i\)</span>.</p>
+<p>From earlier, the line intensity normalized to the continnum flux is</p>
+<div class="math notranslate nohighlight">
+\[\frac{I(\mu)}{I_c(\mu)}=\frac{1+\mu \frac{S_1}{1+\kappa\phi}}{1+\mu S_1}\equiv H(v,\mu)\]</div>
+<p>and I will below refer to it as <span class="math notranslate nohighlight">\(H(v,\mu)\)</span>.</p>
+<p>This means that I can flip this around and express the line intensity (not normalized) as</p>
+<div class="math notranslate nohighlight">
+\[I(v,\mu) = H(v-v_z(\mu), \mu)~I_c(\mu)\]</div>
+<p>where the <span class="math notranslate nohighlight">\(-v_z\)</span> term takes care of the Doppler shift.</p>
+<p>Ok, so here’s the thing – this is not a great expression, as there are two <span class="math notranslate nohighlight">\(\mu\)</span> dependencies in the <span class="math notranslate nohighlight">\(H\)</span> term, one intrinsic the the <span class="math notranslate nohighlight">\(I\)</span> function and the other from the Doppler shift. So the idea here will be to ignore the intrinsic dependency on <span class="math notranslate nohighlight">\(\mu\)</span> and say that the shape of the intensity line profile (normalized to the local continuum) is constant across the stellar disk (I know, in the previous cell I have just shown how this is not the case, but bear with me).</p>
+<p>So,</p>
+<div class="math notranslate nohighlight">
+\[I(v,\mu) \approx H(v-v_z(\mu))~I_c(\mu)\]</div>
+<p>and we can write the normalized flux as:</p>
+<div class="math notranslate nohighlight">
+\[\frac{F(v)}{F_c}=\frac{\int_\mathrm{surf} H(v-v_z(\mu))~I_c(\mu)}{\int_\mathrm{surf}I_c(\mu)}\]</div>
+<p>We have already dealt with the denominator of this equation above, so I will just refer to it as <span class="math notranslate nohighlight">\(F_c\)</span> for now.</p>
+<p>Here, we will do the disk integration in the numerator in cartesian, to use the fact that all the locations with the same <span class="math notranslate nohighlight">\(x\)</span> value have the same <span class="math notranslate nohighlight">\(v_z\)</span>. To integrate a circle in cartesian, we will go from <span class="math notranslate nohighlight">\(-1\)</span> to <span class="math notranslate nohighlight">\(+1\)</span> in <span class="math notranslate nohighlight">\(x\)</span>, and for each <span class="math notranslate nohighlight">\(x\)</span> value, the <span class="math notranslate nohighlight">\(y\)</span> integral will be bounded by <span class="math notranslate nohighlight">\(y(x)=\pm (1-x^2)^{1/2}\)</span>. Thus:</p>
+<div class="math notranslate nohighlight">
+\[\frac{F(v)}{F_c}=\frac{1}{F_c} \int_{x=-1}^{+1}\int_{-y(x)}^{+y(x)} H(v-v_z(x))~I_c(x,y)dydx\]</div>
+<p>Also, we can make a change of variable to use <span class="math notranslate nohighlight">\(v_z\)</span> intead of <span class="math notranslate nohighlight">\(x\)</span>. As <span class="math notranslate nohighlight">\(v_z=x~v\sin i\)</span>, then <span class="math notranslate nohighlight">\(dv_z=dx~v\sin i\)</span>, and when <span class="math notranslate nohighlight">\(x=\pm1\)</span>, then <span class="math notranslate nohighlight">\(v_z=\pm v\sin i\)</span>.</p>
+<div class="math notranslate nohighlight">
+\[\frac{F(v)}{F_c}=\frac{1}{F_c} \int_{v_z=-v\sin i}^{+v\sin i}\int_{-y(v_z)}^{+y(v_z)} H(v-v_z)~I_c(v_z,y)dy\frac{dv_z}{v\sin i}\]</div>
+<p>Note that as <span class="math notranslate nohighlight">\(F_c\)</span> is a constant, I can pull it back into the integral. Finally, because <span class="math notranslate nohighlight">\(H\)</span> is only a function of <span class="math notranslate nohighlight">\(x\)</span> (<span class="math notranslate nohighlight">\(v_z\)</span> now), I can pull that term out of the <span class="math notranslate nohighlight">\(y\)</span> integral. Thus:</p>
+<div class="math notranslate nohighlight">
+\[\frac{F(v)}{F_c}= \int_{v_z=-v\sin i}^{+v\sin i} H(v-v_z) \left[ \frac{\int_{-y(x)}^{+y(x)} ~I_c(v_z,y)dy}{v\sin i~ F_c}\right]dv_z\]</div>
+<p>All right, now let’s call the piece in [] in the previous expression <span class="math notranslate nohighlight">\(G(v_z)\)</span>. As <span class="math notranslate nohighlight">\(y\)</span> will have been integrated out, the result it will not be a function of <span class="math notranslate nohighlight">\(y\)</span>. Additionally, this is not a function of <span class="math notranslate nohighlight">\(v\)</span>, just <span class="math notranslate nohighlight">\(v_z\)</span> as an encoded of location on the stellar disk. We are left with:</p>
+<div class="math notranslate nohighlight">
+\[\frac{F(v)}{F_c}= \int_{v_z=-v\sin i}^{+v\sin i} H(v-v_z) G(v_z)dv_z\]</div>
+<p>We can also note that <span class="math notranslate nohighlight">\(G(Vz)\)</span> will be zero when <span class="math notranslate nohighlight">\(v_z&gt;v\sin i\)</span> – remember, we are using <span class="math notranslate nohighlight">\(v_z\)</span> as a proxy for <span class="math notranslate nohighlight">\(x\)</span>, and inside the <span class="math notranslate nohighlight">\(y\)</span> integral above, <span class="math notranslate nohighlight">\(I(\mu)=0\)</span> outside of the stellar disk. This means that mathematically, we can change the bounds of the <span class="math notranslate nohighlight">\(v_z\)</span> integral to go to infinity without changing the physics.</p>
+<div class="math notranslate nohighlight">
+\[\frac{F(v)}{F_c}= \int_{v_z=-\infty}^{+\infty} H(v-v_z) G(v_z)dv_z\]</div>
+<p>Why, you might ask? Well, because the equation in this form is the basic equation for a convolution:</p>
+<div class="math notranslate nohighlight">
+\[(h*g)(v)=\int_{-\infty}^{+\infty}h(v-v_z)g(v_z)dv_z\]</div>
+<p>This means that if I have my line profile function <span class="math notranslate nohighlight">\(H\)</span>, and the <span class="math notranslate nohighlight">\(G(v_z)\)</span> function, I can simply take the (numerical) convolution of them.</p>
+<p>So now two questions remains: 1. What is <span class="math notranslate nohighlight">\(G(v_z)\)</span> 2. What do I use for <span class="math notranslate nohighlight">\(H(v)\)</span>, if I made the approximation that the intensity profile is constant across the stellar disk (which it is not).</p>
+<p>Let’s start with <span class="math notranslate nohighlight">\(G(v_z)\)</span> by returning to the expression in [] from a bit above:</p>
+<div class="math notranslate nohighlight">
+\[G(v_z)=\left[ \frac{\int_{-y(v_z)}^{+y(v_z)} ~I_c(v_z,y)dy}{v\sin i~ F_c}\right]\]</div>
+<p>We will first note that this integral should be symmetric above and below <span class="math notranslate nohighlight">\(y=0\)</span>, so I can write is as</p>
+<div class="math notranslate nohighlight">
+\[G(v_z)= \frac{2}{v\sin i~ F_c} \int_0^{+y(v_z)} ~(1+\mu S_1)dy\]</div>
+<p>The bound of the integral depends on the value of <span class="math notranslate nohighlight">\(v_z\)</span>, as already explained in the cartesian integral setup in the previous cell:</p>
+<div class="math notranslate nohighlight">
+\[y(v_z)=(1-x^2)^{1/2}=\left[1-\left(\frac{v_z}{v\sin i}\right)^2\right]^{1/2} \equiv y_o\]</div>
+<p>For clarity below, I will shorten the <span class="math notranslate nohighlight">\(y(v_z)\)</span> expression for <span class="math notranslate nohighlight">\(y_o\)</span>.</p>
+<p>So now we need to express <span class="math notranslate nohighlight">\(\mu\)</span> in terms of cartesian coordinates. The radial coordinate of the stellar disk (usually refered to as <span class="math notranslate nohighlight">\(p\)</span>) is related to the <span class="math notranslate nohighlight">\(\theta\)</span> angle (the angle between the LOS and the normal to the surface) by <span class="math notranslate nohighlight">\(p=\sin\theta\)</span> (using the radius in <span class="math notranslate nohighlight">\(R_\star\)</span> units), thus <span class="math notranslate nohighlight">\(p^2=1-\mu^2\)</span>. Furthermore using the cartesian coordinates <span class="math notranslate nohighlight">\(p^2=x^2+y^2\)</span>, so <span class="math notranslate nohighlight">\(\mu^2=1-x^2-y^2\)</span>. We can substitute <span class="math notranslate nohighlight">\(x\)</span> in favor of <span class="math notranslate nohighlight">\(v_z\)</span> such that
+<span class="math notranslate nohighlight">\(\mu^2 = 1-\left(\frac{v_z}{v\sin i}\right)^2-y^2\)</span>, or using the <span class="math notranslate nohighlight">\(y_o\)</span> I introduced earlier <span class="math notranslate nohighlight">\(\mu^2=y_o^2-y^2\)</span>.</p>
+<p>The flux expression becomes:</p>
+<div class="math notranslate nohighlight">
+\[G(v_z)= \frac{2}{v\sin i~ F_c} \int_0^{+y_o} ~(1+ S_1(y_o^2-y^2)^{1/2})dy\]</div>
+<p>Evaluating the integral yields:</p>
+<div class="math notranslate nohighlight">
+\[G(v_z)= \frac{2}{v\sin i~ F_c} y_o + S_1 \frac{\pi}{4} y_o^2\]</div>
+<p>We can now use the expression for <span class="math notranslate nohighlight">\(F_c=\pi\left(1+\frac{2}{3}S_1\right)\)</span> from earlier and expand <span class="math notranslate nohighlight">\(y_o\)</span> such that:</p>
+<div class="math notranslate nohighlight">
+\[G(v_z)= \frac{2\left(1-\left[\frac{v_z}{v\sin i}\right]^2\right)^{1/2} + \frac{\pi}{2}S_1 \left(1-\left[\frac{v_z}{v\sin i}\right]^2\right)}{\pi v\sin i \left(1+\frac{2}{3}S_1\right)}\]</div>
+<p>NOTE: by using the equvalence between <span class="math notranslate nohighlight">\(S_1\)</span> and the <span class="math notranslate nohighlight">\(\epsilon\)</span> parameter from the Grey textbook, explained in Section XX, we can recover the expression for the rotation kernel from Grey (the velocity expresison is given in the 2nd edition – the first edition only has the wavelength form)</p>
+<div class="math notranslate nohighlight">
+\[G(v_z)= \frac{2(1-\epsilon)\left(1-\left[\frac{v_z}{v\sin i}\right]^2\right)^{1/2} + \frac{\pi}{2}\epsilon \left(1-\left[\frac{v_z}{v\sin i}\right]^2\right)}{\pi v\sin i \left(1-\frac{1}{3}\epsilon\right)}\]</div>
+<p>In the cell below, we show the rotation convolution kernel from the expression in terms of <span class="math notranslate nohighlight">\(S_1\)</span> (which imo is simpler) and with the expression from Grey. A reminder that <span class="math notranslate nohighlight">\(S_1=1.5\)</span> corresponds to <span class="math notranslate nohighlight">\(\epsilon=0.6\)</span>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">S1</span> <span class="o">=</span> <span class="mf">1.5</span>
+<span class="n">eps</span> <span class="o">=</span> <span class="mf">0.6</span>
+
+<span class="n">vz</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">501</span><span class="p">)</span>
+<span class="n">vsini</span> <span class="o">=</span> <span class="mf">10.0</span>
+
+<span class="n">yo</span> <span class="o">=</span> <span class="mi">1</span><span class="o">-</span><span class="p">(</span><span class="n">vz</span><span class="o">/</span><span class="n">vsini</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+
+<span class="n">G_eps</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">eps</span><span class="p">)</span><span class="o">*</span><span class="n">yo</span><span class="o">**</span><span class="mf">0.5</span><span class="o">+</span><span class="mf">0.5</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">eps</span><span class="o">*</span><span class="n">yo</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">vsini</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">eps</span><span class="o">/</span><span class="mi">3</span><span class="p">))</span>
+
+<span class="n">G_s1</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">yo</span><span class="o">**</span><span class="mf">0.5</span> <span class="o">+</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">S1</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">yo</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">vsini</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="mi">2</span><span class="o">/</span><span class="mi">3</span><span class="o">*</span><span class="n">S1</span><span class="p">))</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">vz</span><span class="p">,</span> <span class="n">G_eps</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;eps&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">vz</span><span class="p">,</span> <span class="n">G_s1</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;S1&#39;</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;matplotlib.legend.Legend at 0x7ff25972fbb0&gt;
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/diskint2_doc_33_1.png" src="_images/diskint2_doc_33_1.png" />
+</div>
+</div>
+</section>
 <section id="Testing-the-code">
 <h2>Testing the code<a class="headerlink" href="#Testing-the-code" title="Permalink to this heading"></a></h2>
 <p>In the cell below, I prepared a model that can be passed to diskint.</p>
@@ -516,7 +783,7 @@ approximation above is still valid. &gt; However, such a large <span class="math
 <p>In addition to returning the final result itself, I added a line in the disk integration look that returns one of the local profile (e.g. the fifth one in the loop), which was useful for debugging.</p>
 <p>NOTE that once everything is debug, this will be commented out in diskint, so the graph cells below will not work anymore.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">genparam</span> <span class="o">=</span> <span class="p">{</span>
@@ -553,7 +820,7 @@ approximation above is still valid. &gt; However, such a large <span class="math
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
@@ -577,20 +844,22 @@ approximation above is still valid. &gt; However, such a large <span class="math
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
+Using 2200.0 grid point on the surface
 Evaluating with unno method...
 Max shift due to field: 0.0349906123404163 vdop
 Max shift due to vsini: 3.0 vdop
 Max velocity needed: 13.0 vdop
 Number of wavelength/velocity grid points: 281
-0.012964963912963867
+0.26354193687438965
+Using 2200.0 grid point on the surface
 Evaluating with weak approximation...
 Max velocity needed: 13.0 vdop
 Number of wavelength/velocity grid points: 281
-0.0026750564575195312
+0.07726502418518066
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#fig, ax = plt.subplots(1,1)</span>
@@ -622,33 +891,33 @@ Number of wavelength/velocity grid points: 281
 </div>
 </div>
 <div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;matplotlib.legend.Legend at 0x7fb132a38a90&gt;
+&lt;matplotlib.legend.Legend at 0x7fa7aa071af0&gt;
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="_images/diskint2_doc_25_1.png" src="_images/diskint2_doc_25_1.png" />
+<img alt="_images/diskint2_doc_39_1.png" src="_images/diskint2_doc_39_1.png" />
 </div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="_images/diskint2_doc_25_2.png" src="_images/diskint2_doc_25_2.png" />
+<img alt="_images/diskint2_doc_39_2.png" src="_images/diskint2_doc_39_2.png" />
 </div>
 </div>
 </section>
 <section id="Is-it-quick-to-interpolate-or-to-recalculate-w?">
 <h2>Is it quick to interpolate or to recalculate w?<a class="headerlink" href="#Is-it-quick-to-interpolate-or-to-recalculate-w?" title="Permalink to this heading"></a></h2>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
@@ -680,27 +949,8 @@ Number of wavelength/velocity grid points: 281
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
-<span class="ansi-red-fg">KeyboardInterrupt</span>                         Traceback (most recent call last)
-Cell <span class="ansi-green-fg">In[15], line 10</span>
-<span class="ansi-green-intense-fg ansi-bold">      8</span> tic = time.time()
-<span class="ansi-green-intense-fg ansi-bold">      9</span> for i in range(0,1000):
-<span class="ansi-green-fg">---&gt; 10</span>     w = rav.profileI.voigt_fara(all_u, 0.05)
-<span class="ansi-green-intense-fg ansi-bold">     11</span> toc = time.time()
-<span class="ansi-green-intense-fg ansi-bold">     12</span> print(toc - tic)
-
-File <span class="ansi-green-fg">~/ASTRO/programme/pyRaven/profileI.py:34</span>, in <span class="ansi-cyan-fg">voigt_fara</span><span class="ansi-blue-fg">(u, a)</span>
-<span class="ansi-green-intense-fg ansi-bold">     30</span> else:
-<span class="ansi-green-intense-fg ansi-bold">     31</span>     if (s[i] &gt;= 5.5):
-<span class="ansi-green-intense-fg ansi-bold">     32</span>         #region 2
-<span class="ansi-green-intense-fg ansi-bold">     33</span>         #print i, &#39;region 2&#39;
-<span class="ansi-green-fg">---&gt; 34</span>         w[i] = t*(1.410474 + 0.5641896*t**2)/((3.0 + t**2)*t**2 + 0.75)
-<span class="ansi-green-intense-fg ansi-bold">     35</span>     else:
-<span class="ansi-green-intense-fg ansi-bold">     36</span>         if (z[i].imag &gt;= (0.195*abs(z[i].real) - 0.176) ):
-<span class="ansi-green-intense-fg ansi-bold">     37</span>             # region 3
-<span class="ansi-green-intense-fg ansi-bold">     38</span>             #print i, &#39;région 3&#39;
-
-<span class="ansi-red-fg">KeyboardInterrupt</span>:
+6.4084789752960205
+0.11162328720092773
 </pre></div></div>
 </div>
 <div class="nbinput nblast docutils container">

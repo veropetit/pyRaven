@@ -81,6 +81,7 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#pyRaven.params.get_def_param_fitI"><code class="docutils literal notranslate"><span class="pre">get_def_param_fitI()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.params.get_def_param_weak"><code class="docutils literal notranslate"><span class="pre">get_def_param_weak()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pyRaven.params.parameters"><code class="docutils literal notranslate"><span class="pre">parameters</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#pyRaven.params.parameters.pprint"><code class="docutils literal notranslate"><span class="pre">parameters.pprint()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#pyRaven.params.parameters.write"><code class="docutils literal notranslate"><span class="pre">parameters.write()</span></code></a></li>
@@ -99,6 +100,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#id1">localV module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.diskint2.analytical"><code class="docutils literal notranslate"><span class="pre">analytical()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pyRaven.diskint2.get_B_LOS"><code class="docutils literal notranslate"><span class="pre">get_B_LOS()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pyRaven.diskint2.get_B_MAG"><code class="docutils literal notranslate"><span class="pre">get_B_MAG()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pyRaven.diskint2.get_LOS"><code class="docutils literal notranslate"><span class="pre">get_LOS()</span></code></a></li>
@@ -118,6 +120,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#pyRaven.diskint2.get_w_weak"><code class="docutils literal notranslate"><span class="pre">get_w_weak()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pyRaven.diskint2.grid_ROT"><code class="docutils literal notranslate"><span class="pre">grid_ROT()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pyRaven.diskint2.numerical"><code class="docutils literal notranslate"><span class="pre">numerical()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.diskint2.rotconv"><code class="docutils literal notranslate"><span class="pre">rotconv()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#module-pyRaven.loop">loop module</a><ul>
@@ -361,6 +364,13 @@ implement default like this:</p>
 for parameters that are necessary for the intensity profile fitting</p>
 </dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.params.get_def_param_weak">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.params.</span></span><span class="sig-name descname"><span class="pre">get_def_param_weak</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.params.get_def_param_weak" title="Permalink to this definition"></a></dt>
+<dd><p>Function that returns a <cite>parameters</cite> dictionary with default values 
+for parameters that are necessary for a typical weak field calculation</p>
+</dd></dl>
+
 <dl class="py class">
 <dt class="sig sig-object py" id="pyRaven.params.parameters">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyRaven.params.</span></span><span class="sig-name descname"><span class="pre">parameters</span></span><a class="headerlink" href="#pyRaven.params.parameters" title="Permalink to this definition"></a></dt>
@@ -461,6 +471,25 @@ they will now be in the form of python lists. It is important to transform them 
 <section id="id1">
 <h2>localV module<a class="headerlink" href="#id1" title="Permalink to this heading"></a></h2>
 <span class="target" id="module-pyRaven.diskint2"></span><dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.diskint2.analytical">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.diskint2.</span></span><span class="sig-name descname"><span class="pre">analytical</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.diskint2.analytical" title="Permalink to this definition"></a></dt>
+<dd><p>Function to calculate an intensity line profile using an analytical convolution</p>
+<p>The necessary keys in the parameters dictionary object are:
+- general/vsini
+- general/logkappa
+- general/bnu
+- general/vdop
+- general/ndop
+- general/av
+- general/lambda0</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>param</strong> – a parameters dictionary</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="pyRaven.diskint2.get_B_LOS">
 <span class="sig-prename descclassname"><span class="pre">pyRaven.diskint2.</span></span><span class="sig-name descname"><span class="pre">get_B_LOS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">B_MAG</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mag2rot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rot2los</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.diskint2.get_B_LOS" title="Permalink to this definition"></a></dt>
 <dd><p>Function to convert the magnetic field vectors in the MAG coordinate system to the LOS coordinate system</p>
@@ -755,6 +784,22 @@ Returns:
 <dt class="sig sig-object py" id="pyRaven.diskint2.numerical">
 <span class="sig-prename descclassname"><span class="pre">pyRaven.diskint2.</span></span><span class="sig-name descname"><span class="pre">numerical</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unno</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.diskint2.numerical" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.diskint2.rotconv">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.diskint2.</span></span><span class="sig-name descname"><span class="pre">rotconv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">varepsilon</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">urot</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.diskint2.rotconv" title="Permalink to this definition"></a></dt>
+<dd><p>Function to get the rotational covolution profile</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u0</strong> – the velocity array in u0 units (v/vthermal)</p></li>
+<li><p><strong>varepsilon</strong> – the limb-darkening coefficient in the form of the Grey textbook</p></li>
+</ul>
+</dd>
+</dl>
+<p>(see ADD LINK for conversion between the slope of the source function and epsilon)
+:param urot: the vsini in u0 units (vsini / vthermal)</p>
+</dd></dl>
 
 </section>
 <section id="module-pyRaven.loop">
