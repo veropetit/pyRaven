@@ -66,3 +66,28 @@ def get_def_param_fitI():
     'ndop':int(10)       # the number of sample point per doppler width for the wavelength array
     }
     return(parameters({'general' : genparam}))
+
+def get_def_param_weak():
+    '''
+    Function that returns a `parameters` dictionary with default values 
+    for parameters that are necessary for a typical weak field calculation
+    '''
+
+    genparam = {
+    'lambda0':5000,    # the central wavelength of the transition
+    'vsini':50.0,         # the projected rotational velocity
+    'vdop':10.0,          # the thermal broadening
+    'av':0.05,             # the damping coefficient of the Voigt profile
+    'bnu':1.5,             # the slope of the source function with respect to vertical optical depth
+    'logkappa':0.98,          # the line strength parameter
+    'ndop':int(10),       # the number of sample point per doppler width for the wavelength array
+    'Bpole':1000,       # dipolar field strength in Gauss
+    'incl':90,          # inclination of the rotation axis to the LOS
+    'beta':90,          # obliquity of the field to the rotation axis
+    'phase':0           # rotational phase
+    }
+    weakparam = {
+        'geff':1.0
+    }
+
+    return(parameters({'general' : genparam,'weak' : weakparam}))
