@@ -1,7 +1,6 @@
 import numpy as np
 from scipy.special import erf
-from astropy.convolution import Gaussian1DKernel, convolve
-import astropy.convolution as con
+import astropy.convolution as conv
 import copy
 
 import time
@@ -617,59 +616,120 @@ def numerical(param,unno):
 ##############################
 ##############################
 ##############################
-def analytical(param):
-    
-    #models the line profile by convolving the voigt fara function with the rotation profile
 
-    ngrid = 1000+20*param['general']['vsini']
+def get_rotKernel(uo, S1, urot):
+    '''
+    Helper function to get the rotational covolution profile
+
+    :param uo: (numpy array) the velocity array in u0 units (v/vthermal)
+    :param S1: the slope of the source function 
+    (see ADD LINK for conversion between the slope of the source function and epsilon)
+    :param urot: the vsini in u0 units (vsini / vthermal)
+    '''
+
+    #VERO: shouldn't u0 be a numpy array?
+    # Create an empty array with the same length as the passed non-broadened line profile
+    # Note that the analytical function has already created an array that is long enough
+    # to accomodate the rotatinal broadening. 
+    kernel=np.zeros(uo.size)
+    
+    # The Kernel is only defined inside of vsini
+    on = np.logical_and( uo>=-1*urot, uo<=urot )
+
+    # Just an intermediate calculation here 
+    # to make the next expression shorter
+    yo = 1-(uo/urot)**2
+    # This is the kernel function expressed in terms of the slope
+    # of the source function (instead of the epsilon parameter of the grey textbook)
+    # It's equivalent, see the details in the documentation notebook. 
+    kernel[on] = (2*yo[on]**0.5 + 0.5*S1*np.pi*yo[on]) / (np.pi*urot*(1+2/3*S1))
+
+    return(kernel)
+
+def analytical(param, verbose=False):
+    '''
+    Function to calculate an intensity line profile using an analytical convolution
+
+    The necessary keys in the parameters dictionary object are:
+    - general/vsini
+    - general/logkappa
+    - general/bnu
+    - general/vdop
+    - general/ndop
+    - general/av
+    - general/lambda0
+
+    Note: if the vsini is less then vdop/2, then the function directly returns the non-rotating line profile. 
+
+    :param param: a parameters dictionary
+    '''
+    # Original version by Patrick Stanley
+    # Modified slightly by Vero, to use the diskint functions
+    # to match the other calculations. 
+    # Added a case for vsini=0
+
+    # shortcut for parameters
     kappa = 10**param['general']['logkappa'] 
+    S1 = param['general']['bnu']
 
-    const = { 'larmor' : 1.3996e6,\
-        'c' : 2.99792458e5 } #cgs units
+
+
+    #calculate the vsini in u0 units
+    urot = param['general']['vsini'] / param['general']['vdop'] 
+            
+    #sets up the u0 axis to accomodate the rotational broadening 
+    # and the thermal width of the spectral line
+    sig = 10 # the width of the Voigt profile. 10 sigma is usually enough
+    vel_range = urot+sig    
+    # generate the uo array to have ndop points per thermal width. 
+    all_u = get_all_u(vel_range, param['general']['ndop'], verbose=verbose)
     
-    varepsilon=1-(1/(1+param['general']['bnu'])) #defines the limb darkening coefficient
-    urot = param['general']['vsini'] / param['general']['vdop'] #defines the doppler width of vsini
-    
-    #Defines the rotation profile
-    def rotconv(u0, varepsilon, urot):
-        model=np.zeros(len(u0))
-        
-        for i in range(len(u0)):
-            if u0[i]>=-urot and u0[i]<=urot:
-                model[i]=(2*(1-varepsilon)*np.sqrt(1-(u0[i]/urot)**2)+0.5*np.pi*varepsilon*(1-(u0[i]/urot)**2))/(np.pi*(1-varepsilon/3)*urot)
+    # Set up the model structure that will save the resulting spectrum
+    model = get_empty_model(all_u, 
+                            param['general']['vdop'], param['general']['lambda0'],
+                            unno=False)
+
+    # Calculate the non-broadened continnum-normalized line flux using the analytical expression
+    # that takes into account the variation of the line intensity across the stellar disk. 
+    # see the documentation notebook for more details. 
+    phi = rav.profileI.voigt_fara(all_u, param['general']['av']).real/np.pi**0.5
+    flux=(1.0+2.0/3.0*S1/(1.0+kappa*phi)) / (1+2.0/3.0*S1)
+
+    # Check if the kernel is smaller than half of the thermal width
+    if urot < 0.5:
+        # if yes, just return the unbroadened profile. 
+        model['flux']=flux #flux
         return(model)
-    
-    print('Max shift due to vsini: {} vdop'.format(urot))
-    
-    #sets up the u axis
-    vel_range = np.max( [15, urot+15] )
-    vrange = np.round(vel_range+1+urot)
-    print('Max velocity needed: {} vdop'.format(vel_range))
-    
-    all_u = np.linspace( -1*vrange,vrange,int(param['general']['ndop']*vrange*2+1))
-    
-    #finds the rotation profile
-    rotation=rotconv(all_u,varepsilon,urot)
-    if rotation.size%2 == 0:
-        rotation=np.append(rotation,rotation[-1])
-    
-    #models the voigt fara function 
-    voigt = rav.profileI.voigt_fara(all_u,param['general']['av']).real
-    flux=(1.0+2.0*param['general']['bnu']/(3.0*(1.0+kappa*voigt/np.sqrt(np.pi))))/(1.0+2.0*param['general']['bnu']/3.0)
 
-    #Convolves the rotation profle and voigt fara
-    rotk=con.CustomKernel(rotation)
-    rot=convolve(flux,rotk,boundary='fill',fill_value=1.0)
+    else:
+
+        #get the rotation kernel
+        #-------
+        #VERO: the kernel does not have to be the
+        # same size as the all_u, as it is bounded by zeros. 
+        # it only need to be vsini/vdop wide.
+        # Could speed things up if needed. 
+        #-------
+        # The kernel is calculated on the same uo grid as the profile. 
+        # As we have set the range of the uo array to accomodate all of the broadning
+        # the kernel will fit on that array. 
+        # Furthermore, we made sure than the kernel will have at least one 
+        # some data point (assuming that ndop is > 1.0, which should be the case)
+        kernel_array = get_rotKernel(all_u,S1,urot)
+        # if the size of the kernel is even
+        # add one element. 
+        if kernel_array.size%2 == 0:
+            kernel_array=np.append(kernel_array,kernel_array[-1])
+
+        #Create a kernel object from the kernel array
+        kernal_object= conv.CustomKernel(kernel_array)
+
+        # Perform the convolution using astropy convolution tools. 
+        # The continnum is expected to be at 1.0 outside of the line profile
+        # so we use the fill_value parameter. This prevents the wings of the Voigt profile
+        # to be interpolated in a weird way. 
+        rot=conv.convolve(flux,kernal_object,boundary='fill',fill_value=1.0)
+                    
+        model['flux']=rot #flux
     
-    #sets up the model
-    model = np.zeros(all_u.size,
-                    dtype=[('wave',float),('vel',float),('vdop',float),
-                            ('flux',float),('fluxnorm',float)])
-                
-    model['vdop'] = all_u
-    model['vel'] = all_u * param['general']['vdop']
-    model['wave'] = (model['vel']/const['c'])*param['general']['lambda0']+param['general']['lambda0']
-    
-    model['flux']=rot #flux
-    
-    return(model,rotation,flux)
+        return(model)
