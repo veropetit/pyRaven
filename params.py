@@ -48,6 +48,11 @@ def read_parameters(fname):
     '''
     with open(fname, "r") as f:
         param = parameters(json.load(f))
+
+    for key in param:
+        for keys in param[key]:
+            if type(param[key][keys])==list and key!= 'unno':
+                param[key][keys]=np.array(param[key][keys])
     return(parameters(param))
 
 def get_def_param_fitI():
