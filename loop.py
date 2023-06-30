@@ -66,6 +66,8 @@ def loop(param,datapacket, ax):
 
 
     print('Evaluating with weak approximation...')
+    rav.misc.check_req(param,'loop')
+
     # calculation the Voigt and Voigt-Faraday profiles
     w_weak, dw_weak = disk.get_w_weak(small_u, param['general']['av'], param['general']['ndop'])
     # Figure out the length of vector that we need for the velocity grid.

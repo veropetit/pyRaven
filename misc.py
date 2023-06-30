@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as cl
 from scipy.special import erf
 import numpy as np
+import sys
 
 
 def cm_plusmin():
@@ -59,4 +60,71 @@ def viz( ROT, c, cmap=None, title='' ):
     plt.tight_layout()
     
     return(fig,ax)
-    
+
+def check_req(param,func):
+      genreq=['lambda0','vsini','vdop','av','bnu','logkappa','ndop','Bpole','incl','beta','phase']
+      unnoreq=['down','up']
+      weakreq=['geff']
+      gridreq=['Bgrid','igrid','betagrid','phasegrid']
+      loopreq=['lambda0','vsini','vdop','av','bnu','logkappa','ndop']
+      if func=='unno':
+            try:
+                  param['general']
+            except:
+                  print('Missing `general` subdictionary')
+            try:
+                  param['unno']
+            except:
+                  print('Missing `unno` subdictionary')
+            for i in range(len(genreq)):
+                  if genreq[i] not in list(param['general'].keys()):
+                        print('Missing {}'.format(genreq[i]))
+                        sys.exit()
+            for i in range(len(unnoreq)):
+                  if unnoreq[i] not in list(param['unno'].keys()):
+                        print('Missing {}'.format(unnoreq[i]))
+                        sys.exit()
+
+      if func=='weak':
+            try:
+                  param['general']
+            except:
+                  print('Missing `general` subdictionary')
+            try:
+                  param['weak']
+            except:
+                  print('Missing `weak` subdictionary')
+            for i in range(len(genreq)):
+                  if genreq[i] not in list(param['general'].keys()):
+                        print('Missing {}'.format(genreq[i]))
+                        sys.exit()
+            for i in range(len(weakreq)):
+                  if weakreq[i] not in list(param['weak'].keys()):
+                        print('Missing {}'.format(weakreq[i]))
+                        sys.exit()
+
+      if func=='loop':
+            try:
+                  param['general']
+            except:
+                  print('Missing `general` subdictionary')
+            try:
+                  param['weak']
+            except:
+                  print('Missing `weak` subdictionary')
+            try:
+                  param['grid']
+            except:
+                  print('Missing `grid` subdictionary')
+            for i in range(len(loopreq)):
+                  if loopreq[i] not in list(param['general'].keys()):
+                        print('Missing {}'.format(loopreq[i]))
+                        sys.exit()
+            for i in range(len(weakreq)):
+                  if weakreq[i] not in list(param['weak'].keys()):
+                        print('Missing {}'.format(weakreq[i]))
+                        sys.exit()
+            for i in range(len(gridreq)):
+                  if gridreq[i] not in list(param['grid'].keys()):
+                        print('Missing {}'.format(gridreq[i]))
+                        sys.exit()

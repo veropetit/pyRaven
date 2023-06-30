@@ -474,6 +474,7 @@ def numerical(param,unno):
 
     if unno==True:
         print('Evaluating with unno method...')
+        rav.misc.check_req(param,'unno')
         # get the zeeman pattern
         pattern = rav.pattern.zeeman_pattern(param['unno']['down'],param['unno']['up'])
         # calculation the Voigt and Voigt-Faraday profiles
@@ -484,6 +485,7 @@ def numerical(param,unno):
                                        sig, verbose=True)
     else:
         print('Evaluating with weak approximation...')
+        rav.misc.check_req(param,'weak')
         # calculation the Voigt and Voigt-Faraday profiles
         w_weak, dw_weak = get_w_weak(small_u, param['general']['av'], param['general']['ndop'])
         # Figure out the length of vector that we need for the velocity grid.
@@ -667,6 +669,8 @@ def analytical(param, verbose=False):
     # Modified slightly by Vero, to use the diskint functions
     # to match the other calculations. 
     # Added a case for vsini=0
+
+    rav.misc.check_req(param,'weak')
 
     # shortcut for parameters
     kappa = 10**param['general']['logkappa'] 

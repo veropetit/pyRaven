@@ -37,6 +37,7 @@ def numerical(param,unno):
     kappa = 10**param['general']['logkappa']    
 
     if unno==True:
+        rav.misc.check_req(param,'unno')
         print('Evaluating with unno method...')
     
         const = { 'larmor' : 1.3996e6,\
@@ -240,6 +241,7 @@ def numerical(param,unno):
         model['V'] /= conti_flux
     
     if unno==False:
+        rav.misc.check_req(param,'weak')
         const = { 'larmor' : 1.3996e6,\
                 'c' : 2.99792458e5,\
                 'a2cm' : 1.0e-8,\
@@ -422,7 +424,7 @@ def numerical(param,unno):
 def analytical(param):
     
     #models the line profile by convolving the voigt fara function with the rotation profile
-
+    rav.misc.check_req(param,'weak')
     ngrid = 20*param['general']['vsini']
     kappa = 10**param['general']['logkappa'] 
 
