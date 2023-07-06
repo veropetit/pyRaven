@@ -103,6 +103,18 @@ def check_req(param,func):
                         print('Missing {}'.format(weakreq[i]))
                         sys.exit()
 
+
+      if func=='analytic':
+            try:
+                  param['general']
+            except:
+                  print('Missing `general` subdictionary')
+            for i in range(len(loopreq)):
+                  if loopreq[i] not in list(param['general'].keys()):
+                        print('Missing {}'.format(loopreq[i]))
+                        sys.exit()
+
+
       if func=='loop':
             try:
                   param['general']
