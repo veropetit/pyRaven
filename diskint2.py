@@ -40,7 +40,9 @@ param={'general' : genparam,
 ## See the disk integration demo notebook. 
 constLorentz = 1.3996244936166518e-07
 
-c_kms = 2.99792458e-5
+# Used for the conversion of velocity to wavelength in the output model array
+# and for the calculation of the spectral PSF width in velocity from R
+c_kms = 2.99792458e5
 
 
 def get_ngrid(vsini, verbose=False):
@@ -183,7 +185,7 @@ def get_empty_model(all_u, vdop, lambda0, unno=True):
     # Note: this uses the astropy constant for c. 
     model['uo'] = all_u
     model['vel'] = all_u * vdop # result in km/s
-    model['wave'] = model['vel']/rav.c_kms*lambda0+lambda0
+    model['wave'] = model['vel']/c_kms*lambda0+lambda0
 
     return(model)
      
@@ -454,7 +456,7 @@ def get_local_weak_interp(small_u, w_weak, dw_weak, all_u, uLOS, mu_LOS, bnu, ka
 
 
 
-def numerical(param,unno=False):
+def numerical(param,unno=False, verbose=False):
     '''
     Function to calculated a line profile using a numerical disk integration, 
     either in the weak-field approximation (unno=False, default)
@@ -482,6 +484,12 @@ def numerical(param,unno=False):
     - unno/down
     '''
     
+   
+
+    ###############################
+    # Intro material
+    ###############################
+
     # Checking the parameter dictionary for the necessary keywords
     rav.misc.check_req(param,'general')
     if unno==True:
@@ -490,26 +498,23 @@ def numerical(param,unno=False):
         rav.misc.check_req(param,'weak')
     
 
-    # check for the resolution keyword in general
+    ####
+    #### TODO
+    #### move this block to a function get_uconv(pargeneral)
+    # check for the resolution keyword in the general parameter dictionary
     if 'res' not in list(param['general'].keys()):
         print('No spectral resolution given, no PDF convolution performed')
         sig_res = 0.0
     else:
-        sig_res = rav.c_kms/param['general']['res']/(8*np.log(2))**0.5
+        sig_res = c_kms/param['general']['res']/(8*np.log(2))**0.5
+        print(sig_res)
     # check for the macroturbulence keyword in general
     if 'vmac' not in list(param['general'].keys()):
         print('No macroturbulence velocity given, no convolution performed')
         sig_mac = 0.0
     else:
         sig_mac = param['general']['vmac']
-
     uconv = (sig_res**2+sig_mac**2)**0.5/param['general']['vdop']
-
-    
-
-    ###############################
-    # Intro material
-    ###############################
 
     ngrid = get_ngrid(param['general']['vsini'], verbose=True)
     #ngrid = 50
@@ -541,7 +546,7 @@ def numerical(param,unno=False):
         vel_range = param['general']['vsini']/param['general']['vdop']+sig
       
     # Get the total dispersion array
-    all_u = get_all_u(vel_range, param['general']['ndop'], verbose=True)
+    all_u = get_all_u(vel_range, param['general']['ndop'], verbose=verbose)
 
     # Set up the model structure that will save the resulting spectrum
     model = get_empty_model(all_u, 
@@ -649,7 +654,36 @@ def numerical(param,unno=False):
         model['Q'] /= -1*conti_flux# sign flip to be consistent with Zeeman2
         model['U'] /= -1*conti_flux# sign flip to be consistent with Zeeman2
 
-    return(model)
+    # Make a convolution with spectral resolution and macroturbulence, if needed. 
+
+    if uconv < 0.5:
+        # if the width of the total kernel less than half of the thermal width, do nothing. 
+        return(model)
+
+    else:
+        # We need to extend the model by 10*uconv to accomodate the convolution.
+        ext_all_u = get_all_u(vel_range+10*uconv, param['general']['ndop'], verbose=verbose)
+        ext_model = get_empty_model(ext_all_u, 
+                            param['general']['vdop'], param['general']['lambda0'],
+                            unno=unno)
+        # interpolate the params to the new array
+        ext_model['flux'] = np.interp(ext_all_u, all_u, model['flux'], left=1.0, right=1.0)
+        ext_model['V'] = np.interp(ext_all_u, all_u, model['V'], left=0., right=0.)
+        if unno==True:
+            ext_model['Q'] = np.interp(ext_all_u, all_u, model['Q'], left=0., right=0.)
+            ext_model['U'] = np.interp(ext_all_u, all_u, model['U'], left=0., right=0.)
+        # Calculate the gaussian kernel
+        kernel = np.exp(-0.5*ext_all_u**2/uconv**2)/(np.pi**0.5*uconv)
+        kernel_object = conv.CustomKernel(kernel)
+        # make the convolutions
+        ext_model['flux'] = conv.convolve(ext_model['flux'],kernel_object,boundary='fill',fill_value=1.0)
+        ext_model['V'] = conv.convolve(ext_model['V'],kernel_object,boundary='fill',fill_value=0.0)
+        if unno==True:
+            ext_model['Q'] = conv.convolve(ext_model['Q'],kernel_object,boundary='fill',fill_value=0.0)
+            ext_model['U'] = conv.convolve(ext_model['U'],kernel_object,boundary='fill',fill_value=0.0)
+        return(ext_model)
+
+        
 
 
 

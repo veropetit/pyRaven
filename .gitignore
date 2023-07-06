@@ -1,4 +1,5 @@
 docs-src/build
+__pycache__
 __pycache__/__init__.cpython-38.pyc
 __pycache__/diskint.cpython-38.pyc
 __pycache__/localV.cpython-38.pyc
@@ -9,3 +10,5 @@ Packet_test.h5
 data copy.py
 __pycache__/diskint2.cpython-39.pyc
 __pycache__/diskint2.cpython-39.pyc
+__pycache__/diskint2.cpython-39.pyc
+*.pyc
