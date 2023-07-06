@@ -719,7 +719,7 @@ def analytical(param, verbose=False):
     # to match the other calculations. 
     # Added a case for vsini=0
 
-    rav.misc.check_req(param,'weak')
+    rav.misc.check_req(param,'analytic')
 
     # shortcut for parameters
     kappa = 10**param['general']['logkappa'] 
