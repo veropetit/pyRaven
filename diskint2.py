@@ -40,6 +40,9 @@ param={'general' : genparam,
 ## See the disk integration demo notebook. 
 constLorentz = 1.3996244936166518e-07
 
+c_kms = 2.99792458e-5
+
+
 def get_ngrid(vsini, verbose=False):
     '''Function to calculate the number of spatial grid point necessary for a given vsini. '''
     ngrid = 1000 + 40*vsini
@@ -162,7 +165,6 @@ def get_empty_model(all_u, vdop, lambda0, unno=True):
     :param vdop: the thermal broadening in km/s
     :param lambda0: rest wavelength of transition in AA. 
     '''
-    c_kms = 2.99792458e-5 # used to convert dispersion into wavelength
 
     if unno == True:
         # If we are doing a unno calculation, save QUV
@@ -181,7 +183,7 @@ def get_empty_model(all_u, vdop, lambda0, unno=True):
     # Note: this uses the astropy constant for c. 
     model['uo'] = all_u
     model['vel'] = all_u * vdop # result in km/s
-    model['wave'] = model['vel']/c_kms*lambda0+lambda0
+    model['wave'] = model['vel']/rav.c_kms*lambda0+lambda0
 
     return(model)
      
@@ -452,10 +454,59 @@ def get_local_weak_interp(small_u, w_weak, dw_weak, all_u, uLOS, mu_LOS, bnu, ka
 
 
 
-def numerical(param,unno):
+def numerical(param,unno=False):
     '''
+    Function to calculated a line profile using a numerical disk integration, 
+    either in the weak-field approximation (unno=False, default)
+    or with the Unno solution (unno=True). 
+
+    The necessary keys in the parameters dictionary object are:
+    - general/vsini
+    - general/logkappa
+    - general/bnu
+    - general/vdop
+    - general/ndop
+    - general/av
+    - general/lambda0
+    - general/Bpole
+    - general/incl
+    - general/beta
+    - general/phase
+
+    If general/res and general/vmac are not present, the former will be set to infinity and the latter to zero
+
+    For the weak field approximation
+    - weak/geff
+    For the Unno calculation
+    - unno/up
+    - unno/down
     '''
     
+    # Checking the parameter dictionary for the necessary keywords
+    rav.misc.check_req(param,'general')
+    if unno==True:
+        rav.misc.check_req(param,'unno')
+    else:
+        rav.misc.check_req(param,'weak')
+    
+
+    # check for the resolution keyword in general
+    if 'res' not in list(param['general'].keys()):
+        print('No spectral resolution given, no PDF convolution performed')
+        sig_res = 0.0
+    else:
+        sig_res = rav.c_kms/param['general']['res']/(8*np.log(2))**0.5
+    # check for the macroturbulence keyword in general
+    if 'vmac' not in list(param['general'].keys()):
+        print('No macroturbulence velocity given, no convolution performed')
+        sig_mac = 0.0
+    else:
+        sig_mac = param['general']['vmac']
+
+    uconv = (sig_res**2+sig_mac**2)**0.5/param['general']['vdop']
+
+    
+
     ###############################
     # Intro material
     ###############################
@@ -474,7 +525,6 @@ def numerical(param,unno):
 
     if unno==True:
         print('Evaluating with unno method...')
-        rav.misc.check_req(param,'unno')
         # get the zeeman pattern
         pattern = rav.pattern.zeeman_pattern(param['unno']['down'],param['unno']['up'])
         # calculation the Voigt and Voigt-Faraday profiles
@@ -485,7 +535,6 @@ def numerical(param,unno):
                                        sig, verbose=True)
     else:
         print('Evaluating with weak approximation...')
-        rav.misc.check_req(param,'weak')
         # calculation the Voigt and Voigt-Faraday profiles
         w_weak, dw_weak = get_w_weak(small_u, param['general']['av'], param['general']['ndop'])
         # Figure out the length of vector that we need for the velocity grid.
