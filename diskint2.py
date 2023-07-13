@@ -428,8 +428,13 @@ def get_unno_angles(B_LOS, Bpole):
     costheta_temp = 1.0*B_hat[2,:]
     sintheta_temp = (1.0 - costheta_temp**2)**0.5 
     # cos(2phi) and sin(2phi)
-    sin2chi_temp = 2.0*B_hat[0,:]*B_hat[1,:]/sintheta_temp**2
-    cos2chi_temp = 2.0*B_hat[0,:]**2/sintheta_temp**2-1.0
+    # Note, always multiplied by sintheta in the unno calculation for the eta and rho
+    # So I can set these two to zero then sintheta_temp = 0
+    sin2chi_temp = np.zeros(B_hat[0,:].size)
+    cos2chi_temp = np.zeros(B_hat[0,:].size)
+    n = sintheta_temp != 0
+    sin2chi_temp[n] = 2.0*B_hat[0,n]*B_hat[1,n]/sintheta_temp[n]**2
+    cos2chi_temp[n] = 2.0*B_hat[0,n]**2/sintheta_temp[n]**2-1.0
 
     # Scale the unit vector by the field strength/2
     # to get the magnitude of the field
