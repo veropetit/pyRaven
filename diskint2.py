@@ -804,6 +804,8 @@ def analytical(param, verbose=False):
 
     rav.misc.check_req(param,'analytic')
 
+    uconv = get_uconv(param)
+
     # shortcut for parameters
     kappa = 10**param['general']['logkappa'] 
     S1 = param['general']['bnu']
@@ -818,7 +820,7 @@ def analytical(param, verbose=False):
     sig = 10 # the width of the Voigt profile. 10 sigma is usually enough
     vel_range = urot+sig    
     # generate the uo array to have ndop points per thermal width. 
-    all_u = get_all_u(vel_range, param['general']['ndop'], verbose=verbose)
+    all_u = get_all_u(vel_range+10*uconv, param['general']['ndop'], verbose=verbose)
     
     # Set up the model structure that will save the resulting spectrum
     model = get_empty_model(all_u, 
@@ -867,5 +869,19 @@ def analytical(param, verbose=False):
         rot=conv.convolve(flux,kernal_object,boundary='fill',fill_value=1.0)
                     
         model['flux']=rot #flux
+
+
+    if uconv < 0.5:
+        # if the width of the total kernel less than half of the thermal width, do nothing. 
+        return(model)
+
+    else:
+
+        # Get the gaussian kernel
+        # Using the full extended array to calculate the kernel.
+        kernel = get_resmac_kernel(all_u, uconv)
+
+        # make the convolutions
+        model_convolve_resvmac(model, kernel, unno=False)
     
         return(model)
