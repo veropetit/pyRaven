@@ -52,6 +52,27 @@ def get_ngrid(vsini, verbose=False):
         print('Using {} grid point on the surface'.format(ngrid))
     return(ngrid)
 
+def get_uconv(param):
+    '''
+    Function to calculate and return the combined sigma of the gaussian kernel that will 
+    perform the convolution for the macroturbulence and the spectral instrument resolution
+    :param param: a parameter dictionary
+    '''
+
+    if 'res' not in list(param['general'].keys()):
+        print('No spectral resolution given, no PDF convolution performed')
+        sig_res = 0.0
+    else:
+        sig_res = c_kms/param['general']['res']/(8*np.log(2))**0.5
+        print(sig_res)
+    # check for the macroturbulence keyword in general
+    if 'vmac' not in list(param['general'].keys()):
+        print('No macroturbulence velocity given, no convolution performed')
+        sig_mac = 0.0
+    else:
+        sig_mac = param['general']['vmac']
+    uconv = (sig_res**2+sig_mac**2)**0.5/param['general']['vdop']
+    return(uconv)
 
 def get_perGaussLorentz(lambda0, vdop):
     '''
@@ -454,6 +475,49 @@ def get_local_weak_interp(small_u, w_weak, dw_weak, all_u, uLOS, mu_LOS, bnu, ka
 
     return(local_I, local_V)
 
+def pad_model(model, ext_model, unno=True):
+    '''
+    Function to pad a model object with 1.0 (intensity) or 0.0 (Stokes) in order to accomodate a convolution. 
+
+    :param model: the model to pad
+    :param ext_model: the extended empty model object
+    '''
+    # interpolate the params to the new array
+    ext_model['flux'] = np.interp(ext_model['uo'], model['uo'], model['flux'], left=1.0, right=1.0)
+    ext_model['V'] = np.interp(ext_model['uo'], model['uo'], model['V'], left=0., right=0.)
+    if unno==True:
+        ext_model['Q'] = np.interp(ext_model['uo'], model['uo'], model['Q'], left=0., right=0.)
+        ext_model['U'] = np.interp(ext_model['uo'], model['uo'], model['U'], left=0., right=0.)
+    return(ext_model)
+
+def get_resmac_kernel(all_u, uconv):
+    '''
+    Function to calculate a combined gaussian kernel for macroturbulence and spectral resolution
+    Returns an astropy kernel object. 
+
+    :param all_u: dispersion array in uo units on which the kernel will be calculated
+    :param uconv: the sigma of the gaussian kernel in uo units. 
+    Should be set to ( u_rot**2 + u_res**2 )**0.5
+    '''
+    kernel = np.exp(-0.5*all_u**2/uconv**2)/(np.pi**0.5*uconv)
+    kernel_object = conv.CustomKernel(kernel)
+    return(kernel_object)
+
+def model_convolve_resvmac(model, kernel, unno=True):
+    '''Helper function to convolve a model with a kernel. 
+    The flux convolution has a fill_value=1.0, and the Stokes convolution have fill_value=0.0. 
+    Note -- this function does not extend the arrays. The checks on the kernel is performed in the calling function.
+    
+    :param model: a model object
+    :param kernel: an astropy kernel object
+    :param unno: (True) flag for a unno calculation. If True, will convolve Q and U. 
+    '''
+    model['flux'] = conv.convolve(model['flux'],kernel,boundary='fill',fill_value=1.0)
+    model['V'] = conv.convolve(model['V'],kernel,boundary='fill',fill_value=0.0)
+    if unno==True:
+        model['Q'] = conv.convolve(model['Q'],kernel,boundary='fill',fill_value=0.0)
+        model['U'] = conv.convolve(model['U'],kernel,boundary='fill',fill_value=0.0)
+    return(model)
 
 
 def numerical(param,unno=False, verbose=False):
@@ -497,24 +561,8 @@ def numerical(param,unno=False, verbose=False):
     else:
         rav.misc.check_req(param,'weak')
     
-
-    ####
-    #### TODO
-    #### move this block to a function get_uconv(pargeneral)
-    # check for the resolution keyword in the general parameter dictionary
-    if 'res' not in list(param['general'].keys()):
-        print('No spectral resolution given, no PDF convolution performed')
-        sig_res = 0.0
-    else:
-        sig_res = c_kms/param['general']['res']/(8*np.log(2))**0.5
-        print(sig_res)
-    # check for the macroturbulence keyword in general
-    if 'vmac' not in list(param['general'].keys()):
-        print('No macroturbulence velocity given, no convolution performed')
-        sig_mac = 0.0
-    else:
-        sig_mac = param['general']['vmac']
-    uconv = (sig_res**2+sig_mac**2)**0.5/param['general']['vdop']
+    # get the sigma of the macroturbulence+spectral resolution gaussian kernel
+    uconv = get_uconv(param)
 
     ngrid = get_ngrid(param['general']['vsini'], verbose=True)
     #ngrid = 50
@@ -663,24 +711,20 @@ def numerical(param,unno=False, verbose=False):
     else:
         # We need to extend the model by 10*uconv to accomodate the convolution.
         ext_all_u = get_all_u(vel_range+10*uconv, param['general']['ndop'], verbose=verbose)
+        # get an extended empty all_u array
         ext_model = get_empty_model(ext_all_u, 
                             param['general']['vdop'], param['general']['lambda0'],
                             unno=unno)
         # interpolate the params to the new array
-        ext_model['flux'] = np.interp(ext_all_u, all_u, model['flux'], left=1.0, right=1.0)
-        ext_model['V'] = np.interp(ext_all_u, all_u, model['V'], left=0., right=0.)
-        if unno==True:
-            ext_model['Q'] = np.interp(ext_all_u, all_u, model['Q'], left=0., right=0.)
-            ext_model['U'] = np.interp(ext_all_u, all_u, model['U'], left=0., right=0.)
-        # Calculate the gaussian kernel
-        kernel = np.exp(-0.5*ext_all_u**2/uconv**2)/(np.pi**0.5*uconv)
-        kernel_object = conv.CustomKernel(kernel)
+        ext_model = pad_model(model, ext_model, unno=unno)
+        
+        # Get the gaussian kernel
+        # Using the full extended array to calculate the kernel.
+        kernel = get_resmac_kernel(ext_all_u, uconv)
+
         # make the convolutions
-        ext_model['flux'] = conv.convolve(ext_model['flux'],kernel_object,boundary='fill',fill_value=1.0)
-        ext_model['V'] = conv.convolve(ext_model['V'],kernel_object,boundary='fill',fill_value=0.0)
-        if unno==True:
-            ext_model['Q'] = conv.convolve(ext_model['Q'],kernel_object,boundary='fill',fill_value=0.0)
-            ext_model['U'] = conv.convolve(ext_model['U'],kernel_object,boundary='fill',fill_value=0.0)
+        model_convolve_resvmac(ext_model, kernel, unno=unno)
+
         return(ext_model)
 
         
