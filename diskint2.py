@@ -480,13 +480,15 @@ def get_local_weak_interp(small_u, w_weak, dw_weak, all_u, uLOS, mu_LOS, bnu, ka
 
     return(local_I, local_V)
 
-def pad_model(model, ext_model, unno=True):
+def pad_model(model, input_ext_model, unno=True):
     '''
     Function to pad a model object with 1.0 (intensity) or 0.0 (Stokes) in order to accomodate a convolution. 
 
     :param model: the model to pad
-    :param ext_model: the extended empty model object
+    :param input_ext_model: the extended empty model object
     '''
+    # Make a copy of the ext_model. It's a numpy recarray, so using numpy.copy
+    ext_model = np.copy(input_ext_model)
     # interpolate the params to the new array
     ext_model['flux'] = np.interp(ext_model['uo'], model['uo'], model['flux'], left=1.0, right=1.0)
     ext_model['V'] = np.interp(ext_model['uo'], model['uo'], model['V'], left=0., right=0.)
@@ -494,6 +496,19 @@ def pad_model(model, ext_model, unno=True):
         ext_model['Q'] = np.interp(ext_model['uo'], model['uo'], model['Q'], left=0., right=0.)
         ext_model['U'] = np.interp(ext_model['uo'], model['uo'], model['U'], left=0., right=0.)
     return(ext_model)
+
+def pad_V(all_u_ext, all_u, V):
+    '''
+    Helper function for the loop that pads Stokes V to accomodate a convolution
+    
+    :param all_u_ext: the new uo array
+    :param all_u: the existing uo array
+    :param V: the Stokes V model defined on all_u
+    '''
+    ext_V = np.interp(all_u_ext, all_u, V, left=0., right=0.)
+    return(ext_V)
+
+
 
 def get_resmac_kernel(all_u, uconv):
     '''
@@ -728,7 +743,7 @@ def numerical(param,unno=False, verbose=False):
         kernel = get_resmac_kernel(ext_all_u, uconv)
 
         # make the convolutions
-        model_convolve_resvmac(ext_model, kernel, unno=unno)
+        ext_model = model_convolve_resvmac(ext_model, kernel, unno=unno)
 
         return(ext_model)
 
