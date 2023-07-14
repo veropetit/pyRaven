@@ -497,15 +497,15 @@ def pad_model(model, input_ext_model, unno=True):
         ext_model['U'] = np.interp(ext_model['uo'], model['uo'], model['U'], left=0., right=0.)
     return(ext_model)
 
-def pad_V(all_u_ext, all_u, V):
+def pad_V(ext_all_u, all_u, V):
     '''
     Helper function for the loop that pads Stokes V to accomodate a convolution
     
-    :param all_u_ext: the new uo array
+    :param ext_all_u: the new uo array
     :param all_u: the existing uo array
     :param V: the Stokes V model defined on all_u
     '''
-    ext_V = np.interp(all_u_ext, all_u, V, left=0., right=0.)
+    ext_V = np.interp(ext_all_u, all_u, V, left=0., right=0.)
     return(ext_V)
 
 

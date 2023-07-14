@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.special import erf
 from astropy.convolution import Gaussian1DKernel, convolve
-import astropy.convolution as con
+import astropy.convolution as conv
 
 import pyRaven as rav
 import pyRaven.diskint2 as disk
@@ -51,6 +51,12 @@ def loop(param,datapacket, ax):
     ###############################
     # Intro material
     ###############################
+    
+    # Checking the parameter dictionary for the necessary keywords
+    rav.misc.check_req(param,'loop')
+    
+    # get the sigma of the macroturbulence+spectral resolution gaussian kernel
+    uconv = disk.get_uconv(param)
 
     ngrid = disk.get_ngrid(param['general']['vsini'], verbose=True)
     #ngrid = 50
@@ -64,10 +70,6 @@ def loop(param,datapacket, ax):
     sig = 10 # the width of the Voigt profile. 10 sigma is usually enough
     small_u = disk.get_small_u(sig, param['general']['ndop'])
 
-
-    print('Evaluating with weak approximation...')
-    rav.misc.check_req(param,'loop')
-
     # calculation the Voigt and Voigt-Faraday profiles
     w_weak, dw_weak = disk.get_w_weak(small_u, param['general']['av'], param['general']['ndop'])
     # Figure out the length of vector that we need for the velocity grid.
@@ -75,8 +77,6 @@ def loop(param,datapacket, ax):
       
     # Get the total dispersion array
     all_u = disk.get_all_u(vel_range, param['general']['ndop'], verbose=True)
-    # create an array in kms unit, for the chi2 calculations
-    model_vel = all_u*param['general']['ndop']
     
     # Surface Grid Setup
     # cartesian coordinates of each grid points in ROT
@@ -144,7 +144,25 @@ def loop(param,datapacket, ax):
                 modelV = modelV * param['weak']['geff'] /2.0 * perGaussLorentz * param['general']['bnu']*kappa
                  # Normalize the spectra to the continuum.
                 modelV /= conti_flux
+
+                ## Stokes V still has to be multiplied by a set of constants and Bpole. 
+                #  But (af)*g = a(f*g), so I can make the convolution outside of the 
+                # Bpole loop. 
+
+                # if the width of the total kernel less than half of the thermal width, do nothing. 
+                if uconv > 0.5:
+                    ext_all_u = disk.get_all_u(vel_range+10*uconv, param['general']['ndop'], verbose=False)
+                    modelV = disk.pad_V(ext_all_u, all_u, modelV)
+                    kernel = disk.get_resmac_kernel(ext_all_u, uconv)
+                    modelV = conv.convolve(modelV,kernel,boundary='fill',fill_value=0.0)
+                else:
+                    # This is for using a single variable name in the interpolation below
+                    ext_all_u = all_u
+                    
+                # create an array in kms unit, for the chi2 calculations
+                model_vel = ext_all_u*param['general']['ndop']
                 
+
                 #########################################
                 #########################################
                 # Loop on the Bpole values
