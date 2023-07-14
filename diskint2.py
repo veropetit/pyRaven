@@ -897,6 +897,6 @@ def analytical(param, verbose=False):
         kernel = get_resmac_kernel(all_u, uconv)
 
         # make the convolutions
-        model_convolve_resvmac(model, kernel, unno=False)
+        model = model_convolve_resvmac(model, kernel, unno=False)
     
         return(model)
