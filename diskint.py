@@ -32,13 +32,14 @@ param={'general' : genparam,
        'weak' : weakparam}
 '''
 
-def numerical(param,unno):
+def numerical(param,unno, verbose=True):
     ngrid = 1000 + 20*param['general']['vsini']
     kappa = 10**param['general']['logkappa']    
 
     if unno==True:
         rav.misc.check_req(param,'unno')
-        print('Evaluating with unno method...')
+        if verbose:
+            print('Evaluating with unno method...')
     
         const = { 'larmor' : 1.3996e6,\
                 'c' : 2.99792458e5 } #cgs units
@@ -72,15 +73,16 @@ def numerical(param,unno):
         max_b = np.max([max1,max2])*param['general']['Bpole']*value['lorentz']
         max_vsini = param['general']['vsini']/param['general']['vdop']
     
-        print('Max shift due to field: {} vdop'.format(max_b))
-        print('Max shift due to vsini: {} vdop'.format(max_vsini))
+        if verbose:
+            print('Max shift due to field: {} vdop'.format(max_b))
+            print('Max shift due to vsini: {} vdop'.format(max_vsini))
     
         vel_range = np.max( [max_b+15, max_vsini+15] )
         vrange = np.round(vel_range+1)
-        print('Max velocity needed: {} vdop'.format(vel_range))
+        if verbose: print('Max velocity needed: {} vdop'.format(vel_range))
     
         all_u = np.linspace( -1*vrange,vrange,int(param['general']['ndop']*vrange*2+1))
-        print('Number of grid points: {}'.format(all_u.size))
+        if verbose: print('Number of grid points: {}'.format(all_u.size))
     
         # Set up the model structure that will save the resulting spectrum
         model = np.zeros(all_u.size,
@@ -262,7 +264,7 @@ def numerical(param,unno):
     
         vel_range = np.max( [15, urot+15] )
         vrange = np.round(vel_range+1)
-        print('Max velocity needed: {} vdop'.format(vel_range))
+        if verbose: print('Max velocity needed: {} vdop'.format(vel_range))
         
         all_u = np.linspace( -1*vrange,vrange,int(param['general']['ndop']*vrange*2+1))
 
@@ -421,7 +423,7 @@ def numerical(param,unno):
     
     return(model, ROT, LOS, MAG)
 
-def analytical(param):
+def analytical(param, verbose=True):
     
     #models the line profile by convolving the voigt fara function with the rotation profile
     rav.misc.check_req(param,'weak')
@@ -443,12 +445,12 @@ def analytical(param):
                 model[i]=(2*(1-varepsilon)*np.sqrt(1-(u0[i]/urot)**2)+0.5*np.pi*varepsilon*(1-(u0[i]/urot)**2))/(np.pi*(1-varepsilon/3)*urot)
         return(model)
     
-    print('Max shift due to vsini: {} vdop'.format(urot))
+    if verbose: print('Max shift due to vsini: {} vdop'.format(urot))
     
     #sets up the u axis
     vel_range = np.max( [15, urot+15] )
     vrange = np.round(vel_range+1+urot)
-    print('Max velocity needed: {} vdop'.format(vel_range))
+    if verbose: print('Max velocity needed: {} vdop'.format(vel_range))
     
     all_u = np.linspace( -1*vrange,vrange,int(param['general']['ndop']*vrange*2+1))
     
