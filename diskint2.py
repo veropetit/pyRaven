@@ -48,11 +48,10 @@ c_kms = 2.99792458e5
 def get_ngrid(vsini, verbose=False):
     '''Function to calculate the number of spatial grid point necessary for a given vsini. '''
     ngrid = 1000 + 40*vsini
-    if verbose:
-        print('Using {} grid point on the surface'.format(ngrid))
+    if verbose: print('Using {} grid point on the surface'.format(ngrid))
     return(ngrid)
 
-def get_uconv(param):
+def get_uconv(param, verbose=False):
     '''
     Function to calculate and return the combined sigma of the gaussian kernel that will 
     perform the convolution for the macroturbulence and the spectral instrument resolution
@@ -60,14 +59,13 @@ def get_uconv(param):
     '''
 
     if 'res' not in list(param['general'].keys()):
-        print('No spectral resolution given, no PDF convolution performed')
+        if verbose: print('No spectral resolution given, no PDF convolution performed')
         sig_res = 0.0
     else:
         sig_res = c_kms/param['general']['res']/(8*np.log(2))**0.5
-        print(sig_res)
     # check for the macroturbulence keyword in general
     if 'vmac' not in list(param['general'].keys()):
-        print('No macroturbulence velocity given, no convolution performed')
+        if verbose: print('No macroturbulence velocity given, no convolution performed')
         sig_mac = 0.0
     else:
         sig_mac = param['general']['vmac']
@@ -584,7 +582,7 @@ def numerical(param,unno=False, verbose=False):
     # get the sigma of the macroturbulence+spectral resolution gaussian kernel
     uconv = get_uconv(param)
 
-    ngrid = get_ngrid(param['general']['vsini'], verbose=True)
+    ngrid = get_ngrid(param['general']['vsini'], verbose=verbose)
     #ngrid = 50
 
     kappa = 10**param['general']['logkappa']    
@@ -597,7 +595,7 @@ def numerical(param,unno=False, verbose=False):
     small_u = get_small_u(sig, param['general']['ndop'])
 
     if unno==True:
-        print('Evaluating with unno method...')
+        if verbose: print('Evaluating with unno method...')
         # get the zeeman pattern
         pattern = rav.pattern.zeeman_pattern(param['unno']['down'],param['unno']['up'])
         # calculation the Voigt and Voigt-Faraday profiles
@@ -607,7 +605,7 @@ def numerical(param,unno=False, verbose=False):
                                        param['general']['vsini']/param['general']['vdop'],
                                        sig, verbose=True)
     else:
-        print('Evaluating with weak approximation...')
+        if verbose: print('Evaluating with weak approximation...')
         # calculation the Voigt and Voigt-Faraday profiles
         w_weak, dw_weak = get_w_weak(small_u, param['general']['av'], param['general']['ndop'])
         # Figure out the length of vector that we need for the velocity grid.

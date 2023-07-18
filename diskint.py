@@ -38,8 +38,7 @@ def numerical(param,unno, verbose=True):
 
     if unno==True:
         rav.misc.check_req(param,'unno')
-        if verbose:
-            print('Evaluating with unno method...')
+        if verbose: print('Evaluating with unno method...')
     
         const = { 'larmor' : 1.3996e6,\
                 'c' : 2.99792458e5 } #cgs units
