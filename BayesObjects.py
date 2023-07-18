@@ -3,6 +3,10 @@ import h5py
 
 ## Develop by Robin Moore and Veronique Petit
 
+###########################################
+###########################################
+###########################################
+
 class chi:
     '''
     Class definition for the objects that will store the chi2s

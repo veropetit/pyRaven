@@ -5,6 +5,7 @@ import astropy.convolution as conv
 
 import pyRaven as rav
 import pyRaven.diskint2 as disk
+import time
 
 '''
 The input for both diskint.strong and diskint.weak is of the form:
@@ -23,10 +24,10 @@ weakparam = {
     }
     
 gridparam = {
-        'Bgrid': np.arange(0,5000, 500),
-        'igrid': np.arange(0,180,20),
-        'betagrid':np.arange(0,180,20),
-        'phasegrid':np.arange(0,360,20)
+        'Bpole_grid': np.arange(0,5000, 500),
+        'incl_grid': np.arange(0,180,20),
+        'beta_grid':np.arange(0,180,20),
+        'phase_grid':np.arange(0,360,20)
         }
     
 param={'general' : genparam,
@@ -35,7 +36,7 @@ param={'general' : genparam,
        }
 '''
 
-def loop(param,datapacket, ax):
+def loop(param, datapacket, path=''):
     '''
     Function to calculate the chi square between 
     all of the LSD profiles in a pyRaven data packet and 
@@ -44,7 +45,6 @@ def loop(param,datapacket, ax):
 
     :param param: For now, see the documentation notebook for the content of the param dictionary.
     :param datapacket: a pyRaven datapacket for a given set of observations
-    :param ax: TEMPORARY: an ax linked to a figure in the documentation notebook, for debugging purposes
     '''
 
 
@@ -90,8 +90,21 @@ def loop(param,datapacket, ax):
     #########################################
     #########################################
 
-    for ind_i, incl in enumerate(param['grid']['igrid']):
-        for ind_p, phase in enumerate(param['grid']['phasegrid']):
+    for ind_i, incl in enumerate(param['grid']['incl_grid']):
+        print('Starting inclination loop {}/{}'.format(ind_i,param['grid']['incl_grid'].size))
+        tic = time.time()
+        # create a structure for each observation, to store the chi2s (one for each obs)
+        chi2V_data = []
+        for o in range(0, datapacket.nobs):
+            chi2V_data.append(rav.BayesObjects.create_chi(param['grid']['beta_grid'], param['grid']['Bpole_grid'], param['grid']['phase_grid'],
+                                            incl, datapacket.obs_names[o] ))
+        chi2N1_data = []
+        for o in range(0, datapacket.nobs):
+            chi2N1_data.append(rav.BayesObjects.create_chi(param['grid']['beta_grid'], param['grid']['Bpole_grid'], param['grid']['phase_grid'],
+                                            incl, datapacket.obs_names[o] ))
+
+
+        for ind_p, phase in enumerate(param['grid']['phase_grid']):
 
             #rotation matrix that converts from LOS frame to ROT frame
             los2rot = disk.get_los2rot(incl, phase)
@@ -109,7 +122,7 @@ def loop(param,datapacket, ax):
             #########################################
             #########################################
 
-            for ind_beta, beta in enumerate(param['grid']['betagrid']):
+            for ind_beta, beta in enumerate(param['grid']['beta_grid']):
 
                 # Rotation matrix betweeen the rot and the MAG frames
                 #ROT frame to MAG frame
@@ -145,6 +158,7 @@ def loop(param,datapacket, ax):
                  # Normalize the spectra to the continuum.
                 modelV /= conti_flux
 
+                # convolve the model over the instrumental resolution
                 ## Stokes V still has to be multiplied by a set of constants and Bpole. 
                 #  But (af)*g = a(f*g), so I can make the convolution outside of the 
                 # Bpole loop. 
@@ -162,36 +176,62 @@ def loop(param,datapacket, ax):
                 # create an array in kms unit, for the chi2 calculations
                 model_vel = ext_all_u*param['general']['ndop']
                 
-
+                # Interpolate the model to the dispersion of the data
+                interpol_modelV = [] # empty list
+                # loop over the LSD profiles
+                for o in range(0,datapacket.nobs):
+                    interpol_modelV.append(np.interp(datapacket.cutfit.lsds[o].vel, model_vel,modelV))
+                
                 #########################################
                 #########################################
                 # Loop on the Bpole values
                 #########################################
                 #########################################
                 
-                for ind_bp, bpole in enumerate(param['grid']['Bgrid']):
+                for ind_bp, bpole in enumerate(param['grid']['Bpole_grid']):
                 
                     # multiply by the Bpole value that I left out from the disk integration loop above
-                    model_V_scaled = modelV * bpole
+                    #model_V_scaled = modelV * bpole
 
-                    ax.plot(model_vel,model_V_scaled, label='{},{},{},{}'.format(bpole, incl, beta, phase/360))
-                    
+                    for o in range(0,datapacket.nobs):
+                        chiV = np.sum(   ( 
+                                            (datapacket.cutfit.lsds[o].specV - interpol_modelV[o]*bpole)
+                                            / datapacket.cutfit.lsds[o].specSigV
+                                        )**2
+                                    )
+                        chiN1 = np.sum(   ( 
+                                            (datapacket.cutfit.lsds[o].specN1 - interpol_modelV[o]*bpole)
+                                            / datapacket.cutfit.lsds[o].specSigN1
+                                        )**2
+                                    )
 
-                    # convolve the model over the instrumental resolution
+                        chi2V_data[o].data[ind_beta,ind_bp,ind_p] = chiV
+                        chi2N1_data[o].data[ind_beta,ind_bp,ind_p] = chiN1
 
+        for o in range(0,datapacket.nobs):
+            chi2V_data[0].write( '{}chiV_i{}obs{}.h5'.format(path,ind_i, o) )
+            chi2N1_data[0].write( '{}chiN1_i{}obs{}.h5'.format(path,ind_i, o) )
+        
+        toc = time.time()
+        print(toc - tic)
 
-                    #########################################
-                    #########################################
-                    # Loop on the observations in the Data Packet
-                    #########################################
-                    #########################################
-                    
-                                        
-                        # Interpolate the model to the dispersion of the data
-                    
-                        # calculate the chi square between data and model
-                    
-                        # Store the chi2 in the data cube.
+    return
 
+def loop_wrapper(file_param, file_datapacket, path=''):
+    '''
+    This function is a wrapper to the loop function. 
+    It it designed to be run in a directory that contains a parameters json file, and a DataPacket h5 file. 
+    The output are written in the same directory by default. 
+
+    This wrapper is useful to generate the chi2 data on a remote server. 
+
+    :param file_param: A json file containing the parameter object (see INSERT LINK)
+    :param file_datapackt: A h5 file containing the DataPacket structure
+    '''
+
+    param = rav.params.read_parameters(file_param)
+    packet = rav.data.read_packet(file_datapacket)
+
+    loop(param, packet)
 
     return

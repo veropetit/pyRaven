@@ -65,7 +65,7 @@ def check_req(param,func):
       genreq=['lambda0','vsini','vdop','av','bnu','logkappa','ndop','Bpole','incl','beta','phase']
       unnoreq=['down','up']
       weakreq=['geff']
-      gridreq=['Bgrid','igrid','betagrid','phasegrid']
+      gridreq=['Bpole_grid','incl_grid','beta_grid','phase_grid']
       loopreq=['lambda0','vsini','vdop','av','bnu','logkappa','ndop']
       if func=='unno':
             try:
