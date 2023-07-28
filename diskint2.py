@@ -8,6 +8,7 @@ import time
 import pyRaven as rav
 
 import matplotlib.pyplot as plt
+from numba import njit
 
 '''
 The input for both diskint.strong and diskint.weak is of the form:
@@ -477,6 +478,44 @@ def get_local_weak_interp(small_u, w_weak, dw_weak, all_u, uLOS, mu_LOS, bnu, ka
     local_V = Bz * ( mu_LOS*dw_weak_shift/(1+kappa*w_weak_shift)**2 )
 
     return(local_I, local_V)
+
+@njit
+def get_local_weak_interp_Vonly_numba(small_u, w_weak, dw_weak, all_u, uLOS, mu_LOS, kappa, Bz):
+    '''
+    Function to get the local V only (for the loop) from the weak field approximation, by using an interpolation of a 
+    fixed profile function in the rest frame. 
+
+    :param small_u: the uo grid on which the profile is defined
+    :param w_weak: the voigt profile (already divided by sqrt(2pi))
+    :param dw_weak: the derivative of the voigt profile with respect to uo
+    :param all_u: the (larger) dispersion grid on which to interpolate (enough to encompase the vsini) in uo units
+    :param uLOS: the (rotational) radial velocity of the grid point in uo units
+    :param mu_LOS: the mu angle of the grid point (angle between LOS and normal to surface)
+    :param bnu: the slope of the source function with respect to tau_z (the vertical optical depth, the change in slope because of the mu angle is coded in)
+    :param kappa: the line strenght parameter
+    :param Bz: the Bz of that grid point (in Bpole/2 units)
+
+    returns: local_V profile, used for disk integration. 
+    The local_V need to be multiplied by the projected area (A_LOS) of the grid point during the integration.
+    Furthermore, the local_V needs to be multiplied (can be done after the integration) by geff * Bpole/2 * kappa * perGaussLorentz,
+    where perGaussLorentz(lambda0, vdop) is defined in the explanatory notebook. 
+    '''
+
+    # Shift the profiles to the right uLOS, and interpolate over the all_u velocity grid.         
+    w_weak_shift  = rav.localV.interpol_lin_numba(w_weak,  small_u+uLOS, all_u)
+    dw_weak_shift = rav.localV.interpol_lin_numba(dw_weak, small_u+uLOS, all_u)
+
+    # See diskint2_doc.ipynb for details. 
+    # calculate the local intensity profile
+    # These are the full expressions. 
+    # leaving them here to make the code more easy to understand
+    #geffBz = geff * B_LOS * Bpole/2.0 # The value of geff*Bz in gauss
+    #local_V = perGaussLorentz * geffBz * ( mu_LOS*bnu*kappa*dw_weak_shift/(1+kappa*w_weak_shift)**2 )
+            
+    # Now, I moved some of the multiplications out of the disk integrationloop to shave down some time
+    local_V = Bz * ( mu_LOS*dw_weak_shift/(1+kappa*w_weak_shift)**2 )
+
+    return(local_V)
 
 def pad_model(model, input_ext_model, unno=True):
     '''

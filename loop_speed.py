@@ -7,6 +7,8 @@ import pyRaven as rav
 import pyRaven.diskint2 as disk
 import time
 from numba import njit
+from numba.typed import List
+
 
 '''
 The input for both diskint.strong and diskint.weak is of the form:
@@ -37,7 +39,44 @@ param={'general' : genparam,
        }
 '''
 
-def loop(param, datapacket, path=''):
+@njit
+def disk_int_loop_numba(all_u, vis, small_u, w_weak, dw_weak, uLOS, mu_LOS, kappa, B_LOS, A_LOS):
+    '''
+    Helper function to perform the disk integration, decorated with numba.
+    '''
+    modelV = np.zeros(all_u.size)
+
+    for i in range(0,vis[vis].size):
+        local_V = disk.get_local_weak_interp_Vonly_numba(small_u, w_weak, dw_weak, all_u,
+                                    uLOS[vis][i], mu_LOS[vis][i], kappa, 
+                                    B_LOS[2,vis][i]  )
+
+        # numerical integration (hence the projected area multiplication)
+        modelV += A_LOS[vis][i]*local_V
+    return(modelV)
+
+@njit
+def B_loop_numba(chi2V_data, chi2N1_data, Bpole_grid, 
+                    specV, specSigV, specN1, specSigN1, nobs,
+                    interpol_modelV, ind_beta, ind_p):
+                
+    for ind_bp, bpole in enumerate(Bpole_grid):
+    
+        # multiply by the Bpole value that I left out from the disk integration loop above
+        #model_V_scaled = modelV * bpole
+
+        for o in range(0,nobs):
+            chiV  = np.sum( ( (specV[o]  - interpol_modelV[o]*bpole) / specSigV[o]  )**2 )
+
+            chiN1 = np.sum( ( (specN1[o] - interpol_modelV[o]*bpole) / specSigN1[o] )**2 )
+
+            chi2V_data[ind_beta,ind_bp,ind_p,o] = chiV
+            chi2N1_data[ind_beta,ind_bp,ind_p,o] = chiN1
+
+    return(chi2V_data, chi2N1_data)
+
+
+def loop_speed(param, datapacket, path=''):
     '''
     Function to calculate the chi square between 
     all of the LSD profiles in a pyRaven data packet and 
@@ -48,6 +87,25 @@ def loop(param, datapacket, path=''):
     :param datapacket: a pyRaven datapacket for a given set of observations
     '''
 
+    ## For speed, extracting the data used in the chi2 calculation into lists of arrays, 
+    # cause numba cannot interpret the DataPacket class
+    # 
+    specV = [datapacket.cutfit.lsds[x].specV for x in range(0,datapacket.nobs)]
+    typed_specV = List()
+    for x in specV: typed_specV.append(x)
+
+    specSigV = [datapacket.cutfit.lsds[x].specSigV for x in range(0,datapacket.nobs)]
+    typed_specSigV = List()
+    for x in specSigV: typed_specSigV.append(x)
+
+    specN1 = [datapacket.cutfit.lsds[x].specN1 for x in range(0,datapacket.nobs)]
+    typed_specN1 = List()
+    for x in specN1: typed_specN1.append(x) 
+   
+    specSigN1 = [datapacket.cutfit.lsds[x].specSigN1 for x in range(0,datapacket.nobs)]
+    typed_specSigN1 = List()
+    for x in specSigN1: typed_specSigN1.append(x)
+   
 
     ###############################
     # Intro material
@@ -91,19 +149,22 @@ def loop(param, datapacket, path=''):
     #########################################
     #########################################
 
-    for ind_i, incl in enumerate(param['grid']['incl_grid']):
-        print('Starting inclination loop {}/{}'.format(ind_i,param['grid']['incl_grid'].size))
-        tic = time.time()
-        # create a structure for each observation, to store the chi2s (one for each obs)
-        chi2V_data = []
-        for o in range(0, datapacket.nobs):
-            chi2V_data.append(rav.BayesObjects.create_chi(param['grid']['beta_grid'], param['grid']['Bpole_grid'], param['grid']['phase_grid'],
-                                            incl, datapacket.obs_names[o] ))
-        chi2N1_data = []
-        for o in range(0, datapacket.nobs):
-            chi2N1_data.append(rav.BayesObjects.create_chi(param['grid']['beta_grid'], param['grid']['Bpole_grid'], param['grid']['phase_grid'],
-                                            incl, datapacket.obs_names[o] ))
+    # Helping with readability
+    nbeta = param['grid']['beta_grid'].size
+    nBpole = param['grid']['Bpole_grid'].size
+    nphase = param['grid']['phase_grid'].size
+    nincl = param['grid']['incl_grid'].size
+    
 
+    for ind_i, incl in enumerate(param['grid']['incl_grid']):
+        print('Starting inclination loop {}/{}'.format(ind_i,nincl))
+        tic = time.time()
+        # create a matrix for each observation, to store the chi2s (one for each obs)
+        # Note that when callong create_chi_data, I then use .data to only keep the numpy data matrix
+        # this is to be able to run with numba
+        # I will rearrange into a chi object later on. 
+        chi2V_data = np.empty((nbeta, nBpole, nphase, datapacket.nobs))
+        chi2N1_data = np.empty((nbeta, nBpole, nphase, datapacket.nobs))
 
         for ind_p, phase in enumerate(param['grid']['phase_grid']):
 
@@ -145,15 +206,12 @@ def loop(param, datapacket, path=''):
                 #########################################
                 #########################################
  
-                modelV = np.zeros(all_u.size)
-                for i in range(0,vis[vis].size):
-                    local_I, local_V = disk.get_local_weak_interp(small_u, w_weak, dw_weak, all_u,
-                                                uLOS[vis][i], mu_LOS[vis][i], 
-                                                param['general']['bnu'], kappa, 
-                                                B_LOS[2,vis][i]  )
 
-                    # numerical integration (hence the projected area multiplication)
-                    modelV += A_LOS[vis][i]*local_V
+                # calling the numba decorated loop function
+                modelV = disk_int_loop_numba(
+                                        all_u, vis, small_u, w_weak, dw_weak, uLOS, 
+                                        mu_LOS, kappa, B_LOS, A_LOS)
+
                 # constant stuff that I pulled out of the loop in get_local_weak_interp (except for Bpole)
                 modelV = modelV * param['weak']['geff'] /2.0 * perGaussLorentz * param['general']['bnu']*kappa
                  # Normalize the spectra to the continuum.
@@ -178,7 +236,7 @@ def loop(param, datapacket, path=''):
                 model_vel = ext_all_u*param['general']['ndop']
                 
                 # Interpolate the model to the dispersion of the data
-                interpol_modelV = [] # empty list
+                interpol_modelV = List() # empty typed list (form numba)
                 # loop over the LSD profiles
                 for o in range(0,datapacket.nobs):
                     interpol_modelV.append(np.interp(datapacket.cutfit.lsds[o].vel, model_vel,modelV))
@@ -189,36 +247,50 @@ def loop(param, datapacket, path=''):
                 #########################################
                 #########################################
                 
-                for ind_bp, bpole in enumerate(param['grid']['Bpole_grid']):
+                chi2V_data, chi2N1_data = B_loop_numba(
+                                            chi2V_data, chi2N1_data, 
+                                            param['grid']['Bpole_grid'], 
+                                            typed_specV, typed_specSigV, typed_specN1, typed_specSigN1, datapacket.nobs,
+                                            interpol_modelV, 
+                                            ind_beta, ind_p)
                 
-                    # multiply by the Bpole value that I left out from the disk integration loop above
-                    #model_V_scaled = modelV * bpole
+                #for ind_bp, bpole in enumerate(param['grid']['Bpole_grid']):
+                #
+                #    # multiply by the Bpole value that I left out from the disk integration loop above
+                #    #model_V_scaled = modelV * bpole
+                #
+                #    for o in range(0,datapacket.nobs):
+                #        chiV = np.sum(   ( 
+                #                            (datapacket.cutfit.lsds[o].specV - interpol_modelV[o]*bpole)
+                #                            / datapacket.cutfit.lsds[o].specSigV
+                #                        )**2
+                #                    )
+                #        chiN1 = np.sum(   ( 
+                #                            (datapacket.cutfit.lsds[o].specN1 - interpol_modelV[o]*bpole)
+                #                            / datapacket.cutfit.lsds[o].specSigN1
+                #                        )**2
+                #                    )
+                #
+                #        chi2V_data[o].data[ind_beta,ind_bp,ind_p] = chiV
+                #        chi2N1_data[o].data[ind_beta,ind_bp,ind_p] = chiN1
 
-                    for o in range(0,datapacket.nobs):
-                        chiV = np.sum(   ( 
-                                            (datapacket.cutfit.lsds[o].specV - interpol_modelV[o]*bpole)
-                                            / datapacket.cutfit.lsds[o].specSigV
-                                        )**2
-                                    )
-                        chiN1 = np.sum(   ( 
-                                            (datapacket.cutfit.lsds[o].specN1 - interpol_modelV[o]*bpole)
-                                            / datapacket.cutfit.lsds[o].specSigN1
-                                        )**2
-                                    )
 
-                        chi2V_data[o].data[ind_beta,ind_bp,ind_p] = chiV
-                        chi2N1_data[o].data[ind_beta,ind_bp,ind_p] = chiN1
 
         for o in range(0,datapacket.nobs):
-            chi2V_data[o].write( '{}chiV_i{}obs{}.h5'.format(path,ind_i, o) )
-            chi2N1_data[o].write( '{}chiN1_i{}obs{}.h5'.format(path,ind_i, o) )
+            #transforming into a chi object 
+            chi2obj = rav.BayesObjects.chi(chi2V_data[:,:,:,o], param['grid']['beta_grid'], param['grid']['Bpole_grid'], param['grid']['phase_grid'],
+                                            incl, datapacket.obs_names[o] )
+            chi2obj.write( '{}chiV_i{}obs{}.h5'.format(path,ind_i, o) )
+            chi2obj = rav.BayesObjects.chi(chi2N1_data[:,:,:,o], param['grid']['beta_grid'], param['grid']['Bpole_grid'], param['grid']['phase_grid'],
+                                            incl, datapacket.obs_names[o] )
+            chi2obj.write( '{}chiN1_i{}obs{}.h5'.format(path,ind_i, o) )
         
         toc = time.time()
         print(toc - tic)
 
     return
 
-def loop_wrapper(file_param, file_datapacket, path=''):
+def loop_speed_wrapper(file_param, file_datapacket, path=''):
     '''
     This function is a wrapper to the loop function. 
     It it designed to be run in a directory that contains a parameters json file, and a DataPacket h5 file. 
@@ -233,6 +305,6 @@ def loop_wrapper(file_param, file_datapacket, path=''):
     param = rav.params.read_parameters(file_param)
     packet = rav.data.read_packet(file_datapacket)
 
-    loop(param, packet)
+    loop_speed(param, packet)
 
     return
