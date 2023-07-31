@@ -1,5 +1,6 @@
 import numpy as np
 import h5py
+import matplotlib.pyplot as plt
 
 ## Develop by Robin Moore and Veronique Petit
 
@@ -233,6 +234,50 @@ class lnLH_pars(lnLH_odds):
             # writting the noise_arr. 
             f.create_dataset('noise_arr',data=self.noise_arr)
 
+    def find_bestLH(self):
+        '''
+        Function to return dictionary witht the parameters of the max likelihood
+        (NEED TO: marginalized for the scale noise parameter)
+        '''
+        index = np.argmax(self.data, keepdims=True)
+        params = {'beta':self.beta_arr[index[0]],
+                  'Bpole':self.Bpole_arr[index[1]],
+                  'phi':self.phi_arr[index[2]],
+                  'incl':self.incl_arr[index[3]]}
+        return(params)
+    
+    def plot_mar(self):
+        fig, ax = plt.subplots(3,2)
+        # it's easy to overflow the LH when taking the exponential. 
+        # Here, we don't care about the absolute value cause the whole thing
+        # will be normalized in the end. So I am first normalizing by the 
+        # max value (and will renormalized so that the sum of probability is 1 afterwards)
+        LH = np.exp(self.data-self.data.max())
+        LH = LH/np.sum(LH)
+
+        mar = np.sum(LH,axis=(1,2,3,4))
+        ax[0,0].plot(self.beta_arr, mar/np.sum(mar))
+        ax[0,0].set_xlabel('beta')
+
+        mar = np.sum(LH,axis=(0,2,3,4))
+        ax[0,1].plot(self.Bpole_arr, mar/np.sum(mar))
+        ax[0,1].set_xlabel('Bpole')
+
+        mar = np.sum(LH,axis=(0,1,3,4))
+        ax[1,0].plot(self.phi_arr, mar/np.sum(mar))
+        ax[1,0].set_xlabel('phi')
+
+        mar = np.sum(LH,axis=(0,1,2,4))
+        ax[1,1].plot(self.incl_arr, mar/np.sum(mar))
+        ax[1,1].set_xlabel('incl')
+
+        mar = np.sum(LH,axis=(0,1,2,3))
+        ax[2,0].plot(self.noise_arr, mar/np.sum(mar))
+        ax[2,0].set_xlabel('scale noise')
+
+        plt.tight_layout()
+        return(fig, ax)
+
 def read_lnLH_pars(fname):
     '''
     Function to read in a lnLH_pars object from an h5 file
@@ -289,7 +334,7 @@ def create_lnLH_pars_from_chi(folder_path, param, datapacket):
                                     param['grid']['phase_grid'],
                                     param['grid']['incl_grid'],
                                     datapacket.obs_names[o],
-                                    param['grid']['noise_arr']
+                                    param['grid']['noise_grid']
             )
 
             # calculate the constant term for this observation
@@ -307,7 +352,7 @@ def create_lnLH_pars_from_chi(folder_path, param, datapacket):
                 chi = read_chi(filename)
 
                 # loop over the scale noise values
-                for b, val_b in enumerate(param['grid']['noise_arr']):
+                for b, val_b in enumerate(param['grid']['noise_grid']):
                 
                     lnLH.data[:,:,:,i,b] = -0.5*val_b*chi.data + 0.5*N*np.log(val_b)
 
@@ -317,4 +362,45 @@ def create_lnLH_pars_from_chi(folder_path, param, datapacket):
             lnLH.write('lnLH_PARS_{}_obs{}.h5'.format(S,o))
 
     return
+
+#####################
+#####################
+
+def get_prior_Bpole(Bpole_arr):
+    '''
+    Get the modified jeffreys prior for the Bpole. 
+    '''
+    Jeff_B = Bpole_arr[5]
+    prior_B = 1.0 / ( (Bpole_arr+ Jeff_B) * np.log(  (Jeff_B+Bpole_arr[-1])/Jeff_B ) )
+    return(prior_B)
+
+def get_prior_incl(incl_arr):
+    '''
+    Get the sin prior for the inclination
+    
+    :param incl_arr: the inclination grid values (in degree)
+    '''
+    prior_incl = np.sin(incl_arr*np.pi/180) /2	# p(incl)dincl = sin(incl)dincl (P(i<io) = 1-cos(io))
+    return(prior_incl)
+
+def get_prior_beta(beta_arr):
+    '''
+    Get the flat prior for beta
+    '''
+    prior_beta = np.array( [ 1.0 / (beta_arr[-1] - beta_arr[0]) ] * beta_arr.size )
+    return(prior_beta)
+
+def get_prior_phi(phi_arr):
+    '''
+    Get the flat prior for phi
+    '''
+    prior_phi = np.array( [ 1.0 / (phi_arr[-1] - phi_arr[0]) ] * phi_arr.size )
+    return(prior_phi)
+
+def get_prior_noise(noise_arr):
+    '''
+    Get the Jeffreys prior for the scale noise parameter
+    '''
+    prior_noise = 1.0 / ( noise_arr* np.log(noise_arr[-1] / noise_arr[0]) )
+    return(prior_noise)
 
