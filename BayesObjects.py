@@ -1,6 +1,7 @@
 import numpy as np
 import h5py
 import matplotlib.pyplot as plt
+import copy
 
 ## Develop by Robin Moore and Veronique Petit
 
@@ -246,8 +247,9 @@ class lnLH_pars(lnLH_odds):
                   'incl':self.incl_arr[index[3]]}
         return(params)
     
-    def plot_mar(self):
-        fig, ax = plt.subplots(3,2)
+    def plot_mar(self, fig=None, ax=None):
+        if fig == None:
+            fig, ax = plt.subplots(3,2)
         # it's easy to overflow the LH when taking the exponential. 
         # Here, we don't care about the absolute value cause the whole thing
         # will be normalized in the end. So I am first normalizing by the 
@@ -277,6 +279,44 @@ class lnLH_pars(lnLH_odds):
 
         plt.tight_layout()
         return(fig, ax)
+
+    def get_lnpost(self):
+        '''
+        Function to get the posterior probabilty by multiplying by the priors
+        '''
+        # I could use numpy broadcasting in numpy for that, 
+        # but considering that we are only doing this operation a few times
+        # using a loop does not add that much more time
+        # and it makes the code more readable. 
+        post = copy.deepcopy(self)
+        prior_beta= np.log(get_prior_beta(self.beta_arr))
+        prior_Bpole = np.log(get_prior_Bpole(self.Bpole_arr))
+        prior_phi = np.log(get_prior_phi(self.phi_arr))
+        prior_incl = np.log(get_prior_incl(self.incl_arr))
+        prior_noise = np.log(get_prior_noise(self.noise_arr))
+        for beta, p_beta in enumerate(prior_beta):
+            for Bpole, p_Bpole in enumerate(prior_Bpole):
+                for phi, p_phi in enumerate(prior_phi):
+                    for incl, p_incl in enumerate(prior_incl):
+                        for noise, p_noise in enumerate(prior_noise):
+                            post.data[beta, Bpole, phi, incl, noise] += (p_beta+p_Bpole+p_phi+p_incl+p_noise)
+        return(post)
+
+    def mar_phase_noise(self):
+        '''
+        Function to return the data array that has been marginalized over phase and noise scale
+        '''
+        # it's easy to overflow the LH when taking the exponential. 
+        # Here, we don't care about the absolute value cause the whole thing
+        # will be normalized in the end. So I am first normalizing by the 
+        # max value (and will renormalized so that the sum of probability is 1 afterwards)
+        LH = np.exp(self.data-self.data.max())
+
+        post_mar = np.sum(LH, axis=(2,4))
+        total_sum = np.sum(LH)
+        ln_post_mar = np.log(post_mar)-np.log(total_sum)
+        return(ln_post_mar)
+
 
 def read_lnLH_pars(fname):
     '''
@@ -370,7 +410,7 @@ def get_prior_Bpole(Bpole_arr):
     '''
     Get the modified jeffreys prior for the Bpole. 
     '''
-    Jeff_B = Bpole_arr[5]
+    Jeff_B = 100 #gauss
     prior_B = 1.0 / ( (Bpole_arr+ Jeff_B) * np.log(  (Jeff_B+Bpole_arr[-1])/Jeff_B ) )
     return(prior_B)
 
@@ -403,4 +443,132 @@ def get_prior_noise(noise_arr):
     '''
     prior_noise = 1.0 / ( noise_arr* np.log(noise_arr[-1] / noise_arr[0]) )
     return(prior_noise)
+
+#####################
+#####################
+class lnpost():
+    '''
+    Class to store posterior probabilities (marginalized for phase and noise scale)
+    '''
+
+    def __init__(self, data, beta_arr, Bpole_arr, incl_arr, obsID):
+        self.data = data
+        self.beta_arr = beta_arr
+        self.Bpole_arr = Bpole_arr
+        self.incl_arr = incl_arr
+        self.obsID = obsID
+
+    def write(self, fname):
+        '''
+        Function to write a posterior object to a h5 files
+        '''
+        with h5py.File(fname, 'w') as f:
+            f.create_dataset('data',data=self.data)
+            f.create_dataset('beta_arr',data=self.beta_arr)
+            f.create_dataset('Bpole_arr',data=self.Bpole_arr)
+            f.create_dataset('incl_arr',data=self.incl_arr)
+            f.create_dataset('obsID', data=self.obsID ) 
+
+    def plot_corner(self):
+        fig, ax = plt.subplots(3,3)
+
+        cmap = copy.copy(plt.cm.Purples)
+        cmap.set_bad('green', 1.0) # the masked values are masked (the 1 is for the alpha)
+        #cmap.set_over('yellow', 1.0)
+        #cmap.set_under('yellow', 1.0)
+
+        for item in ax.flatten():
+            item.set_axis_off()
+
+        P = np.exp(self.data-self.data.max())
+
+
+        # Bpole
+        mar = np.sum(P, axis=(0,2))
+        mar /= np.sum(mar)
+        ax[0,0].set_axis_on()
+        ax[0,0].plot(self.Bpole_arr, mar)
+
+        #beta
+        mar = np.sum(P, axis=(1,2))
+        mar /= np.sum(mar)
+        ax[2,2].set_axis_on()
+        ax[2,2].plot(self.beta_arr, mar)
+
+        #incl
+        mar = np.sum(P, axis=(0,1))
+        mar /= np.sum(mar)
+        ax[1,1].set_axis_on()
+        ax[1,1].plot(self.incl_arr, mar)
+
+        # Bpole - beta
+        mar = np.sum(P, axis=2)
+        mar /= np.sum(mar)
+        ax[2,0].set_axis_on()
+        ax[2,0].pcolormesh(self.Bpole_arr,self.beta_arr, mar, shading='auto', cmap=cmap, vmin=0, vmax=mar.max())
+
+        # Bpole - incl
+        mar = np.sum(P, axis=0)
+        mar /= np.sum(mar)
+        ax[1,0].set_axis_on()
+        ax[1,0].pcolormesh(self.Bpole_arr,self.incl_arr, mar.T, shading='auto', cmap=cmap, vmin=0, vmax=mar.max())
+
+        # beta - incl
+        mar = np.sum(P, axis=1)
+        mar /= np.sum(mar)
+        ax[2,1].set_axis_on()
+        ax[2,1].pcolormesh(self.incl_arr,self.beta_arr, mar, shading='auto', cmap=cmap, vmin=0, vmax=mar.max())
+
+        ax[2,2].set_xlabel('beta (deg)')
+        ax[2,1].set_xlabel('incl (deg)')
+        ax[2,0].set_xlabel('Bpole (G)')
+        ax[2,0].set_ylabel('beta (deg)')
+        ax[1,0].set_ylabel('incl (deg)')
+
+        plt.tight_layout()
+        return(fig, ax)
+
+def read_lnpost(fname):
+    '''
+    Function to read in a lnpost object from an h5 file
+    
+    :param fname: (string) the name of the h5 file
+    '''
+    with h5py.File(fname, 'r') as f:
+        data = np.array(f['data'])
+        beta_arr = np.array(f['beta_arr'])
+        Bpole_arr = np.array(f['Bpole_arr'])
+        incl_arr = np.array(f['incl_arr'])
+        obsID = np.array(f['obsID'])
+
+    return(lnpost(data, beta_arr, Bpole_arr, incl_arr, obsID))    
+
+def combine_obs(nobs):
+    '''
+    Funciton to combine the probabilities for multiple observtions
+    '''
+
+    Stokes = ['V', 'N1']
+
+    for S in Stokes: 
+
+        ### Dealing with the parameter estimation first
+        # 1. read in the first observation
+        ln_LH = read_lnLH_pars('lnLH_PARS_{}_obs1.h5'.format(S))
+        # 2. multiply by the prior
+        ln_post = ln_LH.get_lnpost()
+        # 3. marginalize phi and noise scale (function does normalize)
+        ln_post_mar_data = ln_post.mar_phase_noise()
+        # 4. Keeping track of the obsID used
+        obsID = [ln_LH.obsID]
+        # if there are more than one observation:
+        if nobs > 1:
+            for i in range(1,nobs):
+                ln_LH = read_lnLH_pars('lnLH_PARS_{}_obs{}.h5'.format(S,i))
+                ln_post = ln_LH.get_lnpost()
+                ln_post_mar_data = ln_post_mar_data + ln_post.mar_phase_noise()
+                obsID.append(ln_LH.obsID)
+        ln_post_mar = lnpost(ln_post_mar_data, ln_LH.beta_arr,ln_LH.Bpole_arr,ln_LH.incl_arr, obsID)
+        ln_post_mar.write('lnpost_PARS_{}.h5'.format(S))        
+    return()
 
