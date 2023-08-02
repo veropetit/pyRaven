@@ -40,7 +40,7 @@ param={'general' : genparam,
 '''
 
 @njit
-def disk_int_loop_numba(all_u, vis, small_u, w_weak, dw_weak, uLOS, mu_LOS, kappa, B_LOS, A_LOS):
+def disk_int_loop_numba(all_u, vis, small_u, w_weak, dw_weak, uLOS, mu_LOS, kappa, B_z, A_LOS):
     '''
     Helper function to perform the disk integration, decorated with numba.
     '''
@@ -49,7 +49,7 @@ def disk_int_loop_numba(all_u, vis, small_u, w_weak, dw_weak, uLOS, mu_LOS, kapp
     for i in range(0,vis[vis].size):
         local_V = disk.get_local_weak_interp_Vonly_numba(small_u, w_weak, dw_weak, all_u,
                                     uLOS[vis][i], mu_LOS[vis][i], kappa, 
-                                    B_LOS[2,vis][i]  )
+                                    B_z[vis][i]  )
 
         # numerical integration (hence the projected area multiplication)
         modelV += A_LOS[vis][i]*local_V
@@ -210,7 +210,7 @@ def loop_speed(param, datapacket, path=''):
                 # calling the numba decorated loop function
                 modelV = disk_int_loop_numba(
                                         all_u, vis, small_u, w_weak, dw_weak, uLOS, 
-                                        mu_LOS, kappa, B_LOS, A_LOS)
+                                        mu_LOS, kappa, B_LOS[2,:], A_LOS)
 
                 # constant stuff that I pulled out of the loop in get_local_weak_interp (except for Bpole)
                 modelV = modelV * param['weak']['geff'] /2.0 * perGaussLorentz * param['general']['bnu']*kappa
