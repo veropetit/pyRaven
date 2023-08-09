@@ -11,6 +11,44 @@ from matplotlib.backends.backend_pdf import PdfPages
 ###########################################
 ###########################################
 
+def exp_check(lnP):
+    '''
+    Function with an automated check for nans in the expoential
+    '''
+    P = np.exp(lnP)
+    if type(P) is np.ndarray:
+        if False in np.isfinite(P):
+            print('WARNING: nan or inf in the exp(P)')    
+    else:
+        if False in np.array([P]):
+            print('WARNING: nan or inf in the exp(P)') 
+    return(P)
+
+def ln_mar_check(lnP_array, axis=None, verbose=True):
+    '''
+    Function to marginalize an array of ln(P) and return a ln(P).
+    Note, this function does not know about the grid size. 
+    Therefore the multiplication with the binsize should be done by the caller of this function. 
+
+    :param array: the array of logarithmic probabilities to marginalize
+    :param axis: (None) the axis information to pass to np.sum
+    :param verbose: (True) outputs a warning for overflow/underflow/nans
+    '''
+    # normalizing the array by its maximum value.
+    norm = lnP_array.max()
+    P_array = np.exp(lnP_array - norm)
+    ln_mar = np.log( np.sum(P_array, axis=axis) ) + norm
+
+    if type(ln_mar) is np.ndarray:
+        if False in np.isfinite(ln_mar):
+            print('WARNING: nan or inf in the marginalization')    
+    else:
+        if False in np.array([ln_mar]):
+            print('WARNING: nan or inf in the marginalization') 
+
+    return(ln_mar)
+
+
 class chi:
     '''
     Class definition for the objects that will store the chi2s
@@ -147,7 +185,6 @@ def read_lnLH_odds(fname):
 
     return(lnLH_odds(data, beta_arr, Bpole_arr, phi_arr, incl_arr, obsID))
 
-
 def create_empty_lnLH_odds(beta_arr, Bpole_arr, phi_arr, incl_arr, obsID):
     '''
     Helper function to create an empty LH_odds object. 
@@ -249,14 +286,23 @@ class lnLH_pars(lnLH_odds):
                   'incl':self.incl_arr[index[3]]}
         return(params)
 
-    def get_deltas(self):
-        return(
-            self.beta_arr[1]-self.beta_arr[0],
-            self.Bpole_arr[1]-self.Bpole_arr[0],
-            self.phi_arr[1]-self.phi_arr[0],
-            self.incl_arr[1]-self.incl_arr[0],
-            self.noise_arr[1]-self.noise_arr[0],
-        )
+    def get_deltas(self, ln=False):
+        if ln == False:
+            return(
+                self.beta_arr[1]-self.beta_arr[0],
+                self.Bpole_arr[1]-self.Bpole_arr[0],
+                self.phi_arr[1]-self.phi_arr[0],
+                self.incl_arr[1]-self.incl_arr[0],
+                self.noise_arr[1]-self.noise_arr[0]
+            )
+        else:
+            return(
+                np.log(self.beta_arr[1]-self.beta_arr[0]),
+                np.log(self.Bpole_arr[1]-self.Bpole_arr[0]),
+                np.log(self.phi_arr[1]-self.phi_arr[0]),
+                np.log(self.incl_arr[1]-self.incl_arr[0]),
+                np.log(self.noise_arr[1]-self.noise_arr[0])
+            )
 
     def plot_mar(self, fig=None, ax=None, right=False, **kwargs):
         '''
@@ -278,33 +324,27 @@ class lnLH_pars(lnLH_odds):
             k = 2
         else:
             k=0
-        # it's easy to overflow the LH when taking the exponential. 
-        # Here, we don't care about the absolute value cause the whole thing
-        # will be normalized in the end. So I am first normalizing by the 
-        # max value (and will renormalized so that the sum of probability is 1 afterwards)
-        LH = np.exp(self.data-self.data.max())
-        LH = LH/np.sum(LH)
 
-        d_beta, d_Bpole, d_phi, d_incl, d_noise = self.get_deltas()
+        lnd_beta, lnd_Bpole, lnd_phi, lnd_incl, lnd_noise = self.get_deltas(ln=True)
 
-        mar = np.sum(LH,axis=(1,2,3,4)) * d_Bpole * d_phi * d_incl * d_noise
-        ax[0,0+k].plot(self.beta_arr, mar/(np.sum(mar)*d_beta), **kwargs)
+        lnmar = ln_mar_check(self.data, axis=(1,2,3,4)) + lnd_Bpole + lnd_phi + lnd_incl + lnd_noise
+        ax[0,0+k].plot(self.beta_arr, exp_check(lnmar), **kwargs)
         ax[0,0+k].set_xlabel('beta')
 
-        mar = np.sum(LH,axis=(0,2,3,4)) * d_beta * d_phi * d_incl * d_noise
-        ax[0,1+k].plot(self.Bpole_arr, mar/(np.sum(mar)*d_Bpole), **kwargs)
+        lnmar = ln_mar_check(self.data,axis=(0,2,3,4)) + lnd_beta + lnd_phi + lnd_incl + lnd_noise
+        ax[0,1+k].plot(self.Bpole_arr, exp_check(lnmar), **kwargs)
         ax[0,1+k].set_xlabel('Bpole')
 
-        mar = np.sum(LH,axis=(0,1,3,4)) * d_beta * d_Bpole * d_incl * d_noise
-        ax[1,0+k].plot(self.phi_arr, mar/(np.sum(mar)*d_phi), **kwargs)
+        lnmar = ln_mar_check(self.data,axis=(0,1,3,4)) + lnd_beta + lnd_Bpole + lnd_incl + lnd_noise
+        ax[1,0+k].plot(self.phi_arr, exp_check(lnmar), **kwargs)
         ax[1,0+k].set_xlabel('phi')
 
-        mar = np.sum(LH,axis=(0,1,2,4)) * d_beta * d_Bpole * d_phi * d_noise
-        ax[1,1+k].plot(self.incl_arr, mar/(np.sum(mar)*d_incl), **kwargs)
+        lnmar = ln_mar_check(self.data,axis=(0,1,2,4)) + lnd_beta + lnd_Bpole + lnd_phi + lnd_noise
+        ax[1,1+k].plot(self.incl_arr, exp_check(lnmar), **kwargs)
         ax[1,1+k].set_xlabel('incl')
 
-        mar = np.sum(LH,axis=(0,1,2,3)) * d_beta * d_Bpole * d_phi * d_incl
-        ax[2,0+k].plot(self.noise_arr, mar/(np.sum(mar)*d_noise), **kwargs)
+        lnmar = ln_mar_check(self.data,axis=(0,1,2,3)) + lnd_beta + lnd_Bpole + lnd_phi + lnd_incl
+        ax[2,0+k].plot(self.noise_arr, exp_check(lnmar), **kwargs)
         ax[2,0+k].set_xlabel('scale noise')
 
         ax[2,1+k].set_axis_off()
@@ -337,7 +377,7 @@ class lnLH_pars(lnLH_odds):
         else:
             k=0
 
-        d_beta, d_Bpole, d_phi, d_incl, d_noise = self.get_deltas()
+        d_beta, d_Bpole, d_phi, d_incl, d_noise = self.get_deltas(ln=False)
   
         prior = get_prior_beta(self.beta_arr)
         ax[0,0+k].plot(self.beta_arr, prior/(np.sum(prior)*d_beta) , **kwargs)
@@ -372,47 +412,43 @@ class lnLH_pars(lnLH_odds):
         # but considering that we are only doing this operation a few times
         # using a loop does not add that much more time
         # and it makes the code more readable. 
-        post = copy.deepcopy(self)
-        prior_beta= np.log(get_prior_beta(self.beta_arr))
-        prior_Bpole = np.log(get_prior_Bpole(self.Bpole_arr))
-        prior_phi = np.log(get_prior_phi(self.phi_arr))
-        prior_incl = np.log(get_prior_incl(self.incl_arr))
-        prior_noise = np.log(get_prior_noise(self.noise_arr))
-        for beta, p_beta in enumerate(prior_beta):
-            for Bpole, p_Bpole in enumerate(prior_Bpole):
-                for phi, p_phi in enumerate(prior_phi):
-                    for incl, p_incl in enumerate(prior_incl):
-                        for noise, p_noise in enumerate(prior_noise):
-                            post.data[beta, Bpole, phi, incl, noise] += (p_beta+p_Bpole+p_phi+p_incl+p_noise)
-        return(post)
+        lnpost = copy.deepcopy(self)
+        ln_prior_beta= np.log(get_prior_beta(self.beta_arr))
+        ln_prior_Bpole = np.log(get_prior_Bpole(self.Bpole_arr))
+        ln_prior_phi = np.log(get_prior_phi(self.phi_arr))
+        ln_prior_incl = np.log(get_prior_incl(self.incl_arr))
+        ln_prior_noise = np.log(get_prior_noise(self.noise_arr))
+        for beta, lnp_beta in enumerate(ln_prior_beta):
+            for Bpole, lnp_Bpole in enumerate(ln_prior_Bpole):
+                for phi, lnp_phi in enumerate(ln_prior_phi):
+                    for incl, lnp_incl in enumerate(ln_prior_incl):
+                        for noise, lnp_noise in enumerate(ln_prior_noise):
+                            lnpost.data[beta, Bpole, phi, incl, noise] += (lnp_beta+lnp_Bpole+lnp_phi+lnp_incl+lnp_noise)
+        return(lnpost)
 
-    def mar_phase_noise(self, normalize=True):
+    def mar_phase_noise(self):
         '''
-        Function to return the data array that has been marginalized over phase and noise scale. 
-        Returns a lnpost object. 
+        Function to return the a marginalization of a lnLH object over phase and noise scale, 
+        in a new ln_post object. 
         '''
-        # it's easy to overflow the LH when taking the exponential. 
-        # Here, we don't care about the absolute value cause the whole thing
-        # will be normalized in the end. So I am first normalizing by the 
-        # max value (and will renormalized so that the sum of probability is 1 afterwards)
 
-        # Scaling the LH by a constant factor, to avoid overflows. 
-        LH = np.exp(self.data-self.data.max())
+        lnd_beta, lnd_Bpole, lnd_phi, lnd_incl, lnd_noise = self.get_deltas(ln=True)
 
-        d_beta, d_Bpole, d_phi, d_incl, d_noise = self.get_deltas()
+        ln_post_mar = ln_mar_check(self.data, axis=(2,4))+ lnd_phi + lnd_noise
 
-        post_mar = np.sum(LH, axis=(2,4))*d_phi*d_noise
-        if normalize == True:
-            # If the result is to be normalized, then we don't need to add the constant back
-            total_sum = np.sum(LH)*d_beta* d_Bpole* d_phi* d_incl* d_noise
-            ln_post_mar = np.log(post_mar)-np.log(total_sum)
-        else:
-            # If we don't want the resulting probability to be normalized (e.g. for the observations combination)
-            # we need to add the constant back in there. 
-            ln_post_mar = np.log(post_mar)+self.data.max()
         #create a ln_post object to return
         ln_post = lnpost(ln_post_mar,self.beta_arr,self.Bpole_arr,self.incl_arr, self.obsID)
         return(ln_post)
+
+    def normalize(self):
+        '''
+        Return a normalized version of self
+        '''
+        lnd_beta, lnd_Bpole, lnd_phi, lnd_incl, lnd_noise = self.get_deltas(ln=True)
+
+        ln_norm = ln_mar_check(self.data) + lnd_beta+lnd_Bpole+lnd_incl+lnd_phi+lnd_noise 
+        
+        return(lnLH_pars(self.data-ln_norm, self.beta_arr,self.Bpole_arr,self.phi_arr, self.incl_arr,self.obsID, self.noise_arr))
 
 
 def read_lnLH_pars(fname):
@@ -566,23 +602,29 @@ class lnpost():
             f.create_dataset('incl_arr',data=self.incl_arr)
             f.create_dataset('obsID', data=self.obsID ) 
  
-    def get_deltas(self):
-        return(
-            self.beta_arr[1]-self.beta_arr[0],
-            self.Bpole_arr[1]-self.Bpole_arr[0],
-            self.incl_arr[1]-self.incl_arr[0],
-        )
+    def get_deltas(self, ln=False):
+        if ln == False:
+            return(
+                self.beta_arr[1]-self.beta_arr[0],
+                self.Bpole_arr[1]-self.Bpole_arr[0],
+                self.incl_arr[1]-self.incl_arr[0],
+            )
+        else:
+            return(
+                np.log(self.beta_arr[1]-self.beta_arr[0]),
+                np.log(self.Bpole_arr[1]-self.Bpole_arr[0]),
+                np.log(self.incl_arr[1]-self.incl_arr[0]),
+            )
 
     def normalize(self):
         '''
         Return a normalized version of self
         '''
-        d_beta, d_Bpole, d_incl = self.get_deltas()
-        P = np.exp(self.data - self.data.max())
+        lnd_beta, lnd_Bpole, lnd_incl = self.get_deltas(ln=True)
 
-        ln_total = np.log( np.sum(P)*d_beta*d_Bpole*d_incl )
+        ln_norm = ln_mar_check(self.data) + lnd_beta+lnd_Bpole+lnd_incl 
         
-        return(lnpost(np.log(P)-ln_total, self.beta_arr,self.Bpole_arr,self.incl_arr,self.obsID))
+        return(lnpost(self.data-ln_norm, self.beta_arr,self.Bpole_arr,self.incl_arr,self.obsID))
 
     def plot_corner(self, fig=None, ax=None, right=False):
         '''
@@ -614,45 +656,37 @@ class lnpost():
         #cmap.set_over('yellow', 1.0)
         #cmap.set_under('yellow', 1.0)
 
-        d_beta, d_Bpole, d_incl = self.get_deltas()
-
-        P = np.exp(self.data-self.data.max())
+        lnd_beta, lnd_Bpole, lnd_incl = self.get_deltas(ln=True)
 
         # Bpole
-        mar = np.sum(P, axis=(0,2))*d_beta*d_incl
-        mar /= np.sum(mar)*d_Bpole
+        lnmar = ln_mar_check(self.data, axis=(0,2)) + lnd_beta+lnd_incl
         ax[0,0+k].set_axis_on()
-        ax[0,0+k].plot(self.Bpole_arr, mar)
+        ax[0,0+k].plot(self.Bpole_arr, exp_check(lnmar))
 
         #beta
-        mar = np.sum(P, axis=(1,2))*d_Bpole*d_incl
-        mar /= np.sum(mar)*d_beta
+        lnmar = ln_mar_check(self.data, axis=(1,2)) + lnd_Bpole+lnd_incl
         ax[2,2+k].set_axis_on()
-        ax[2,2+k].plot(self.beta_arr, mar)
+        ax[2,2+k].plot(self.beta_arr, exp_check(lnmar))
 
         #incl
-        mar = np.sum(P, axis=(0,1))*d_beta*d_Bpole
-        mar /= np.sum(mar)*d_incl
+        lnmar = ln_mar_check(self.data, axis=(0,1)) + lnd_beta+lnd_Bpole
         ax[1,1+k].set_axis_on()
-        ax[1,1+k].plot(self.incl_arr, mar)
+        ax[1,1+k].plot(self.incl_arr, exp_check(lnmar))
 
         # Bpole - beta
-        mar = np.sum(P, axis=2)*d_incl
-        mar /= np.sum(mar)*d_beta*d_Bpole
+        lnmar = ln_mar_check(self.data, axis=2) + lnd_incl
         ax[2,0+k].set_axis_on()
-        ax[2,0+k].pcolormesh(self.Bpole_arr,self.beta_arr, mar, shading='auto', cmap=cmap, vmin=0, vmax=mar.max())
+        ax[2,0+k].pcolormesh(self.Bpole_arr,self.beta_arr, exp_check(lnmar), shading='auto', cmap=cmap, vmin=0, vmax=exp_check(lnmar).max())
 
         # Bpole - incl
-        mar = np.sum(P, axis=0)*d_beta
-        mar /= np.sum(mar)*d_Bpole*d_incl
+        lnmar = ln_mar_check(self.data, axis=0) + lnd_beta
         ax[1,0+k].set_axis_on()
-        ax[1,0+k].pcolormesh(self.Bpole_arr,self.incl_arr, mar.T, shading='auto', cmap=cmap, vmin=0, vmax=mar.max())
+        ax[1,0+k].pcolormesh(self.Bpole_arr,self.incl_arr, exp_check(lnmar).T, shading='auto', cmap=cmap, vmin=0, vmax=exp_check(lnmar).max())
 
         # beta - incl
-        mar = np.sum(P, axis=1)*d_Bpole
-        mar /= np.sum(mar)*d_beta*d_incl
+        lnmar = ln_mar_check(self.data, axis=1) + lnd_Bpole
         ax[2,1+k].set_axis_on()
-        ax[2,1+k].pcolormesh(self.incl_arr,self.beta_arr, mar, shading='auto', cmap=cmap, vmin=0, vmax=mar.max())
+        ax[2,1+k].pcolormesh(self.incl_arr,self.beta_arr, exp_check(lnmar), shading='auto', cmap=cmap, vmin=0, vmax=exp_check(lnmar).max())
 
         ax[2,2+k].set_xlabel('beta (deg)')
         ax[2,1+k].set_xlabel('incl (deg)')
@@ -692,55 +726,56 @@ def combine_obs(nobs):
         # 1. read in the first observation
         ln_LH = read_lnLH_pars('lnLH_PARS_{}_obs0.h5'.format(S))
 
-        # 2. Write the normalized the post_noprior to disk
-        ln_LH.mar_phase_noise(normalize=True).write('lnpost_PARS_noprior_{}_obs0.h5'.format(S))
-        # now get the unnormalized post_noprior
-        ln_post_noprior = ln_LH.mar_phase_noise(normalize=False)
+        # 2. Marginalize for the phase and noise scale (without priors), 
+        ln_post_mar_noprior0 = ln_LH.mar_phase_noise()
+        
+        # 3. Write to disk the normalized verison
+        ln_post_mar_noprior0.normalize().write('lnpost_PARS_noprior_{}_obs0.h5'.format(S))
 
-        # 3. multiply by the prior
+        # 4. multiply by LH the prior
         ln_post = ln_LH.apply_priors()
-            #write to disk
-        ln_post.write('lnpost_PARS_fullpar_{}_obs0.h5'.format(S))
-        # 4. write the normalized marginalize phi and noise scale
-        ln_post.mar_phase_noise(normalize=True).write('lnpost_PARS_{}_obs0.h5'.format(S))
-        # now get the unnormalized post_noprior
-        ln_post_mar = ln_post.mar_phase_noise(normalize=False)
+        
+        # 5. write to disk the normalize version of the posterior for the observation
+        ln_post.normalize().write('lnpost_PARS_fullpar_{}_obs0.h5'.format(S))
 
-
-        # 4. Keeping track of the obsID used
+        # 6. marginalize the observation for phi and noise scale
+        ln_post_mar0 = ln_post.mar_phase_noise()
+        
+        # 7. Write to disk the normalize marginalized posterior for this observation. 
+        ln_post_mar0.normalize().write('lnpost_PARS_{}_obs0.h5'.format(S))
+        
+        # 8. Keeping track of the obsID used
         obsID = [ln_LH.obsID]
         # if there are more than one observation:
         if nobs > 1:
             for i in range(1,nobs):
-                # 1. read in the LH for ith observation
+                # steps 1-3 from above
                 ln_LH = read_lnLH_pars('lnLH_PARS_{}_obs{}.h5'.format(S,i))
-                # write the normalized post noprior
-                ln_LH.mar_phase_noise(normalize=True).write('lnpost_PARS_noprior_{}_obs{}.h5'.format(S,i))
-                # now get the unnormalized version
-                mar = ln_LH.mar_phase_noise(normalize=False)
-                # combine the probabilities
-                ln_post_noprior.data = ln_post_noprior.data + mar.data
+                ln_post_mar_noprior = ln_LH.mar_phase_noise()
+                ln_post_mar_noprior.normalize().write('lnpost_PARS_noprior_{}_obs{}.h5'.format(S,i))
                 
-                # 2. multiply by the prior
+                # combine the probabilities into the first observation data structure
+                ln_post_mar_noprior0.data = ln_post_mar_noprior0.data + ln_post_mar_noprior.data
+                
+                # steps 4-7 from above
                 ln_post = ln_LH.apply_priors()
-                ln_post.write('lnpost_PARS_fullpar_{}_obs{}.h5'.format(S,i))
-                # write the normalized post noprior
-                ln_post.mar_phase_noise(normalize=True).write('lnpost_PARS_{}_obs{}.h5'.format(S,i))
-                # get the unnormalized version
-                mar = ln_post.mar_phase_noise(normalize=False)
-                # combine the probabilities
-                ln_post_mar.data = ln_post_mar.data + mar.data
+                ln_post.normalize().write('lnpost_PARS_fullpar_{}_obs{}.h5'.format(S,i))
+                ln_post_mar = ln_post.mar_phase_noise()
+                ln_post_mar.normalize().write('lnpost_PARS_{}_obs0.h5'.format(S))
+
+                # combine the probabilities into the first observation data structure
+                ln_post_mar0.data = ln_post_mar0.data + ln_post_mar.data
+                
                 # keep track of the obsID combined
                 obsID.append(ln_LH.obsID)
+
         # replace the obsID in the object in which the combination was done
-        ln_post_mar.obsID = obsID
-        ln_post_noprior.obsID = obsID
-        # normalize the results
-        ln_post_mar = ln_post_mar.normalize()
-        ln_post_noprior = ln_post_noprior.normalize()
-        #write to disk
-        ln_post_mar.write('lnpost_PARS_{}.h5'.format(S))  
-        ln_post_noprior.write('lnpost_PARS_noprior_{}.h5'.format(S))        
+        ln_post_mar0.obsID = obsID
+        ln_post_mar_noprior0.obsID = obsID
+
+        #write to combined normalized posterior to disk
+        ln_post_mar0.normalize().write('lnpost_PARS_{}.h5'.format(S))  
+        ln_post_mar_noprior0.normalize().write('lnpost_PARS_noprior_{}.h5'.format(S))        
       
     return()
 
@@ -749,24 +784,27 @@ def overview_plots(nobs):
     Function to create a PDF with overview plots of the probabilities. 
     This function assumed that the files created by the combine_obs function are in the current directory. 
     '''
-    #Stokes = ['V', 'N1']
+    
+    # during the 'combine_obs' stage, all of the probabilities have been appropriately normalized. 
+    # so this is not necessary to perform here. Just read in the data and plot. 
+
     with PdfPages('post_summary.pdf') as pdf:
 
         # For each observation, the full parameter 1D marginalization
         for i in range(0,nobs):
             # The likelihood alone (aka no prior, with scale noise)
-            P = read_lnLH_pars('lnLH_PARS_N1_obs{}.h5'.format(i))
-            fig, ax = P.plot_mar(right=True, c='k',ls='--')
-            P = read_lnLH_pars('lnLH_PARS_V_obs{}.h5'.format(i))
-            fig, ax = P.plot_mar(fig=fig, ax=ax, right=False, c='k',ls='--')            
+            lnP = read_lnLH_pars('lnLH_PARS_N1_obs{}.h5'.format(i))
+            fig, ax = lnP.plot_mar(right=True, c='k',ls='--')
+            lnP = read_lnLH_pars('lnLH_PARS_V_obs{}.h5'.format(i))
+            fig, ax = lnP.plot_mar(fig=fig, ax=ax, right=False, c='k',ls='--')            
             # The posterior (aka with prior and scale noise)
-            P = read_lnLH_pars('lnpost_PARS_fullpar_N1_obs{}.h5'.format(i))
-            fig, ax = P.plot_mar(fig=fig, ax=ax, right=True, c='k')
-            P = read_lnLH_pars('lnpost_PARS_fullpar_V_obs{}.h5'.format(i))
-            fig, ax = P.plot_mar(fig=fig, ax=ax, right=False, c='k')
+            lnP = read_lnLH_pars('lnpost_PARS_fullpar_N1_obs{}.h5'.format(i))
+            fig, ax = lnP.plot_mar(fig=fig, ax=ax, right=True, c='k')
+            lnP = read_lnLH_pars('lnpost_PARS_fullpar_V_obs{}.h5'.format(i))
+            fig, ax = lnP.plot_mar(fig=fig, ax=ax, right=False, c='k')
             # over plot the priors
-            fig, ax = P.plot_prior(fig=fig, ax=ax, right=True, c='orchid', alpha=0.5, lw=3 )
-            fig, ax = P.plot_prior(fig=fig, ax=ax, right=False, c='orchid', alpha=0.5, lw=3 )
+            fig, ax = lnP.plot_prior(fig=fig, ax=ax, right=True, c='orchid', alpha=0.5, lw=3 )
+            fig, ax = lnP.plot_prior(fig=fig, ax=ax, right=False, c='orchid', alpha=0.5, lw=3 )
             # add labels and titles
             ax[0,0].set_title('Stokes V')
             ax[0,2].set_title('Null')
@@ -780,10 +818,10 @@ def overview_plots(nobs):
         # For each observation, the corner plot of beta, Bpole, incl. 
         for i in range(0,nobs):
             # No prior, with scale noise
-            P = read_lnpost('lnpost_PARS_noprior_N1_obs{}.h5'.format(i))
-            fig, ax = P.plot_corner(right=True)
-            P = read_lnpost('lnpost_PARS_noprior_V_obs{}.h5'.format(i))
-            fig, ax = P.plot_corner(fig=fig, ax=ax, right=False)
+            lnP = read_lnpost('lnpost_PARS_noprior_N1_obs{}.h5'.format(i))
+            fig, ax = lnP.plot_corner(right=True)
+            lnP = read_lnpost('lnpost_PARS_noprior_V_obs{}.h5'.format(i))
+            fig, ax = lnP.plot_corner(fig=fig, ax=ax, right=False)
             ax[0,0].set_title('Stokes V')
             ax[0,3].set_title('Null')
             fig.suptitle("Observation {}, scale noise, no prior".format(i), fontsize=16)
@@ -793,10 +831,10 @@ def overview_plots(nobs):
             fig.subplots_adjust(top=0.88)
             pdf.savefig()
             # With prior, with scale noise
-            P = read_lnpost('lnpost_PARS_N1_obs{}.h5'.format(i))
-            fig, ax = P.plot_corner(right=True)
-            P = read_lnpost('lnpost_PARS_V_obs{}.h5'.format(i))
-            fig, ax = P.plot_corner(fig=fig, ax=ax, right=False)
+            lnP = read_lnpost('lnpost_PARS_N1_obs{}.h5'.format(i))
+            fig, ax = lnP.plot_corner(right=True)
+            lnP = read_lnpost('lnpost_PARS_V_obs{}.h5'.format(i))
+            fig, ax = lnP.plot_corner(fig=fig, ax=ax, right=False)
             ax[0,0].set_title('Stokes V')
             ax[0,3].set_title('Null')
             fig.suptitle("Observation {}, scale noise, with prior".format(i), fontsize=16)
@@ -806,10 +844,10 @@ def overview_plots(nobs):
             fig.subplots_adjust(top=0.88)
             pdf.savefig()
 
-        P = read_lnpost('lnpost_PARS_noprior_N1.h5')
-        fig, ax = P.plot_corner(right=True)
-        P = read_lnpost('lnpost_PARS_noprior_V.h5')
-        fig, ax = P.plot_corner(fig=fig, ax=ax, right=False)
+        lnP = read_lnpost('lnpost_PARS_noprior_N1.h5')
+        fig, ax = lnP.plot_corner(right=True)
+        lnP = read_lnpost('lnpost_PARS_noprior_V.h5')
+        fig, ax = lnP.plot_corner(fig=fig, ax=ax, right=False)
         ax[0,0].set_title('Stokes V')
         ax[0,3].set_title('Null')
         for item in ax.flatten():
@@ -819,10 +857,10 @@ def overview_plots(nobs):
         fig.subplots_adjust(top=0.88)
         pdf.savefig()
 
-        P = read_lnpost('lnpost_PARS_N1.h5')
-        fig, ax = P.plot_corner(right=True)
-        P = read_lnpost('lnpost_PARS_V.h5')
-        fig, ax = P.plot_corner(fig=fig, ax=ax, right=False)
+        lnP = read_lnpost('lnpost_PARS_N1.h5')
+        fig, ax = lnP.plot_corner(right=True)
+        lnP = read_lnpost('lnpost_PARS_V.h5')
+        fig, ax = lnP.plot_corner(fig=fig, ax=ax, right=False)
         ax[0,0].set_title('Stokes V')
         ax[0,3].set_title('Null')
         for item in ax.flatten():
@@ -831,9 +869,6 @@ def overview_plots(nobs):
         fig.tight_layout()
         fig.subplots_adjust(top=0.88)
         pdf.savefig()
-
-
-
 
     return()
 
