@@ -549,11 +549,15 @@ def get_prior_Bpole(Bpole_arr):
 
 def get_prior_incl(incl_arr):
     '''
-    Get the sin prior for the inclination
+    Get the sin prior for the inclination. 
+    If incl = 0 or 180, the prior is formally zero. This causes problems in ln-format calculations.
+    Normally, if the star has a measured vsini, i cannot be zero, and this issue is avoided 
+    by the inclination grid not going to 0 and 180. 
     
     :param incl_arr: the inclination grid values (in degree)
     '''
     prior_incl = np.sin(incl_arr*np.pi/180) /2	# p(incl)dincl = sin(incl)dincl (P(i<io) = 1-cos(io))
+    
     return(prior_incl)
 
 def get_prior_beta(beta_arr):
