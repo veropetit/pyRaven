@@ -88,6 +88,16 @@ class chi:
             f.attrs['incl'] = self.incl
             f.attrs['obsID'] = self.obsID
 
+    def plot(self, index_phi):
+        fig, ax = plt.subplots(1,1)
+        im = ax.pcolormesh(self.Bpole_arr, self.beta_arr, self.data[:,:,index_phi], 
+                        cmap='Purples_r', vmin=0, vmax=np.max(self.data))
+        co = plt.colorbar(im)
+        co.ax.set_ylabel('chi2')
+        ax.set_xlabel('Bpole (Gauss)')
+        ax.set_ylabel('Beta (degree)')
+        ax.set_title('Obs: {} incl: {:3.1f}, phi: {:3.1f}'.format(self.obsID, self.incl,self.phi_arr[index_phi]))
+        return(fig, ax)
 
 def create_chi(beta_arr, Bpole_arr, phi_arr, incl, obsID):
     '''
