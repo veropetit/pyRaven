@@ -740,23 +740,26 @@ def combine_obs(nobs):
         # 1. read in the first observation
         ln_LH = read_lnLH_pars('lnLH_PARS_{}_obs0.h5'.format(S))
 
-        # 2. Marginalize for the phase and noise scale (without priors), 
+        # 2. write the normalized LH to disk
+        ln_LH.normalize().write('lnpost_PARS_noprior_{}_obs0.h5'.format(S))
+
+        # 3. Marginalize for the phase and noise scale (without priors), 
         ln_post_mar_noprior0 = ln_LH.mar_phase_noise()
         
-        # 3. Write to disk the normalized verison
-        ln_post_mar_noprior0.normalize().write('lnpost_PARS_noprior_{}_obs0.h5'.format(S))
+        # 4. Write to disk the normalized verison
+        ln_post_mar_noprior0.normalize().write('lnpost_PARS_mar_noprior_{}_obs0.h5'.format(S))
 
-        # 4. multiply by LH the prior
+        # 5. multiply LH by the prior
         ln_post = ln_LH.apply_priors()
         
-        # 5. write to disk the normalize version of the posterior for the observation
-        ln_post.normalize().write('lnpost_PARS_fullpar_{}_obs0.h5'.format(S))
+        # 6. write to disk the normalize version of the posterior for the observation
+        ln_post.normalize().write('lnpost_PARS_wprior_{}_obs0.h5'.format(S))
 
-        # 6. marginalize the observation for phi and noise scale
+        # 7. marginalize the observation for phi and noise scale
         ln_post_mar0 = ln_post.mar_phase_noise()
         
-        # 7. Write to disk the normalize marginalized posterior for this observation. 
-        ln_post_mar0.normalize().write('lnpost_PARS_{}_obs0.h5'.format(S))
+        # 8. Write to disk the normalize marginalized posterior for this observation. 
+        ln_post_mar0.normalize().write('lnpost_PARS_mar_wprior_{}_obs0.h5'.format(S))
         
         # 8. Keeping track of the obsID used
         obsID = [ln_LH.obsID]
@@ -765,17 +768,18 @@ def combine_obs(nobs):
             for i in range(1,nobs):
                 # steps 1-3 from above
                 ln_LH = read_lnLH_pars('lnLH_PARS_{}_obs{}.h5'.format(S,i))
+                ln_LH.normalize().write('lnpost_PARS_noprior_{}_obs{}.h5'.format(S,i))
                 ln_post_mar_noprior = ln_LH.mar_phase_noise()
-                ln_post_mar_noprior.normalize().write('lnpost_PARS_noprior_{}_obs{}.h5'.format(S,i))
+                ln_post_mar_noprior.normalize().write('lnpost_PARS_mar_noprior_{}_obs{}.h5'.format(S,i))
                 
                 # combine the probabilities into the first observation data structure
                 ln_post_mar_noprior0.data = ln_post_mar_noprior0.data + ln_post_mar_noprior.data
                 
-                # steps 4-7 from above
+                # steps 5-8 from above
                 ln_post = ln_LH.apply_priors()
-                ln_post.normalize().write('lnpost_PARS_fullpar_{}_obs{}.h5'.format(S,i))
+                ln_post.normalize().write('lnpost_PARS_wprior_{}_obs{}.h5'.format(S,i))
                 ln_post_mar = ln_post.mar_phase_noise()
-                ln_post_mar.normalize().write('lnpost_PARS_{}_obs0.h5'.format(S))
+                ln_post_mar.normalize().write('lnpost_PARS_mar_wprior_{}_obs{}.h5'.format(S,i))
 
                 # combine the probabilities into the first observation data structure
                 ln_post_mar0.data = ln_post_mar0.data + ln_post_mar.data
@@ -788,8 +792,8 @@ def combine_obs(nobs):
         ln_post_mar_noprior0.obsID = obsID
 
         #write to combined normalized posterior to disk
-        ln_post_mar0.normalize().write('lnpost_PARS_{}.h5'.format(S))  
-        ln_post_mar_noprior0.normalize().write('lnpost_PARS_noprior_{}.h5'.format(S))        
+        ln_post_mar0.normalize().write('lnpost_PARS_mar_wprior_{}.h5'.format(S))  
+        ln_post_mar_noprior0.normalize().write('lnpost_PARS_mar_noprior_{}.h5'.format(S))        
       
     return()
 
@@ -806,15 +810,15 @@ def overview_plots(nobs):
 
         # For each observation, the full parameter 1D marginalization
         for i in range(0,nobs):
-            # The likelihood alone (aka no prior, with scale noise)
-            lnP = read_lnLH_pars('lnLH_PARS_N1_obs{}.h5'.format(i))
+            # The posterior with flat prior (aka no prior, with scale noise)
+            lnP = read_lnLH_pars('lnpost_PARS_noprior_N1_obs{}.h5'.format(i))
             fig, ax = lnP.plot_mar(right=True, c='k',ls='--')
-            lnP = read_lnLH_pars('lnLH_PARS_V_obs{}.h5'.format(i))
+            lnP = read_lnLH_pars('lnpost_PARS_noprior_V_obs{}.h5'.format(i))
             fig, ax = lnP.plot_mar(fig=fig, ax=ax, right=False, c='k',ls='--')            
             # The posterior (aka with prior and scale noise)
-            lnP = read_lnLH_pars('lnpost_PARS_fullpar_N1_obs{}.h5'.format(i))
+            lnP = read_lnLH_pars('lnpost_PARS_wprior_N1_obs{}.h5'.format(i))
             fig, ax = lnP.plot_mar(fig=fig, ax=ax, right=True, c='k')
-            lnP = read_lnLH_pars('lnpost_PARS_fullpar_V_obs{}.h5'.format(i))
+            lnP = read_lnLH_pars('lnpost_PARS_wprior_V_obs{}.h5'.format(i))
             fig, ax = lnP.plot_mar(fig=fig, ax=ax, right=False, c='k')
             # over plot the priors
             fig, ax = lnP.plot_prior(fig=fig, ax=ax, right=True, c='orchid', alpha=0.5, lw=3 )
@@ -832,9 +836,9 @@ def overview_plots(nobs):
         # For each observation, the corner plot of beta, Bpole, incl. 
         for i in range(0,nobs):
             # No prior, with scale noise
-            lnP = read_lnpost('lnpost_PARS_noprior_N1_obs{}.h5'.format(i))
+            lnP = read_lnpost('lnpost_PARS_mar_noprior_N1_obs{}.h5'.format(i))
             fig, ax = lnP.plot_corner(right=True)
-            lnP = read_lnpost('lnpost_PARS_noprior_V_obs{}.h5'.format(i))
+            lnP = read_lnpost('lnpost_PARS_mar_noprior_V_obs{}.h5'.format(i))
             fig, ax = lnP.plot_corner(fig=fig, ax=ax, right=False)
             ax[0,0].set_title('Stokes V')
             ax[0,3].set_title('Null')
@@ -845,9 +849,9 @@ def overview_plots(nobs):
             fig.subplots_adjust(top=0.88)
             pdf.savefig()
             # With prior, with scale noise
-            lnP = read_lnpost('lnpost_PARS_N1_obs{}.h5'.format(i))
+            lnP = read_lnpost('lnpost_PARS_mar_wprior_N1_obs{}.h5'.format(i))
             fig, ax = lnP.plot_corner(right=True)
-            lnP = read_lnpost('lnpost_PARS_V_obs{}.h5'.format(i))
+            lnP = read_lnpost('lnpost_PARS_mar_wprior_V_obs{}.h5'.format(i))
             fig, ax = lnP.plot_corner(fig=fig, ax=ax, right=False)
             ax[0,0].set_title('Stokes V')
             ax[0,3].set_title('Null')
@@ -858,9 +862,9 @@ def overview_plots(nobs):
             fig.subplots_adjust(top=0.88)
             pdf.savefig()
 
-        lnP = read_lnpost('lnpost_PARS_noprior_N1.h5')
+        lnP = read_lnpost('lnpost_PARS_mar_noprior_N1.h5')
         fig, ax = lnP.plot_corner(right=True)
-        lnP = read_lnpost('lnpost_PARS_noprior_V.h5')
+        lnP = read_lnpost('lnpost_PARS_mar_noprior_V.h5')
         fig, ax = lnP.plot_corner(fig=fig, ax=ax, right=False)
         ax[0,0].set_title('Stokes V')
         ax[0,3].set_title('Null')
@@ -871,9 +875,9 @@ def overview_plots(nobs):
         fig.subplots_adjust(top=0.88)
         pdf.savefig()
 
-        lnP = read_lnpost('lnpost_PARS_N1.h5')
+        lnP = read_lnpost('lnpost_PARS_mar_wprior_N1.h5')
         fig, ax = lnP.plot_corner(right=True)
-        lnP = read_lnpost('lnpost_PARS_V.h5')
+        lnP = read_lnpost('lnpost_PARS_mar_wprior_V.h5')
         fig, ax = lnP.plot_corner(fig=fig, ax=ax, right=False)
         ax[0,0].set_title('Stokes V')
         ax[0,3].set_title('Null')
