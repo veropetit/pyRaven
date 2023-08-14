@@ -4,7 +4,7 @@ import pyRaven as rav
 import emcee
 import corner
 from scipy.stats import norm
-import scipy.optimize.curve_fit
+import scipy
 
 
 def fitdata(param,DataPacket,guess):
