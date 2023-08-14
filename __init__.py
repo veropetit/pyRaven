@@ -10,3 +10,5 @@ import pyRaven.loop
 import pyRaven.loop_speed
 import pyRaven.params
 import pyRaven.BayesObjects
+import pyRaven.fitparams
+
