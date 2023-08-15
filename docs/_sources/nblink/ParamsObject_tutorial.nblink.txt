@@ -1,0 +1,3 @@
+{
+    "path": "../../../StandAloneTutorials/ParamsObject_tutorial.ipynb"
+}

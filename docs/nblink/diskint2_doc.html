@@ -1,0 +1,1429 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Documentation for diskint2 &mdash; Raven  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/nbsphinx-code-cells.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/template.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Geometry documentation" href="geometry_doc.html" />
+    <link rel="prev" title="User’s manual for the BayesObjects.py classes" href="BayesObjects_user.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Raven
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../Installation.html">Installation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">How to run pyRaven tutorial</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="01-DataSetup.html">01 - Data Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02-FitIntensity.html">02- Fit of the intensity profiles for single stars</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03-ChiSquareCalcLoop.html">03- Calculating the chi2 with the loop code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04-CalculateProbabilities.html">04 - Calculate probabilites from the chi2 files</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Standalone tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="ParamsObject_tutorial.html">Tutorial on how to use the Params Dictionary objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="BayesObjects_user.html">User’s manual for the BayesObjects.py classes</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Underlying physics and statistics</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Documentation for diskint2</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#0.-Importing-the-necessary-packages">0. Importing the necessary packages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#1.-Notes-on-the-hardcoded-constants-in-the-codes">1. Notes on the hardcoded constants in the codes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#2.-The-weak-solution-derived-from-the-Unno-solution-(and-illustration-of-when-the-Weak-solution-is-not-valid)">2. The weak solution derived from the Unno solution (and illustration of when the Weak solution is not valid)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#3.-The-expressions-for-the-angles-used-in-the-Unno-solution">3. The expressions for the angles used in the Unno solution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#4.-The-correspondance-between-the-slope-of-the-source-function-and-the-\epsilon-limb-darkening-parameter-from-Grey">4. The correspondance between the slope of the source function and the <span class="math notranslate nohighlight">\(\epsilon\)</span> limb-darkening parameter from Grey</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#5.-The-analytical-rotation-broadened-profiles">5. The analytical rotation-broadened profiles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#6.-Convolution-with-macroturbulence-and-instrument-resolution">6. Convolution with macroturbulence and instrument resolution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Testing-the-code">Testing the code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Is-it-quick-to-interpolate-or-to-recalculate-w?">Is it quick to interpolate or to recalculate w?</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="geometry_doc.html">Geometry documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bayes_doc.html">Documentation for the bayesian calculations</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../API.html">pyRaven Package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Raven</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Documentation for diskint2</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/nblink/diskint2_doc.nblink.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="Documentation-for-diskint2">
+<h1>Documentation for diskint2<a class="headerlink" href="#Documentation-for-diskint2" title="Permalink to this heading"></a></h1>
+<p>In this notebook, we provide some derivations of the equations used in the calculation of the synthetic profiles.</p>
+<p>Table of content: 1. Notes on the hardcoded constants in the codes 2. The weak solution derived from the Unno solution (and illustration of when the Weak solution is not valid) 3. The expressions for the angles used in the Unno solution 4. The correspondance between the slope of the source function and the <span class="math notranslate nohighlight">\(\epsilon\)</span> limb-darkening parameter from Grey 5. The analytical rotation-broadened profiles</p>
+<section id="0.-Importing-the-necessary-packages">
+<h2>0. Importing the necessary packages<a class="headerlink" href="#0.-Importing-the-necessary-packages" title="Permalink to this heading"></a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">astropy.units</span> <span class="k">as</span> <span class="nn">u</span>
+<span class="kn">import</span> <span class="nn">astropy.constants</span> <span class="k">as</span> <span class="nn">const</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="kn">import</span> <span class="nn">pyRaven</span> <span class="k">as</span> <span class="nn">rav</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+loading specpolFlow package
+</pre></div></div>
+</div>
+</section>
+<section id="1.-Notes-on-the-hardcoded-constants-in-the-codes">
+<h2>1. Notes on the hardcoded constants in the codes<a class="headerlink" href="#1.-Notes-on-the-hardcoded-constants-in-the-codes" title="Permalink to this heading"></a></h2>
+<p><strong>For the Unno calculation:</strong></p>
+<p>The profile functions that needs to be calculated are</p>
+<div class="math notranslate nohighlight">
+\[\frac{1}{\sqrt{\pi}}\sum_i S_i H(u_o+u_{B,i} - u_\mathrm{LOS}),\]</div>
+<p>where</p>
+<div class="math notranslate nohighlight">
+\[u_{B,i}=\left[ \frac{\Delta \lambda_B}{\lambda_B}\right] * u_B.\]</div>
+<p>The term in bracket is what is returned by the Zeeman pattern function:</p>
+<div class="math notranslate nohighlight">
+\[u_B = \frac{\lambda_B}{\Delta\lambda_D}= \frac{\frac{\lambda_o^2}{c} \left[\frac{e_oB}{4\pi m_e c}\right]}{\frac{\lambda_o v_D}{c}}\]</div>
+<p>In the rightmost equation, the first <span class="math notranslate nohighlight">\(c\)</span> is in the units that matches the wavelength (<span class="math notranslate nohighlight">\(Å\)</span>/s) and the bracket terms is the Larmor frequency (Hz) so the <span class="math notranslate nohighlight">\(c\)</span> in the bracket is in cm/s. This makes the whole numerator to be in wavelength unit.</p>
+<p>The denominator also needs to be in wavelength units. So the <span class="math notranslate nohighlight">\(c\)</span> in the denominator must match the units of <span class="math notranslate nohighlight">\(v_D\)</span>, so here km/s.</p>
+<p>In the disk integration, <span class="math notranslate nohighlight">\(B\)</span> will change from cell to cell, but <span class="math notranslate nohighlight">\(\lambda_o\)</span> and <span class="math notranslate nohighlight">\(v_D\)</span> are set for a given model. So we can re-write this as:</p>
+<div class="math notranslate nohighlight">
+\[u_B = B[\mathrm{G}] ~~ \frac{\lambda_o[Å]}{v_D[\mathrm{km/s}]}~~ \frac{c[\mathrm{km/s}]}{c[\mathrm{Å/s}]} ~~\left[\frac{e_o[\mathrm{esu}]}{4\pi m_e[\mathrm{g}] ~~c[\mathrm{cm/s}]}\right]\]</div>
+<p>or</p>
+<div class="math notranslate nohighlight">
+\[u_B = B[\mathrm{G}] ~~ \frac{\lambda_o[Å]}{v_D[\mathrm{km/s}]} ~~\left[\frac{e_o}{4\pi m_e ~~c}\right] = 1.399624\times10^{-7}~~ B[\mathrm{G}] ~~ \frac{\lambda_o[Å]}{v_D[\mathrm{km/s}]}\]</div>
+<p>where we ask the astropy unit package below to give us the term in bracket in explicit units of <span class="math notranslate nohighlight">\(\frac{\mathrm{km/s}}{\mathrm{G}~ Å}\)</span>, so that <span class="math notranslate nohighlight">\(\lambda_o\)</span>, <span class="math notranslate nohighlight">\(v_D\)</span> and later on <span class="math notranslate nohighlight">\(B\)</span> will be entered with numerical values in <span class="math notranslate nohighlight">\(Å\)</span>, km/s, and G.</p>
+<p>In the code, it is setup this way:</p>
+<div class="math notranslate nohighlight">
+\[u_B =  \left[1.399624\times10^{-7}\frac{\lambda_o[Å]}{v_D[\mathrm{km/s}]}\right] ~~ B[\mathrm{G}],\]</div>
+<p>where the constant is <code class="docutils literal notranslate"><span class="pre">constLorentz</span></code> and the term in parenthesis is calculated early on as <code class="docutils literal notranslate"><span class="pre">perGaussLorentz</span></code>.</p>
+<p><strong>For the weak-field calculation:</strong></p>
+<p>The expression for Stokes V is:</p>
+<div class="math notranslate nohighlight">
+\[V(\lambda) = -\lambda_B g_\mathrm{eff} \cos\theta \frac{dI}{d\lambda}\]</div>
+<p>However, in our calculations we like to work in Doppler units (<span class="math notranslate nohighlight">\(u_o\)</span>). So we can first change the derivative from wavelength to velocity (in km/s):</p>
+<div class="math notranslate nohighlight">
+\[V(v) = -\lambda_B g_\mathrm{eff} \cos\theta \frac{dI}{dv} \frac{c[\mathrm{km/s}]}{\lambda_o[Å]}\]</div>
+<p>where the units of <span class="math notranslate nohighlight">\(c\)</span> matches the units of the velocity.</p>
+<p>Next, we can make the transformation to the thermal Doppler velocity unit (<span class="math notranslate nohighlight">\(u_o = v/v_D\)</span>):</p>
+<div class="math notranslate nohighlight">
+\[V(u_o) = -\lambda_B g_\mathrm{eff} \cos\theta \frac{dI}{du_o} \frac{c[\mathrm{km/s}]}{v_D[\mathrm{km/s}]\lambda_o[Å]}\]</div>
+<p>Now we can expand <span class="math notranslate nohighlight">\(\lambda_B\)</span> like above:</p>
+<div class="math notranslate nohighlight">
+\[V(u_o) = - \frac{\lambda_o^2}{c[\mathrm{Å/s}]} \left[\frac{e_oB}{4\pi m_e c[\mathrm{cm/s}]}\right] g_\mathrm{eff} \cos\theta \frac{dI}{du_o} \frac{c[\mathrm{km/s}]}{v_D[\mathrm{km/s}]\lambda_o[Å]}\]</div>
+<p>We can now re-organize a bit, noting that <span class="math notranslate nohighlight">\(B\)</span> and <span class="math notranslate nohighlight">\(\cos\theta\)</span> will be different on the surface, but <span class="math notranslate nohighlight">\(\lambda_o\)</span> and <span class="math notranslate nohighlight">\(g_\mathrm{eff}\)</span> will be the same for a given model:</p>
+<div class="math notranslate nohighlight">
+\[V(u_o) = - B \cos\theta ~~ g_\mathrm{eff} \frac{\lambda_o}{v_D} ~~ \frac{c[\mathrm{km/s}]}{c[\mathrm{Å/s}]} ~~\left[\frac{e_o[\mathrm{esu}]}{4\pi m_e[\mathrm{g}] ~~c[\mathrm{cm/s}]}\right] \frac{dI}{du_o}\]</div>
+<p>or</p>
+<div class="math notranslate nohighlight">
+\[V(u_o) =  1.399624\times10^{-7}~~ B[\mathrm{G}] \cos\theta ~~ g_\mathrm{eff}\frac{\lambda_o[Å]}{v_D[\mathrm{km/s}]}  \frac{dI}{du_o}\]</div>
+<p>As can be seen, for both the Unno and Weak-field method, we can hardcode the same constant.</p>
+<p>In the codes, it is setup this way:</p>
+<div class="math notranslate nohighlight">
+\[V(u_o) =  \left[1.399624\times10^{-7}~\frac{\lambda_o[Å]}{v_D[\mathrm{km/s}]} \right] g_\mathrm{eff} \cos\theta ~~ B[\mathrm{G}]  \frac{dI}{du_o}\]</div>
+<p>where the constant is <code class="docutils literal notranslate"><span class="pre">constLorentz</span></code> and the term in parenthesis is calculated early on as <code class="docutils literal notranslate"><span class="pre">perGaussLorentz</span></code>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">G_cgs</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">def_unit</span><span class="p">(</span><span class="s1">&#39;G_cgs&#39;</span><span class="p">,</span> <span class="mi">1</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">g</span><span class="o">**</span><span class="mf">0.5</span><span class="o">/</span><span class="n">u</span><span class="o">.</span><span class="n">cm</span><span class="o">**</span><span class="mf">0.5</span><span class="o">/</span><span class="n">u</span><span class="o">.</span><span class="n">s</span><span class="p">)</span>
+
+<span class="n">constant</span> <span class="o">=</span> <span class="p">(</span> <span class="n">const</span><span class="o">.</span><span class="n">e</span><span class="o">.</span><span class="n">esu</span> <span class="o">/</span> <span class="p">(</span><span class="mi">4</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">const</span><span class="o">.</span><span class="n">m_e</span><span class="o">*</span><span class="n">const</span><span class="o">.</span><span class="n">c</span><span class="p">)</span> <span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">km</span><span class="o">/</span><span class="n">u</span><span class="o">.</span><span class="n">s</span><span class="o">/</span><span class="p">(</span><span class="n">G_cgs</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">AA</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">constant</span><span class="p">)</span>
+
+
+<span class="c1"># Just checking that muB is what it&#39;s supposed to be</span>
+<span class="c1"># This is typical values for NGC 1624-2 CIV lines.</span>
+<span class="n">B</span> <span class="o">=</span> <span class="mf">20e3</span><span class="o">*</span><span class="n">G_cgs</span>
+<span class="n">vdop</span> <span class="o">=</span> <span class="mf">6.44</span> <span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">km</span><span class="o">/</span><span class="n">u</span><span class="o">.</span><span class="n">s</span> <span class="c1"># for carbon at 30000K</span>
+<span class="n">wave0</span> <span class="o">=</span> <span class="mf">5811.98</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">AA</span>
+
+<span class="n">muB</span> <span class="o">=</span> <span class="n">B</span><span class="o">*</span><span class="n">wave0</span><span class="o">/</span><span class="n">vdop</span> <span class="o">*</span> <span class="n">constant</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">muB</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">const</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">km</span><span class="o">/</span><span class="n">u</span><span class="o">.</span><span class="n">s</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+1.3996244936166518e-07 km / (Angstrom G_cgs s)
+2.526270051059039
+299792.458 km / s
+</pre></div></div>
+</div>
+</section>
+<section id="2.-The-weak-solution-derived-from-the-Unno-solution-(and-illustration-of-when-the-Weak-solution-is-not-valid)">
+<h2>2. The weak solution derived from the Unno solution (and illustration of when the Weak solution is not valid)<a class="headerlink" href="#2.-The-weak-solution-derived-from-the-Unno-solution-(and-illustration-of-when-the-Weak-solution-is-not-valid)" title="Permalink to this heading"></a></h2>
+<p>The weak-field local profile should be the same as the unno local profile when the field strength is set to zero.</p>
+<p>If <span class="math notranslate nohighlight">\(B=0\)</span>, then <span class="math notranslate nohighlight">\(\phi_p = \phi_r = \phi_b = \phi\)</span>. All of the elements of the propagation matrix therefore goes to zero, except <span class="math notranslate nohighlight">\(\eta_I = 1+\kappa\phi\)</span>. Also, <span class="math notranslate nohighlight">\(\Delta=\eta_I^4\)</span>.</p>
+<p>In the emerging intensity for the Unno solution reduces to:</p>
+<div class="math notranslate nohighlight">
+\[I(0) = S_0 + \frac{\eta^3}{\Delta} S_1 = 1 + \frac{1}{\eta} \mu S_1\]</div>
+<p>In the latter equality, I have made the intercept of the source function unity, and the slope of the source function <span class="math notranslate nohighlight">\(S_1\)</span> (<code class="docutils literal notranslate"><span class="pre">bnu</span></code> variable in the code) is the vertical slope which needs to be multiply by the cos of the angle between the local ray and the normal to the surface (<span class="math notranslate nohighlight">\(\mu\)</span>). Replacing the <span class="math notranslate nohighlight">\(\eta_I\)</span> with its value above yields:</p>
+<div class="math notranslate nohighlight">
+\[I(0) = 1 + \frac{1}{1+\kappa \phi}\mu S_1.\]</div>
+<p>Now, in the case of a purely longitudinal field: we can set <span class="math notranslate nohighlight">\(\theta=0\)</span> in the definitions of the propagation matrix elements. We also know that <span class="math notranslate nohighlight">\(\phi_r\)</span> and <span class="math notranslate nohighlight">\(\phi_b\)</span> will be the same as <span class="math notranslate nohighlight">\(\phi_p\)</span> but with a tiny tiny shift to the red and blue (we are here using a triplet approximation already). Here are the elements of the matrix that are not zero:</p>
+<div class="math notranslate nohighlight">
+\[\eta_I = 1 + \kappa \frac{\phi_b-\phi_r}{2} \simeq 1 + \kappa \phi\]</div>
+<p>where for the last approximation, we are telling ourselves that the mean of <span class="math notranslate nohighlight">\(\phi_r\)</span> and <span class="math notranslate nohighlight">\(\phi_b\)</span> is basically just <span class="math notranslate nohighlight">\(\phi\)</span> is the shift is very small.</p>
+<div class="math notranslate nohighlight">
+\[\eta_V = \frac{\kappa}{2}\left[\phi_b-\phi_r\right] = \frac{\kappa}{2}\left[\phi(u+g_\mathrm{eff}u_B)-\phi(u-g_\mathrm{eff}u_B)\right].\]</div>
+<p>Using the fact that <span class="math notranslate nohighlight">\(f(x+a)-f(x-a) = 2a \frac{f(x)}{dx}\)</span>, yields:</p>
+<div class="math notranslate nohighlight">
+\[\eta_V  \simeq \kappa g_\mathrm{eff}u_B\frac{d\phi(u)}{du}\]</div>
+<p>Similarly,</p>
+<div class="math notranslate nohighlight">
+\[\rho_V \simeq \kappa g_\mathrm{eff}u_B\frac{d\psi(u)}{du}\]</div>
+<p>Using only the non-zero elements, we can write</p>
+<div class="math notranslate nohighlight">
+\[\Delta = \eta_I^2(\eta_I^2-\eta_V^2+\rho_V^2) - (\eta_V\rho_V)^2\]</div>
+<p>and</p>
+<div class="math notranslate nohighlight">
+\[V(0) = -\frac{1}{\Delta} [\eta_I^2\eta_V + \rho_V(\eta_V\rho_V)]\mu S_1\]</div>
+<p>Combining together (and leaving the <span class="math notranslate nohighlight">\(-\mu S_1\)</span> term on the left side for a moment)</p>
+<div class="math notranslate nohighlight">
+\[\frac{-V(0)}{\mu S_1} = \frac{\eta_I^2\eta_V+\eta_V\rho_V^2}{\eta_I^4 - \eta_I^2\eta_V^2 + (\eta_I^2-\eta_V^2)\rho_V^2}\]</div>
+<p>(Intuitively, I know that the weak field approximation we use for e.g. the Bz calculation does not depends on the dispersion profile <span class="math notranslate nohighlight">\(\psi\)</span>, so the <span class="math notranslate nohighlight">\(\rho_V\)</span> element must cancel out, and the best way is with factorization)</p>
+<div class="math notranslate nohighlight">
+\[\frac{-V(0)}{\mu S_1} = \frac{\eta_V(\eta_I^2+\rho_V^2)}{(\eta_I^2-\eta_V^2)\eta_I^2+(\eta_I^2-\eta_V^2)\rho_V^2} = \frac{\eta_V(\eta_I^2+\rho_V^2)}{(\eta_I^2-\eta_V^2)(\eta_I^2+\rho_V^2)}=\frac{\eta_V}{(\eta_I^2-\eta_V^2)}\]</div>
+<p>or</p>
+<div class="math notranslate nohighlight">
+\[V(0)=-\mu S_1~\frac{\eta_V}{(\eta_I^2-\eta_V^2)}\]</div>
+<p>Before we replace with the elements of the propagation matrix, there is another approximation that is, I believe, justified. In the bottom term, we could ignore <span class="math notranslate nohighlight">\(\eta_V^2\)</span> if <span class="math notranslate nohighlight">\(\eta_V^2 &lt;&lt; \eta_I^2\)</span>. So let’s have a quick look at that.</p>
+<blockquote>
+<div><p>As a reminder:</p>
+<p><span class="math notranslate nohighlight">\(\eta_I = 1 + \kappa \phi\)</span></p>
+<p><span class="math notranslate nohighlight">\(\eta_V = \kappa g_\mathrm{eff}u_B\frac{d\phi(u)}{du}\)</span></p>
+</div></blockquote>
+<p>The figure below shows that <span class="math notranslate nohighlight">\(\phi\)</span> and <span class="math notranslate nohighlight">\(\frac{d\phi(u)}{du}\)</span> are both of the order of unity. The dashed line shows that a <span class="math notranslate nohighlight">\(u_B\)</span> of about 0.1 would still (barely) satisfy our requirement that the shift between <span class="math notranslate nohighlight">\(\sigma_r\)</span> and <span class="math notranslate nohighlight">\(\sigma_b\)</span> is much smaller than the width of the profile.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">u</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">300</span><span class="p">)</span>
+<span class="n">phi</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">profileI</span><span class="o">.</span><span class="n">voigt_fara</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">)</span><span class="o">.</span><span class="n">real</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+<span class="n">dphi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">phi</span><span class="p">,</span> <span class="n">u</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;phi&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">u</span><span class="o">-</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;phi_b (uB=0.1)&#39;</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">dphi</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;dphi/du&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;u&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Fig. 1&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Text(0.5, 1.0, &#39;Fig. 1&#39;)
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/nblink_diskint2_doc_9_1.png" src="../_images/nblink_diskint2_doc_9_1.png" />
+</div>
+</div>
+<p><span class="math notranslate nohighlight">\(\eta_I\)</span> will be either be of the order of 1.0 if <span class="math notranslate nohighlight">\(\kappa &lt;&lt; 1\)</span> and of the order of <span class="math notranslate nohighlight">\(\kappa\)</span> if <span class="math notranslate nohighlight">\(\kappa &gt;&gt; 1\)</span> (inside of the spectral line, that is).</p>
+<p>Now looking at <span class="math notranslate nohighlight">\(\eta_V\)</span>, <span class="math notranslate nohighlight">\(g_\mathrm{eff}\)</span> is usually of order of unity, and as we said above, <span class="math notranslate nohighlight">\(u_B &lt;&lt; 1\)</span> as per our previous approximation.</p>
+<p>If <span class="math notranslate nohighlight">\(\kappa\)</span> is small compared to unity, then combined with a small <span class="math notranslate nohighlight">\(uB\)</span>, <span class="math notranslate nohighlight">\(\eta_V\)</span> will be smaller than <span class="math notranslate nohighlight">\(\eta_I\)</span>. Even when <span class="math notranslate nohighlight">\(\kappa\)</span> is large, this is also be the case as long as <span class="math notranslate nohighlight">\(u_B\)</span> is small.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">fig_eta</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">kappa</span><span class="p">,</span> <span class="n">geff</span><span class="p">,</span> <span class="n">uB</span><span class="p">):</span> <span class="c1"># u phi and dphi are defined in cell above.</span>
+    <span class="n">etaI</span> <span class="o">=</span> <span class="mi">1</span><span class="o">+</span><span class="n">kappa</span><span class="o">*</span><span class="n">phi</span>
+    <span class="n">etaV</span> <span class="o">=</span> <span class="n">kappa</span> <span class="o">*</span> <span class="n">geff</span> <span class="o">*</span> <span class="n">uB</span> <span class="o">*</span> <span class="n">dphi</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">etaI</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;etaI**2&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">etaV</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;etaV**2&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;u&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;kappa = </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">kappa</span><span class="p">))</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span><span class="p">()</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+<span class="n">fig_eta</span><span class="p">(</span><span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)</span>
+<span class="n">fig_eta</span><span class="p">(</span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">10</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+()
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/nblink_diskint2_doc_11_1.png" src="../_images/nblink_diskint2_doc_11_1.png" />
+</div>
+</div>
+<p>So we can use this approximation to simplify as such:</p>
+<div class="math notranslate nohighlight">
+\[V(0)=-\mu S_1~\frac{\eta_V}{(\eta_I^2-\eta_V^2)} \simeq -\mu S_1~\frac{\eta_V}{\eta_I^2}\]</div>
+<p>The figure below checks that this is a fine approximation under the approximations above.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">fig_V</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">kappa</span><span class="p">,</span> <span class="n">geff</span><span class="p">,</span> <span class="n">uB</span><span class="p">,</span> <span class="n">muS1</span><span class="p">):</span> <span class="c1"># u phi and dphi are defined in cell above.</span>
+    <span class="n">etaI</span> <span class="o">=</span> <span class="mi">1</span><span class="o">+</span><span class="n">kappa</span><span class="o">*</span><span class="n">phi</span>
+    <span class="n">etaV</span> <span class="o">=</span> <span class="n">kappa</span> <span class="o">*</span> <span class="n">geff</span> <span class="o">*</span> <span class="n">uB</span> <span class="o">*</span> <span class="n">dphi</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="o">-</span><span class="n">muS1</span> <span class="o">*</span> <span class="n">etaV</span> <span class="o">/</span> <span class="p">(</span><span class="n">etaI</span><span class="o">**</span><span class="mi">2</span><span class="o">-</span><span class="n">etaV</span><span class="o">**</span><span class="mi">2</span><span class="p">),</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;full form&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="o">-</span><span class="n">muS1</span> <span class="o">*</span> <span class="n">etaV</span> <span class="o">/</span> <span class="p">(</span><span class="n">etaI</span><span class="o">**</span><span class="mi">2</span><span class="p">),</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;approximation&#39;</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;u&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;kappa = </span><span class="si">{}</span><span class="s1">, uB=</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">kappa</span><span class="p">,</span> <span class="n">uB</span><span class="p">))</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span><span class="p">()</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+<span class="n">fig_V</span><span class="p">(</span><span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+<span class="n">fig_V</span><span class="p">(</span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">10</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+<span class="n">fig_V</span><span class="p">(</span><span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">10.1</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+<span class="n">fig_V</span><span class="p">(</span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">10</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+()
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/nblink_diskint2_doc_13_1.png" src="../_images/nblink_diskint2_doc_13_1.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/nblink_diskint2_doc_13_2.png" src="../_images/nblink_diskint2_doc_13_2.png" />
+</div>
+</div>
+<p>To be more explicit, as long as <span class="math notranslate nohighlight">\(u_B\)</span> is small, it is OK no matter what <span class="math notranslate nohighlight">\(\kappa\)</span> is.</p>
+<p>But if <span class="math notranslate nohighlight">\(u_B\)</span> is not so small, you can get away with more as far as the specific approximation above is concerned. The bottom row shows that at large kappa, you are still constrained to have a <span class="math notranslate nohighlight">\(u_B\)</span> small enough because <span class="math notranslate nohighlight">\(\eta_I\)</span> will be of the order of <span class="math notranslate nohighlight">\(\kappa\)</span>. But for a small <span class="math notranslate nohighlight">\(\kappa\)</span>, <span class="math notranslate nohighlight">\(\eta_I\)</span> is of the order of 1, and <span class="math notranslate nohighlight">\(\eta_V\)</span> is of the order of <span class="math notranslate nohighlight">\(u_B \kappa\)</span>. So is <span class="math notranslate nohighlight">\(\kappa\)</span> is small, you can get away with a larger <span class="math notranslate nohighlight">\(u_B\)</span> and the
+approximation above is still valid. &gt; However, such a large <span class="math notranslate nohighlight">\(u_B\)</span> would NOT satisfy our previous approximation that the <span class="math notranslate nohighlight">\(\sigma_{rb}\)</span> are only shifted a tiny bit with respect to the width of the profile.</p>
+<p>We can now get an expression as a function of <span class="math notranslate nohighlight">\(\phi\)</span> by replacing the metric elements, which yields</p>
+<div class="math notranslate nohighlight">
+\[V(0) = -\mu S_1 \frac{\kappa g_\mathrm{eff}u_B\frac{d\phi(u)}{du}}{(1 + \kappa \phi)^2} = g_\mathrm{eff}u_B \left[ \frac{- \mu S_1\kappa\frac{d\phi(u)}{du}}{(1 + \kappa \phi)^2} \right]\]</div>
+<p>The second equality is just a re-arrangement of terms, because the term in bracket is equivalent to <span class="math notranslate nohighlight">\(\frac{d}{du}\left[ 1 + \frac{\mu S_1}{(1+\kappa\phi)} \right]=\frac{dI(0)}{du}\)</span>. So that we can also write instead:</p>
+<div class="math notranslate nohighlight">
+\[V(0) = g_\mathrm{eff}u_B \frac{dI(0)}{du}\]</div>
+<p>If ones expand <span class="math notranslate nohighlight">\(u_B\)</span>, and backtracks from <span class="math notranslate nohighlight">\(u\)</span> to wavelength, nothing that at the start of this discussion we assumed a purely longitudinal field, which can be seen as “what is the contribution to Stokes V of the longitudinal component of a given field”, when if one replaces <span class="math notranslate nohighlight">\(B\)</span> in the <span class="math notranslate nohighlight">\(u_B\)</span> expression with <span class="math notranslate nohighlight">\(B\cos\theta\)</span>, we recover the weak field expression that was originally given in the section about the hardcoded units (section 1).</p>
+<div class="math notranslate nohighlight">
+\[V(0) =  \left[1.399624\times10^{-7}\frac{\lambda_o[Å]}{v_D[\mathrm{km/s}]}\right] ~~  B_z[\mathrm{G}] ~g_\mathrm{eff}~ \frac{dI(0)}{du},\]</div>
+<p>where the constant is <code class="docutils literal notranslate"><span class="pre">constLorentz</span></code> and the term in parenthesis is calculated early on as <code class="docutils literal notranslate"><span class="pre">perGaussLorentz</span></code>.</p>
+<p>Finally, this means that computationally we can take the derivative (e.g. numerically) of the local intensity profile at every grid point (because the local profile will change because <span class="math notranslate nohighlight">\(\mu\)</span> changes). Alternatively, we can compute the derivative of <span class="math notranslate nohighlight">\(\phi\)</span>, which does not change, then use the first expression.</p>
+<p>The figure below shows that both expressions are identical indeed.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">fig_Vout</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">kappa</span><span class="p">,</span> <span class="n">geff</span><span class="p">,</span> <span class="n">uB</span><span class="p">,</span> <span class="n">muS1</span><span class="p">):</span> <span class="c1"># u phi and dphi are defined in cell above.</span>
+    <span class="n">I</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">muS1</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">kappa</span><span class="o">*</span><span class="n">phi</span><span class="p">)</span>
+    <span class="n">dI</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">I</span><span class="p">,</span> <span class="n">u</span><span class="p">)</span>
+    <span class="n">V1</span> <span class="o">=</span> <span class="o">-</span><span class="n">muS1</span> <span class="o">*</span> <span class="n">kappa</span> <span class="o">*</span> <span class="n">geff</span> <span class="o">*</span> <span class="n">uB</span> <span class="o">*</span> <span class="n">dphi</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">kappa</span><span class="o">*</span><span class="n">phi</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+    <span class="n">V2</span> <span class="o">=</span> <span class="n">geff</span> <span class="o">*</span> <span class="n">uB</span> <span class="o">*</span> <span class="n">dI</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">V1</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;using dphi&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">V2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;using dI&#39;</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;u&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;kappa = </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">kappa</span><span class="p">))</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span><span class="p">()</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+<span class="n">fig_Vout</span><span class="p">(</span><span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+<span class="n">fig_Vout</span><span class="p">(</span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">10</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+()
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/nblink_diskint2_doc_16_1.png" src="../_images/nblink_diskint2_doc_16_1.png" />
+</div>
+</div>
+<p>Finally to conclude this section, we can make a comparison with the local profile from the full unno solution for the local profiles (in the <code class="docutils literal notranslate"><span class="pre">profileV</span></code> module).</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">comp_unno</span><span class="p">(</span><span class="n">kappa</span><span class="p">,</span> <span class="n">uB</span><span class="p">):</span>
+    <span class="n">u</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">300</span><span class="p">)</span>
+    <span class="n">phi</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">profileI</span><span class="o">.</span><span class="n">voigt_fara</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">)</span><span class="o">.</span><span class="n">real</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">profileI</span><span class="o">.</span><span class="n">voigt_fara</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">)</span>
+    <span class="c1"># the np.sqrt(np.pi) is taken into account inside the local_out function</span>
+    <span class="n">dphi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">phi</span><span class="p">,</span> <span class="n">u</span><span class="p">)</span>
+
+
+    <span class="n">geff</span><span class="o">=</span><span class="mf">1.0</span>
+    <span class="n">muS1</span> <span class="o">=</span> <span class="mf">1.0</span>
+
+
+    <span class="n">I</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">muS1</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">kappa</span><span class="o">*</span><span class="n">phi</span><span class="p">)</span>
+    <span class="n">V</span> <span class="o">=</span> <span class="o">-</span><span class="n">muS1</span> <span class="o">*</span> <span class="n">kappa</span> <span class="o">*</span> <span class="n">geff</span> <span class="o">*</span> <span class="n">uB</span> <span class="o">*</span> <span class="n">dphi</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">kappa</span><span class="o">*</span><span class="n">phi</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="c1"># Using the dphi expression.</span>
+
+    <span class="c1"># Getting a triplet zeeman pattern with a geff=1</span>
+    <span class="n">pat</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">pattern</span><span class="o">.</span><span class="n">zeeman_pattern</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span> <span class="c1">#zeeman pattern with geff=1</span>
+    <span class="c1"># setting the ua=0, sintheta=0, costheta=1, and mu=1, S1(=bnu)=1</span>
+    <span class="n">unno</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">localV</span><span class="o">.</span><span class="n">unno_local_out_IV</span><span class="p">(</span><span class="n">uB</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">pat</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">kappa</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+    <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">I</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;weak&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">unno</span><span class="p">[</span><span class="s1">&#39;I&#39;</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;unno&#39;</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;kappa=</span><span class="si">{}</span><span class="s1">, uB=</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">kappa</span><span class="p">,</span> <span class="n">uB</span><span class="p">))</span>
+    <span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">u</span><span class="p">,</span><span class="n">V</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;weak&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">u</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="o">*</span><span class="n">unno</span><span class="p">[</span><span class="s1">&#39;V&#39;</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;unno&#39;</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">)</span> <span class="c1">#-1* to follow Doanti&#39;s convention</span>
+    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">ax</span><span class="p">:</span>
+        <span class="n">item</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;u&#39;</span><span class="p">)</span>
+        <span class="n">item</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+
+<span class="n">comp_unno</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)</span>
+<span class="n">comp_unno</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)</span>
+<span class="n">comp_unno</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span>
+<span class="n">comp_unno</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/nblink_diskint2_doc_18_0.png" src="../_images/nblink_diskint2_doc_18_0.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/nblink_diskint2_doc_18_1.png" src="../_images/nblink_diskint2_doc_18_1.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/nblink_diskint2_doc_18_2.png" src="../_images/nblink_diskint2_doc_18_2.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/nblink_diskint2_doc_18_3.png" src="../_images/nblink_diskint2_doc_18_3.png" />
+</div>
+</div>
+<p>The last two rows show what happens when the <span class="math notranslate nohighlight">\(u_B\)</span> gets too large.</p>
+</section>
+<section id="3.-The-expressions-for-the-angles-used-in-the-Unno-solution">
+<h2>3. The expressions for the angles used in the Unno solution<a class="headerlink" href="#3.-The-expressions-for-the-angles-used-in-the-Unno-solution" title="Permalink to this heading"></a></h2>
+<p>We obtained the B field vectors in LOS coordinates (B_LOS) with the rotation matrix.</p>
+<p>For the weak field, we only need the component of the field in the line of sign (the zLOS direction), so we only need the z component of B_LOS (<code class="docutils literal notranslate"><span class="pre">B_LOS[2,:]</span></code>).</p>
+<p>For the Unno solution, we need two values: * <span class="math notranslate nohighlight">\(\cos(\theta)\)</span> and <span class="math notranslate nohighlight">\(\sin(\theta)\)</span>, where <span class="math notranslate nohighlight">\(\theta\)</span> is the angle between the B-field vector and the z axis and * <span class="math notranslate nohighlight">\(\cos(2\phi)\)</span> and <span class="math notranslate nohighlight">\(\sin(2\phi)\)</span>, where <span class="math notranslate nohighlight">\(\phi\)</span> is the angle between the projection of the Bfield vector in the plane of the sky (xy) and the reference direction (here we’ll use the x-axis)</p>
+<p>If we use the unit vector in the direction of B, then <span class="math notranslate nohighlight">\(\cos(\theta)\)</span> is straightfowardly the z component of B_LOS (<code class="docutils literal notranslate"><span class="pre">B_LOS[2,:]</span></code>).</p>
+<p>We can get <span class="math notranslate nohighlight">\(\sin(\theta) = \sqrt{1-\cos^2(\theta)}\)</span>. This is also the projection of the Bfield vector on the xy plane (i.e. <span class="math notranslate nohighlight">\(\sqrt{\hat{B}_x^2+\hat{B}_y^2}\)</span>).</p>
+<p>Now, <span class="math notranslate nohighlight">\(\cos{\phi}\)</span> is <span class="math notranslate nohighlight">\(\frac{\hat{B}_x}{\sin(\theta)}\)</span></p>
+<p>We can use trig identity to get the cos and sin of the double angles:</p>
+<div class="math notranslate nohighlight">
+\[\cos(2\phi) = 2\cos^2\phi - 1 = 2 \frac{\hat{B}_x^2}{\sin^2(\theta)} - 1\]</div>
+<div class="math notranslate nohighlight">
+\[\sin(2\phi) = 2\sin\phi\cos\phi = 2 \frac{\hat{B}_x}{\sin(\theta)} \frac{\hat{B}_y}{\sin(\theta)} = 2 \frac{\hat{B}_x\hat{B}_y}{\sin^2(\theta)}\]</div>
+</section>
+<section id="4.-The-correspondance-between-the-slope-of-the-source-function-and-the-\epsilon-limb-darkening-parameter-from-Grey">
+<h2>4. The correspondance between the slope of the source function and the <span class="math notranslate nohighlight">\(\epsilon\)</span> limb-darkening parameter from Grey<a class="headerlink" href="#4.-The-correspondance-between-the-slope-of-the-source-function-and-the-\epsilon-limb-darkening-parameter-from-Grey" title="Permalink to this heading"></a></h2>
+<p>For a semi-infinite flat atmosphere, the intensity along an outgoing ray is:</p>
+<div class="math notranslate nohighlight">
+\[I(\tau_z,u&gt;0) = \int_{\tau_z'=\tau_z}^{\tau_z'=\infty} S(\tau_z')~ \mathrm{e}^{\frac{\tau_z-\tau_z'}{u}} ~ \frac{d\tau_z}{u}\]</div>
+<p>where <span class="math notranslate nohighlight">\(u\)</span> is the cosine of the angle between the ray and the normal to the surface, <span class="math notranslate nohighlight">\(S\)</span> is the source function, and <span class="math notranslate nohighlight">\(\tau_z\)</span> is the vertical optical depth (with <span class="math notranslate nohighlight">\(\tau_z=0\)</span> at the surface).</p>
+<p>If we assume that the source function is a linar function of the optical depth:</p>
+<div class="math notranslate nohighlight">
+\[S(\tau_z) = S_{0} + S_{1} ~\tau_z\]</div>
+<p>then the emergent intensity (<span class="math notranslate nohighlight">\(I(\tau_z=0\)</span>) becomes</p>
+<div class="math notranslate nohighlight">
+\[I(\tau_z=0,~u&gt;0) = S_{0} + S_{1} ~u\]</div>
+<p>We can normalize the intensity by the intensity at the center of the stellar disk ($u=0):</p>
+<div class="math notranslate nohighlight">
+\[\frac{I_\mathrm{obs}(u)}{I_\mathrm{obs}(u=1)} = \frac{S_{0} + S_{1} ~u}{S_{0} + S_{1}}\]</div>
+<p>And we can also express this by parametrizing it with the slope/intercept, instead of having both be independent quantities:</p>
+<div class="math notranslate nohighlight">
+\[\frac{I_\mathrm{obs}(u)}{I_\mathrm{obs}(u=1)} = \frac{1 + \frac{S_{1}}{S_0} ~u}{1 + \frac{S_{1}}{S_0}}\]</div>
+<p>Finally, we can also quantify the limb-darkening by a value which represents the ratio of the limb intensity (<span class="math notranslate nohighlight">\(u=0\)</span>) and the center of the disk intensity (<span class="math notranslate nohighlight">\(u=1\)</span>):</p>
+<div class="math notranslate nohighlight">
+\[\alpha = \frac{I_\mathrm{obs}(u=0)}{I_\mathrm{obs}(u=1)} = \frac{1 }{1 + \frac{S_{1}}{S_0}}\]</div>
+<p>and its inverse:</p>
+<div class="math notranslate nohighlight">
+\[\frac{S_1}{S_0} = \frac{1}{\alpha} -1 = \frac{1-\alpha}{\alpha}\]</div>
+<p>The graph below shows that for example, a slope parameter of unity yields a limb-darkening ratio of <span class="math notranslate nohighlight">\(\alpha=0.5\)</span>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">eps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span><span class="mf">1.0</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+
+<span class="n">S</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="n">eps</span> <span class="o">-</span> <span class="mi">1</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">eps</span><span class="p">,</span> <span class="n">S</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;$S_1/S_0$&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;$\alpha=\frac{I_\mathrm</span><span class="si">{obs}</span><span class="s1">(u=0)}{I_\mathrm</span><span class="si">{obs}</span><span class="s1">(u=1)}$&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Text(0.5, 0, &#39;$\\alpha=\\frac{I_\\mathrm{obs}(u=0)}{I_\\mathrm{obs}(u=1)}$&#39;)
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/nblink_diskint2_doc_24_1.png" src="../_images/nblink_diskint2_doc_24_1.png" />
+</div>
+</div>
+<p>We can also re-express our expression for <span class="math notranslate nohighlight">\(\frac{I_\mathrm{obs}(u)}{I_\mathrm{obs}(u=1)}\)</span> in terms of this <span class="math notranslate nohighlight">\(\alpha\)</span> ratio, instead of the source function slope parameter:</p>
+<div class="math notranslate nohighlight">
+\[\frac{I_\mathrm{obs}(u)}{I_\mathrm{obs}(u=1)} = \frac{1+ \left[\frac{1}{\alpha}-1\right]u}{1+\left[\frac{1}{\alpha}-1\right]}\]</div>
+<div class="math notranslate nohighlight">
+\[=\alpha + (1-\alpha)u.\]</div>
+<p>But in the textbooks and papers, they instead use a quantity called the ‘limb-darkening’ coefficient, which is <span class="math notranslate nohighlight">\(\epsilon=1-\alpha\)</span>, and the equation above becomes</p>
+<div class="math notranslate nohighlight">
+\[\frac{I_\mathrm{obs}(u)}{I_\mathrm{obs}(u=1)}  =(1-\epsilon) + \epsilon u.\]</div>
+<p>So the bottom line is that if e.g. the limb-darkening ratio <span class="math notranslate nohighlight">\(\alpha\)</span> is 0.4, then the limb-darkening coefficient <span class="math notranslate nohighlight">\(\epsilon\)</span> is 0.6, and the source function slope parameter <span class="math notranslate nohighlight">\(S\)</span> is 1.5.</p>
+</section>
+<section id="5.-The-analytical-rotation-broadened-profiles">
+<h2>5. The analytical rotation-broadened profiles<a class="headerlink" href="#5.-The-analytical-rotation-broadened-profiles" title="Permalink to this heading"></a></h2>
+<p>Let’s start with an analytical expression for the non-rotating disk-integrated intensity line profile.</p>
+<p>From section XX, we know that the local intensity profiles are</p>
+<div class="math notranslate nohighlight">
+\[I(\mu)=1+\frac{1}{1+\kappa\phi}S_1 \mu\]</div>
+<p>and</p>
+<div class="math notranslate nohighlight">
+\[I_c(\mu)=1+\mu S_1\]</div>
+<p>A reminder that the wavelength dependence is inside of the <span class="math notranslate nohighlight">\(\phi\)</span> profile function (which is the Voigt function divided by <span class="math notranslate nohighlight">\(\sqrt{\pi}\)</span>).</p>
+<p>The most straigthforward disk integration is to use the <span class="math notranslate nohighlight">\(\mu\)</span> integral form (with azimuthal symmetry).</p>
+<div class="math notranslate nohighlight">
+\[F=2\pi\int_{\mu=o}^{+1} I(\mu)\mu d\mu\]</div>
+<p>This leads to</p>
+<div class="math notranslate nohighlight">
+\[F = \pi \left[1+\frac{2}{3} \frac{S_1}{1+\kappa\phi}\right]\]</div>
+<p>We can also compute the continnum surface flux in the same way</p>
+<div class="math notranslate nohighlight">
+\[F_\mathrm{surf}=2\pi\int_{\mu=o}^{+1} I_c(\mu)\mu d\mu\]</div>
+<p>which yields</p>
+<div class="math notranslate nohighlight">
+\[F_\mathrm{surf}=\pi \left[1+\frac{2}{3} S_1\right]\]</div>
+<p>Thus we can expressed the line flux normalized to the continnum flux as</p>
+<div class="math notranslate nohighlight">
+\[\frac{F}{F_c}=\frac{1+\frac{2}{3} \frac{S_1}{1+\kappa\phi}}{1+\frac{2}{3} S_1}\]</div>
+<p>This is equivalent to the local itensity line profile normalized to the local continuum, aka</p>
+<div class="math notranslate nohighlight">
+\[\frac{I(\mu)}{I_c(\mu)}=\frac{1+\mu \frac{S_1}{1+\kappa\phi}}{1+\mu S_1}\]</div>
+<p>evaluated at <span class="math notranslate nohighlight">\(\mu=2/3\)</span>.</p>
+<p>In the cell below, we show the agreement between the analytical solution and the numerical disk integration (under the weak field approximation). We also show the local intensity profile normalized to the local continuum at the center of the stellar disk for an array of <span class="math notranslate nohighlight">\(\mu\)</span> values.</p>
+<p>Of course as shown above, the normalize flux corresponds to the local locally-normalized intensity at <span class="math notranslate nohighlight">\(\mu=2/3\)</span>. But I also want to emphasis here that the local profiles are not the same across the stellar disk.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">param</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get_def_param_weak</span><span class="p">()</span>
+<span class="n">param</span><span class="p">[</span><span class="s2">&quot;general&quot;</span><span class="p">][</span><span class="s2">&quot;vsini&quot;</span><span class="p">]</span><span class="o">=</span><span class="mf">0.0</span>
+
+<span class="n">model_num</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">diskint2</span><span class="o">.</span><span class="n">numerical</span><span class="p">(</span><span class="n">param</span><span class="p">,</span><span class="n">unno</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="n">phi</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">profileI</span><span class="o">.</span><span class="n">voigt_fara</span><span class="p">(</span><span class="n">model_num</span><span class="p">[</span><span class="s2">&quot;uo&quot;</span><span class="p">],</span> <span class="n">param</span><span class="p">[</span><span class="s2">&quot;general&quot;</span><span class="p">][</span><span class="s2">&quot;av&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">real</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">**</span><span class="mf">0.5</span>
+<span class="n">S1</span> <span class="o">=</span> <span class="n">param</span><span class="p">[</span><span class="s2">&quot;general&quot;</span><span class="p">][</span><span class="s2">&quot;bnu&quot;</span><span class="p">]</span>
+<span class="n">kappa</span> <span class="o">=</span> <span class="mi">10</span><span class="o">**</span><span class="n">param</span><span class="p">[</span><span class="s2">&quot;general&quot;</span><span class="p">][</span><span class="s2">&quot;logkappa&quot;</span><span class="p">]</span>
+<span class="n">model_ana</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="mi">2</span><span class="o">/</span><span class="mi">3</span><span class="o">*</span><span class="n">S1</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">kappa</span><span class="o">*</span><span class="n">phi</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="mi">2</span><span class="o">/</span><span class="mi">3</span><span class="o">*</span><span class="n">S1</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">I_Ic</span><span class="p">(</span><span class="n">mu</span><span class="p">):</span>
+    <span class="k">return</span><span class="p">(</span> <span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">mu</span><span class="o">*</span><span class="n">S1</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">kappa</span><span class="o">*</span><span class="n">phi</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">mu</span><span class="o">*</span><span class="n">S1</span><span class="p">)</span> <span class="p">)</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">model_num</span><span class="p">[</span><span class="s1">&#39;vel&#39;</span><span class="p">],</span> <span class="n">model_num</span><span class="p">[</span><span class="s1">&#39;flux&#39;</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;numerical&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">model_num</span><span class="p">[</span><span class="s1">&#39;vel&#39;</span><span class="p">],</span> <span class="n">model_ana</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;analytical&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">model_num</span><span class="p">[</span><span class="s1">&#39;vel&#39;</span><span class="p">],</span> <span class="n">I_Ic</span><span class="p">(</span><span class="mf">1.0</span><span class="p">),</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;dotted&#39;</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;$I(\mu=1)/Ic$&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">model_num</span><span class="p">[</span><span class="s1">&#39;vel&#39;</span><span class="p">],</span> <span class="n">I_Ic</span><span class="p">(</span><span class="mi">2</span><span class="o">/</span><span class="mi">3</span><span class="p">),</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;dotted&#39;</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;$I(\mu=2/3)/Ic$&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">model_num</span><span class="p">[</span><span class="s1">&#39;vel&#39;</span><span class="p">],</span> <span class="n">I_Ic</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="mi">3</span><span class="p">),</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;dotted&#39;</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;$I(\mu=1/3)/Ic$&#39;</span><span class="p">)</span>
+
+
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+No spectral resolution given, no PDF convolution performed
+No macroturbulence velocity given, no convolution performed
+Using 1000.0 grid point on the surface
+Evaluating with weak approximation...
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;matplotlib.legend.Legend at 0x7fdda857f2e0&gt;
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/nblink_diskint2_doc_29_2.png" src="../_images/nblink_diskint2_doc_29_2.png" />
+</div>
+</div>
+<p>Now, let’s make the star rotate. Following the Grey textbook, we define the direction that is perpendicular to the plane subtended by the LOS and the rotational axis as <span class="math notranslate nohighlight">\(\hat{x}\)</span>. ADD FIGURE Therefore positions on the stellar disk with the same x-coordinate all have the same rotational projected velocity. The local profile at these location will be doppler shifted by <span class="math notranslate nohighlight">\(v_z=x~v\sin i\)</span>.</p>
+<p>From earlier, the line intensity normalized to the continnum flux is</p>
+<div class="math notranslate nohighlight">
+\[\frac{I(\mu)}{I_c(\mu)}=\frac{1+\mu \frac{S_1}{1+\kappa\phi}}{1+\mu S_1}\equiv H(v,\mu)\]</div>
+<p>and I will below refer to it as <span class="math notranslate nohighlight">\(H(v,\mu)\)</span>.</p>
+<p>This means that I can flip this around and express the line intensity (not normalized) as</p>
+<div class="math notranslate nohighlight">
+\[I(v,\mu) = H(v-v_z(\mu), \mu)~I_c(\mu)\]</div>
+<p>where the <span class="math notranslate nohighlight">\(-v_z\)</span> term takes care of the Doppler shift.</p>
+<p>Ok, so here’s the thing – this is not a great expression, as there are two <span class="math notranslate nohighlight">\(\mu\)</span> dependencies in the <span class="math notranslate nohighlight">\(H\)</span> term, one intrinsic the the <span class="math notranslate nohighlight">\(I\)</span> function and the other from the Doppler shift. So the idea here will be to ignore the intrinsic dependency on <span class="math notranslate nohighlight">\(\mu\)</span> and say that the shape of the intensity line profile (normalized to the local continuum) is constant across the stellar disk (I know, in the previous cell I have just shown how this is not the case, but bear with me).</p>
+<p>So,</p>
+<div class="math notranslate nohighlight">
+\[I(v,\mu) \approx H(v-v_z(\mu))~I_c(\mu)\]</div>
+<p>and we can write the normalized flux as:</p>
+<div class="math notranslate nohighlight">
+\[\frac{F(v)}{F_c}=\frac{\int_\mathrm{surf} H(v-v_z(\mu))~I_c(\mu)}{\int_\mathrm{surf}I_c(\mu)}\]</div>
+<p>We have already dealt with the denominator of this equation above, so I will just refer to it as <span class="math notranslate nohighlight">\(F_c\)</span> for now.</p>
+<p>Here, we will do the disk integration in the numerator in cartesian, to use the fact that all the locations with the same <span class="math notranslate nohighlight">\(x\)</span> value have the same <span class="math notranslate nohighlight">\(v_z\)</span>. To integrate a circle in cartesian, we will go from <span class="math notranslate nohighlight">\(-1\)</span> to <span class="math notranslate nohighlight">\(+1\)</span> in <span class="math notranslate nohighlight">\(x\)</span>, and for each <span class="math notranslate nohighlight">\(x\)</span> value, the <span class="math notranslate nohighlight">\(y\)</span> integral will be bounded by <span class="math notranslate nohighlight">\(y(x)=\pm (1-x^2)^{1/2}\)</span>. Thus:</p>
+<div class="math notranslate nohighlight">
+\[\frac{F(v)}{F_c}=\frac{1}{F_c} \int_{x=-1}^{+1}\int_{-y(x)}^{+y(x)} H(v-v_z(x))~I_c(x,y)dydx\]</div>
+<p>Also, we can make a change of variable to use <span class="math notranslate nohighlight">\(v_z\)</span> intead of <span class="math notranslate nohighlight">\(x\)</span>. As <span class="math notranslate nohighlight">\(v_z=x~v\sin i\)</span>, then <span class="math notranslate nohighlight">\(dv_z=dx~v\sin i\)</span>, and when <span class="math notranslate nohighlight">\(x=\pm1\)</span>, then <span class="math notranslate nohighlight">\(v_z=\pm v\sin i\)</span>.</p>
+<div class="math notranslate nohighlight">
+\[\frac{F(v)}{F_c}=\frac{1}{F_c} \int_{v_z=-v\sin i}^{+v\sin i}\int_{-y(v_z)}^{+y(v_z)} H(v-v_z)~I_c(v_z,y)dy\frac{dv_z}{v\sin i}\]</div>
+<p>Note that as <span class="math notranslate nohighlight">\(F_c\)</span> is a constant, I can pull it back into the integral. Finally, because <span class="math notranslate nohighlight">\(H\)</span> is only a function of <span class="math notranslate nohighlight">\(x\)</span> (<span class="math notranslate nohighlight">\(v_z\)</span> now), I can pull that term out of the <span class="math notranslate nohighlight">\(y\)</span> integral. Thus:</p>
+<div class="math notranslate nohighlight">
+\[\frac{F(v)}{F_c}= \int_{v_z=-v\sin i}^{+v\sin i} H(v-v_z) \left[ \frac{\int_{-y(x)}^{+y(x)} ~I_c(v_z,y)dy}{v\sin i~ F_c}\right]dv_z\]</div>
+<p>All right, now let’s call the piece in [] in the previous expression <span class="math notranslate nohighlight">\(G(v_z)\)</span>. As <span class="math notranslate nohighlight">\(y\)</span> will have been integrated out, the result it will not be a function of <span class="math notranslate nohighlight">\(y\)</span>. Additionally, this is not a function of <span class="math notranslate nohighlight">\(v\)</span>, just <span class="math notranslate nohighlight">\(v_z\)</span> as an encoded of location on the stellar disk. We are left with:</p>
+<div class="math notranslate nohighlight">
+\[\frac{F(v)}{F_c}= \int_{v_z=-v\sin i}^{+v\sin i} H(v-v_z) G(v_z)dv_z\]</div>
+<p>We can also note that <span class="math notranslate nohighlight">\(G(Vz)\)</span> will be zero when <span class="math notranslate nohighlight">\(v_z&gt;v\sin i\)</span> – remember, we are using <span class="math notranslate nohighlight">\(v_z\)</span> as a proxy for <span class="math notranslate nohighlight">\(x\)</span>, and inside the <span class="math notranslate nohighlight">\(y\)</span> integral above, <span class="math notranslate nohighlight">\(I(\mu)=0\)</span> outside of the stellar disk. This means that mathematically, we can change the bounds of the <span class="math notranslate nohighlight">\(v_z\)</span> integral to go to infinity without changing the physics.</p>
+<div class="math notranslate nohighlight">
+\[\frac{F(v)}{F_c}= \int_{v_z=-\infty}^{+\infty} H(v-v_z) G(v_z)dv_z\]</div>
+<p>Why, you might ask? Well, because the equation in this form is the basic equation for a convolution:</p>
+<div class="math notranslate nohighlight">
+\[(h*g)(v)=\int_{-\infty}^{+\infty}h(v-v_z)g(v_z)dv_z\]</div>
+<p>This means that if I have my line profile function <span class="math notranslate nohighlight">\(H\)</span>, and the <span class="math notranslate nohighlight">\(G(v_z)\)</span> function, I can simply take the (numerical) convolution of them.</p>
+<p>So now two questions remains: 1. What is <span class="math notranslate nohighlight">\(G(v_z)\)</span> 2. What do I use for <span class="math notranslate nohighlight">\(H(v)\)</span>, if I made the approximation that the intensity profile is constant across the stellar disk (which it is not).</p>
+<p>Let’s start with <span class="math notranslate nohighlight">\(G(v_z)\)</span> by returning to the expression in [] from a bit above:</p>
+<div class="math notranslate nohighlight">
+\[G(v_z)=\left[ \frac{\int_{-y(v_z)}^{+y(v_z)} ~I_c(v_z,y)dy}{v\sin i~ F_c}\right]\]</div>
+<p>We will first note that this integral should be symmetric above and below <span class="math notranslate nohighlight">\(y=0\)</span>, so I can write is as</p>
+<div class="math notranslate nohighlight">
+\[G(v_z)= \frac{2}{v\sin i~ F_c} \int_0^{+y(v_z)} ~(1+\mu S_1)dy\]</div>
+<p>The bound of the integral depends on the value of <span class="math notranslate nohighlight">\(v_z\)</span>, as already explained in the cartesian integral setup in the previous cell:</p>
+<div class="math notranslate nohighlight">
+\[y(v_z)=(1-x^2)^{1/2}=\left[1-\left(\frac{v_z}{v\sin i}\right)^2\right]^{1/2} \equiv y_o\]</div>
+<p>For clarity below, I will shorten the <span class="math notranslate nohighlight">\(y(v_z)\)</span> expression for <span class="math notranslate nohighlight">\(y_o\)</span>.</p>
+<p>So now we need to express <span class="math notranslate nohighlight">\(\mu\)</span> in terms of cartesian coordinates. The radial coordinate of the stellar disk (usually refered to as <span class="math notranslate nohighlight">\(p\)</span>) is related to the <span class="math notranslate nohighlight">\(\theta\)</span> angle (the angle between the LOS and the normal to the surface) by <span class="math notranslate nohighlight">\(p=\sin\theta\)</span> (using the radius in <span class="math notranslate nohighlight">\(R_\star\)</span> units), thus <span class="math notranslate nohighlight">\(p^2=1-\mu^2\)</span>. Furthermore using the cartesian coordinates <span class="math notranslate nohighlight">\(p^2=x^2+y^2\)</span>, so <span class="math notranslate nohighlight">\(\mu^2=1-x^2-y^2\)</span>. We can substitute <span class="math notranslate nohighlight">\(x\)</span> in favor of <span class="math notranslate nohighlight">\(v_z\)</span> such that
+<span class="math notranslate nohighlight">\(\mu^2 = 1-\left(\frac{v_z}{v\sin i}\right)^2-y^2\)</span>, or using the <span class="math notranslate nohighlight">\(y_o\)</span> I introduced earlier <span class="math notranslate nohighlight">\(\mu^2=y_o^2-y^2\)</span>.</p>
+<p>The flux expression becomes:</p>
+<div class="math notranslate nohighlight">
+\[G(v_z)= \frac{2}{v\sin i~ F_c} \int_0^{+y_o} ~(1+ S_1(y_o^2-y^2)^{1/2})dy\]</div>
+<p>Evaluating the integral yields:</p>
+<div class="math notranslate nohighlight">
+\[G(v_z)= \frac{2}{v\sin i~ F_c} y_o + S_1 \frac{\pi}{4} y_o^2\]</div>
+<p>We can now use the expression for <span class="math notranslate nohighlight">\(F_c=\pi\left(1+\frac{2}{3}S_1\right)\)</span> from earlier and expand <span class="math notranslate nohighlight">\(y_o\)</span> such that:</p>
+<div class="math notranslate nohighlight">
+\[G(v_z)= \frac{2\left(1-\left[\frac{v_z}{v\sin i}\right]^2\right)^{1/2} + \frac{\pi}{2}S_1 \left(1-\left[\frac{v_z}{v\sin i}\right]^2\right)}{\pi v\sin i \left(1+\frac{2}{3}S_1\right)}\]</div>
+<p>NOTE: by using the equvalence between <span class="math notranslate nohighlight">\(S_1\)</span> and the <span class="math notranslate nohighlight">\(\epsilon\)</span> parameter from the Grey textbook, explained in Section XX, we can recover the expression for the rotation kernel from Grey (the velocity expresison is given in the 2nd edition – the first edition only has the wavelength form)</p>
+<div class="math notranslate nohighlight">
+\[G(v_z)= \frac{2(1-\epsilon)\left(1-\left[\frac{v_z}{v\sin i}\right]^2\right)^{1/2} + \frac{\pi}{2}\epsilon \left(1-\left[\frac{v_z}{v\sin i}\right]^2\right)}{\pi v\sin i \left(1-\frac{1}{3}\epsilon\right)}\]</div>
+<p>In the cell below, we show the rotation convolution kernel from the expression in terms of <span class="math notranslate nohighlight">\(S_1\)</span> (which imo is simpler) and with the expression from Grey. A reminder that <span class="math notranslate nohighlight">\(S_1=1.5\)</span> corresponds to <span class="math notranslate nohighlight">\(\epsilon=0.6\)</span>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">S1</span> <span class="o">=</span> <span class="mf">1.5</span>
+<span class="n">eps</span> <span class="o">=</span> <span class="mf">0.6</span>
+
+<span class="n">vz</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">501</span><span class="p">)</span>
+<span class="n">vsini</span> <span class="o">=</span> <span class="mf">10.0</span>
+
+<span class="n">yo</span> <span class="o">=</span> <span class="mi">1</span><span class="o">-</span><span class="p">(</span><span class="n">vz</span><span class="o">/</span><span class="n">vsini</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+
+<span class="n">G_eps</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">eps</span><span class="p">)</span><span class="o">*</span><span class="n">yo</span><span class="o">**</span><span class="mf">0.5</span><span class="o">+</span><span class="mf">0.5</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">eps</span><span class="o">*</span><span class="n">yo</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">vsini</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">eps</span><span class="o">/</span><span class="mi">3</span><span class="p">))</span>
+
+<span class="n">G_s1</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">yo</span><span class="o">**</span><span class="mf">0.5</span> <span class="o">+</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">S1</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">yo</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">vsini</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="mi">2</span><span class="o">/</span><span class="mi">3</span><span class="o">*</span><span class="n">S1</span><span class="p">))</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">vz</span><span class="p">,</span> <span class="n">G_eps</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;eps&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">vz</span><span class="p">,</span> <span class="n">G_s1</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;S1&#39;</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;matplotlib.legend.Legend at 0x7fdda1551910&gt;
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/nblink_diskint2_doc_33_1.png" src="../_images/nblink_diskint2_doc_33_1.png" />
+</div>
+</div>
+<p>Now that we have an expression for the rotational kernel, we can use it to convolve it with the <span class="math notranslate nohighlight">\(H(\nu)\)</span> function. It is not apriori clear which function to use for it, as the derivation above assumend that the local line profile normalized by the local continnum is function across the stellar disk (which isn’t).</p>
+<p>It would make sense to want to recover the expression for the non-rotating disk-integrated profile in the limiting case where <span class="math notranslate nohighlight">\(v\sin i\)</span> is zero. So we will use <span class="math notranslate nohighlight">\(H(\nu)\)</span> as being the analytical expression for the flux in the non-rotating case above (including the line limb-darkening), which also, as we mentioned above, is the local intensity normalized to the local continuum when <span class="math notranslate nohighlight">\(\mu=2/3\)</span>).</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">rav.diskint2.analytical(param)</span></code> function accepts a parameter dictionary. The necessary keywords are: * INSERT LIST HERE</p>
+<p>In the cell below, we show the comparison between the full numerical disk integration and the convolution calculation.</p>
+<p>ADD SOME ILLUSTRATIONS OF THE VALIDITY OF THE APPROXIMATION MADE FOR VARIOUS VSINI AND LIMB-DARKENING.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">param</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get_def_param_weak</span><span class="p">()</span>
+<span class="n">param</span><span class="p">[</span><span class="s2">&quot;general&quot;</span><span class="p">][</span><span class="s2">&quot;vdop&quot;</span><span class="p">]</span><span class="o">=</span><span class="mf">5.0</span>
+<span class="n">param</span><span class="p">[</span><span class="s2">&quot;general&quot;</span><span class="p">][</span><span class="s2">&quot;bnu&quot;</span><span class="p">]</span><span class="o">=</span><span class="mf">1.5</span>
+<span class="c1">#param.pprint()</span>
+
+<span class="n">param</span><span class="p">[</span><span class="s2">&quot;general&quot;</span><span class="p">][</span><span class="s2">&quot;vsini&quot;</span><span class="p">]</span><span class="o">=</span><span class="mf">0.0</span>
+<span class="n">numerical</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">diskint2</span><span class="o">.</span><span class="n">numerical</span><span class="p">(</span><span class="n">param</span><span class="p">,</span> <span class="n">unno</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">numerical</span><span class="p">[</span><span class="s2">&quot;vel&quot;</span><span class="p">],</span> <span class="n">numerical</span><span class="p">[</span><span class="s2">&quot;flux&quot;</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;dotted&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;vsini=0&#39;</span><span class="p">)</span>
+
+
+<span class="n">param</span><span class="p">[</span><span class="s2">&quot;general&quot;</span><span class="p">][</span><span class="s2">&quot;vsini&quot;</span><span class="p">]</span><span class="o">=</span><span class="mi">0</span>
+<span class="n">numerical</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">diskint2</span><span class="o">.</span><span class="n">numerical</span><span class="p">(</span><span class="n">param</span><span class="p">,</span> <span class="n">unno</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">numerical</span><span class="p">[</span><span class="s2">&quot;vel&quot;</span><span class="p">],</span> <span class="n">numerical</span><span class="p">[</span><span class="s2">&quot;flux&quot;</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;numerical&#39;</span><span class="p">)</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">diskint2</span><span class="o">.</span><span class="n">analytical</span><span class="p">(</span><span class="n">param</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">model</span><span class="p">[</span><span class="s2">&quot;vel&quot;</span><span class="p">],</span> <span class="n">model</span><span class="p">[</span><span class="s2">&quot;flux&quot;</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;analytical&#39;</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+No spectral resolution given, no PDF convolution performed
+No macroturbulence velocity given, no convolution performed
+Using 1000.0 grid point on the surface
+Evaluating with weak approximation...
+No spectral resolution given, no PDF convolution performed
+No macroturbulence velocity given, no convolution performed
+Using 1000 grid point on the surface
+Evaluating with weak approximation...
+No spectral resolution given, no PDF convolution performed
+No macroturbulence velocity given, no convolution performed
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;matplotlib.legend.Legend at 0x7fdda85d8550&gt;
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/nblink_diskint2_doc_37_2.png" src="../_images/nblink_diskint2_doc_37_2.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#How quick is that code?</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="n">param</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get_def_param_weak</span><span class="p">()</span>
+<span class="n">param</span><span class="p">[</span><span class="s2">&quot;general&quot;</span><span class="p">][</span><span class="s2">&quot;vdop&quot;</span><span class="p">]</span><span class="o">=</span><span class="mf">5.0</span>
+<span class="n">param</span><span class="p">[</span><span class="s2">&quot;general&quot;</span><span class="p">][</span><span class="s2">&quot;bnu&quot;</span><span class="p">]</span><span class="o">=</span><span class="mf">1.5</span>
+<span class="n">param</span><span class="p">[</span><span class="s2">&quot;general&quot;</span><span class="p">][</span><span class="s2">&quot;res&quot;</span><span class="p">]</span><span class="o">=</span><span class="mi">65000</span>
+<span class="n">param</span><span class="p">[</span><span class="s2">&quot;general&quot;</span><span class="p">][</span><span class="s2">&quot;vmac&quot;</span><span class="p">]</span><span class="o">=</span><span class="mi">30</span>
+<span class="c1">#param.pprint()</span>
+
+<span class="n">param</span><span class="p">[</span><span class="s2">&quot;general&quot;</span><span class="p">][</span><span class="s2">&quot;vsini&quot;</span><span class="p">]</span><span class="o">=</span><span class="mf">200.0</span>
+
+<span class="n">tic</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">):</span>
+    <span class="n">numerical</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">diskint2</span><span class="o">.</span><span class="n">numerical</span><span class="p">(</span><span class="n">param</span><span class="p">,</span> <span class="n">unno</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">toc</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="n">total</span> <span class="o">=</span> <span class="n">toc</span><span class="o">-</span><span class="n">tic</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;time: &#39;</span><span class="p">,</span> <span class="n">total</span><span class="o">*</span><span class="mi">25</span><span class="o">*</span><span class="mi">18</span><span class="o">*</span><span class="mi">18</span><span class="o">*</span><span class="mi">18</span><span class="o">*</span><span class="mi">2</span><span class="o">/</span><span class="mi">3600</span><span class="p">)</span>
+
+<span class="n">tic</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="c1">#for i in range(0,300):</span>
+    <span class="c1">#model = rav.diskint2.analytical(param, verbose=False)</span>
+<span class="n">toc</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="c1">#print(toc - tic)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+time:  92.7879867553711
+</pre></div></div>
+</div>
+</section>
+<section id="6.-Convolution-with-macroturbulence-and-instrument-resolution">
+<h2>6. Convolution with macroturbulence and instrument resolution<a class="headerlink" href="#6.-Convolution-with-macroturbulence-and-instrument-resolution" title="Permalink to this heading"></a></h2>
+<p>For simplicity, we will assume that both the macroturbulent broadening and the spectral PSF have gaussian shapes.</p>
+<p>Because the convolution of two gaussian is itself a gaussian, we only need to calculate one combined kernel for the macroturbulent and instrument broadening.</p>
+<p>A function <span class="math notranslate nohighlight">\(f(t)\)</span> is a Gaussian such that</p>
+<div class="math notranslate nohighlight">
+\[f(t)=\frac{1}{\sqrt{\pi}\sigma_f}\mathrm{e}^{-\frac{t^2}{2\sigma_t^2}}\]</div>
+<p>The Fourrier transform is:</p>
+<div class="math notranslate nohighlight">
+\[FT(f(t))(\nu) = \int_{-\infty}^{\infty}f(t)\mathrm{e}^{-2\pi i\nu t}dt\]</div>
+<p>Replacing <span class="math notranslate nohighlight">\(f(t)\)</span> yields:</p>
+<div class="math notranslate nohighlight">
+\[FT(f(t))(\nu) = \int_{-\infty}^{\infty}\frac{1}{\sqrt{\pi}\sigma_f}\mathrm{e}^{-\frac{t^2}{2\sigma_t^2}}\mathrm{e}^{-2\pi i\nu t}dt\]</div>
+<p>Expanding the second exponentinal using euler’s formula gives:</p>
+<div class="math notranslate nohighlight">
+\[FT(f(t))(\nu) = \frac{1}{\sqrt{\pi}\sigma_f} \int_{-\infty}^{\infty}\mathrm{e}^{-\frac{t^2}{2\sigma_t^2}} \left[\cos(2\pi \nu t)+i\sin(2\pi \nu t) \right]dt\]</div>
+<p>We can split the integral in two:</p>
+<div class="math notranslate nohighlight">
+\[FT(f(t))(\nu) = \frac{1}{\sqrt{\pi}\sigma_f} \left[ \int_{-\infty}^{\infty}\mathrm{e}^{-\frac{t^2}{2\sigma_t^2}} \cos(2\pi \nu t)dt+ \int_{-\infty}^{\infty}\mathrm{e}^{-\frac{t^2}{2\sigma_t^2}}i\sin(2\pi \nu t)dt \right]\]</div>
+<p>The second integral is the area under the multiplication of an even function and a odd function, meaning that the integral will be zero.</p>
+<p>For the first integral, we make the change of variable <span class="math notranslate nohighlight">\(x=\pi t\)</span>, and we set <span class="math notranslate nohighlight">\(a=1/(2\pi^2\sigma_f^2)\)</span> so that:</p>
+<div class="math notranslate nohighlight">
+\[FT(f(t))(\nu) = \frac{1}{\pi\sqrt{\pi}\sigma_f}  \int_{-\infty}^{\infty}\mathrm{e}^{-ax^2} \cos(2x \nu )dx\]</div>
+<p>We also note that the integrand is a symmetric function about zero, so that the total integral will be twice the integral in the positive <span class="math notranslate nohighlight">\(x\)</span> domain.</p>
+<div class="math notranslate nohighlight">
+\[FT(f(t))(\nu) = \frac{2}{\pi\sqrt{\pi}\sigma_f}  \int_{0}^{\infty}\mathrm{e}^{-ax^2} \cos(2x \nu )dx\]</div>
+<p>The definite integral is known:</p>
+<div class="math notranslate nohighlight">
+\[FT(f(t))(\nu) = \frac{2}{\pi\sqrt{\pi}\sigma_f}  \frac{1}{2}\sqrt{\frac{\pi}{a}}\mathrm{e}^{-\frac{\nu^2}{a}}\]</div>
+<p>Replacing <span class="math notranslate nohighlight">\(a\)</span> and cancelling terms yields:</p>
+<div class="math notranslate nohighlight">
+\[FT(f(t))(\nu) = \mathrm{e}^{-a\pi^2\sigma_f^2 \nu^2}\]</div>
+<p>If we have a function <span class="math notranslate nohighlight">\(g(t)\)</span> which is also a Gaussian with <span class="math notranslate nohighlight">\(\sigma_g\)</span>, then its transform will similarly be</p>
+<div class="math notranslate nohighlight">
+\[FT(g(t))(\nu) = \mathrm{e}^{-a\pi^2\sigma_g^2 \nu^2}\]</div>
+<p>From the convolution theorem, we know that <span class="math notranslate nohighlight">\(FT(f*g) = FT(f)\cdot FT(g)\)</span>. Thus</p>
+<div class="math notranslate nohighlight">
+\[FT(t*g)=\mathrm{e}^{-a\pi^2\sigma_f^2 \nu^2}\mathrm{e}^{-a\pi^2\sigma_g^2 \nu^2}\]</div>
+<p>which reduces to</p>
+<div class="math notranslate nohighlight">
+\[FT(t*g)=\mathrm{e}^{-a\pi^2 (\sigma_f^2+\sigma_g^2) \nu^2}\]</div>
+<p>We can see that this corresponds to the FT of a Gaussian function that would have a <span class="math notranslate nohighlight">\(\sigma\)</span> equal to <span class="math notranslate nohighlight">\(\sqrt{\sigma_f^2+\sigma_g^2}\)</span>. From this we conclude that:</p>
+<div class="math notranslate nohighlight">
+\[g*t = \frac{1}{\sqrt{\pi(\sigma_f^2+\sigma_g^2)}} \mathrm{e}^{-\frac{t^2}{2(\sigma_t^2+\sigma_g^2)}}\]</div>
+<p>We consider that the macroturbulence velocity corresponds to the sigma of the gaussian.</p>
+<p>The spectral resolution is defined in the code with <span class="math notranslate nohighlight">\(R\)</span> such that</p>
+<div class="math notranslate nohighlight">
+\[R=\frac{\lambda}{\Delta\lambda}=\frac{c}{\Delta v}\]</div>
+<p>Thus the spectral resolution element (<span class="math notranslate nohighlight">\(\Delta \lambda\)</span> or <span class="math notranslate nohighlight">\(\Delta v\)</span>) is usually taken to be the FWHM of the PSF. Therefore the <span class="math notranslate nohighlight">\(\sigma\)</span> in km/s of the gaussian PDF is</p>
+<div class="math notranslate nohighlight">
+\[\sigma=\frac{1}{\sqrt{8\ln 2}}\frac{c}{R}\]</div>
+<p>where <span class="math notranslate nohighlight">\(c\)</span> is in km/s.</p>
+<p>We therefore defined the total <span class="math notranslate nohighlight">\(\sigma\)</span> in <span class="math notranslate nohighlight">\(u_o\)</span> units to be</p>
+<div class="math notranslate nohighlight">
+\[u_\mathrm{conv} = \frac{\sqrt{\sigma_\mathrm{res}^2+\sigma_\mathrm{macro}^2}}{v_\mathrm{therm}}\]</div>
+<p>During the disk integration part of the code, the dispersion array (in <span class="math notranslate nohighlight">\(u_o\)</span>) unit has a size of <span class="math notranslate nohighlight">\(u_\mathrm{rot}+10\)</span>, where the latter means that the Voigt profile is calculated out to 10 sigma (remember that in <span class="math notranslate nohighlight">\(u_o\)</span> units, the ‘width’ of the Voigt profile, akin to its <span class="math notranslate nohighlight">\(\sigma\)</span>, is 1.)</p>
+<p>To accomodate the convolution with the resolution and macroturbulence, we have to extend the dispersion array (and pad line profile array accordingly) by <span class="math notranslate nohighlight">\(10\times u_\mathrm{conv}\)</span> (we are calculating the gaussian convolution profile up to 10 sigma).</p>
+<p>In the cell below, we test the convolution capabilities</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">param</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get_def_param_weak</span><span class="p">()</span>
+<span class="n">param</span><span class="o">.</span><span class="n">pprint</span><span class="p">()</span>
+<span class="n">param</span><span class="p">[</span><span class="s1">&#39;general&#39;</span><span class="p">][</span><span class="s1">&#39;vsini&#39;</span><span class="p">]</span><span class="o">=</span><span class="mi">10</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">diskint2</span><span class="o">.</span><span class="n">numerical</span><span class="p">(</span><span class="n">param</span><span class="p">,</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">model</span><span class="p">[</span><span class="s1">&#39;vel&#39;</span><span class="p">],</span> <span class="n">model</span><span class="p">[</span><span class="s1">&#39;flux&#39;</span><span class="p">])</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">model</span><span class="p">[</span><span class="s1">&#39;vel&#39;</span><span class="p">],</span> <span class="n">model</span><span class="p">[</span><span class="s1">&#39;V&#39;</span><span class="p">])</span>
+
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="n">param2</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">param</span><span class="p">)</span>
+<span class="n">param2</span><span class="p">[</span><span class="s1">&#39;general&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;res&#39;</span><span class="p">:</span> <span class="mf">65000.</span><span class="p">})</span>
+<span class="n">param2</span><span class="p">[</span><span class="s1">&#39;general&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;vmac&#39;</span><span class="p">:</span> <span class="mf">10.</span><span class="p">})</span>
+<span class="n">model2</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">diskint2</span><span class="o">.</span><span class="n">numerical</span><span class="p">(</span><span class="n">param2</span><span class="p">,</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">model2</span><span class="p">[</span><span class="s1">&#39;vel&#39;</span><span class="p">],</span> <span class="n">model2</span><span class="p">[</span><span class="s1">&#39;flux&#39;</span><span class="p">])</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">model2</span><span class="p">[</span><span class="s1">&#39;vel&#39;</span><span class="p">],</span> <span class="n">model2</span><span class="p">[</span><span class="s1">&#39;V&#39;</span><span class="p">])</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{
+  &#34;general&#34;: {
+    &#34;lambda0&#34;: 5000,
+    &#34;vsini&#34;: 50.0,
+    &#34;vdop&#34;: 10.0,
+    &#34;av&#34;: 0.05,
+    &#34;bnu&#34;: 1.5,
+    &#34;logkappa&#34;: 0.98,
+    &#34;ndop&#34;: 10,
+    &#34;Bpole&#34;: 1000,
+    &#34;incl&#34;: 90,
+    &#34;beta&#34;: 90,
+    &#34;phase&#34;: 0
+  },
+  &#34;weak&#34;: {
+    &#34;geff&#34;: 1.0
+  }
+}
+No spectral resolution given, no PDF convolution performed
+No macroturbulence velocity given, no convolution performed
+Using 1400 grid point on the surface
+Evaluating with weak approximation...
+1.958617462625618
+Using 1400 grid point on the surface
+Evaluating with weak approximation...
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[&lt;matplotlib.lines.Line2D at 0x2ccb346bd30&gt;]
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/nblink_diskint2_doc_45_2.png" src="../_images/nblink_diskint2_doc_45_2.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">genparam</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;lambda0&#39;</span><span class="p">:</span><span class="mi">5000</span><span class="p">,</span>    <span class="c1"># the central wavelength of the transition</span>
+    <span class="s1">&#39;vsini&#39;</span><span class="p">:</span><span class="mf">0.0</span><span class="p">,</span>         <span class="c1"># the projected rotational velocity</span>
+    <span class="s1">&#39;vdop&#39;</span><span class="p">:</span><span class="mf">10.0</span><span class="p">,</span>          <span class="c1"># the thermal broadening</span>
+    <span class="s1">&#39;av&#39;</span><span class="p">:</span><span class="mf">0.05</span><span class="p">,</span>             <span class="c1"># the damping coefficient of the Voigt profile</span>
+    <span class="s1">&#39;bnu&#39;</span><span class="p">:</span><span class="mf">1.5</span><span class="p">,</span>             <span class="c1"># the slope of the source function with respect to vertical optical depth</span>
+    <span class="s1">&#39;logkappa&#39;</span><span class="p">:</span><span class="mf">0.5</span><span class="p">,</span>          <span class="c1"># the line strength parameter</span>
+    <span class="s1">&#39;ndop&#39;</span><span class="p">:</span><span class="nb">int</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span>       <span class="c1"># the number of sample point per doppler width for the wavelength array</span>
+    <span class="s1">&#39;Bpole&#39;</span><span class="p">:</span><span class="mi">100000</span><span class="p">,</span>
+    <span class="s1">&#39;incl&#39;</span><span class="p">:</span><span class="mi">90</span><span class="p">,</span> <span class="c1">#not necessary for loop</span>
+    <span class="s1">&#39;beta&#39;</span><span class="p">:</span><span class="mi">90</span><span class="p">,</span> <span class="c1">#not necessary for loop</span>
+    <span class="s1">&#39;phase&#39;</span><span class="p">:</span><span class="mi">0</span> <span class="c1">#not necessary for loop</span>
+  <span class="p">}</span>
+
+<span class="n">unnoparam</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;down&#39;</span><span class="p">:[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>   <span class="c1"># the s, j, l of the lower level</span>
+    <span class="s1">&#39;up&#39;</span><span class="p">:[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>    <span class="c1"># the s, j, l of the upper level</span>
+    <span class="p">}</span>
+
+<span class="n">param</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;general&#39;</span> <span class="p">:</span> <span class="n">genparam</span><span class="p">,</span>
+       <span class="s1">&#39;unno&#39;</span><span class="p">:</span> <span class="n">unnoparam</span>
+       <span class="p">}</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">diskint2</span><span class="o">.</span><span class="n">numerical</span><span class="p">(</span><span class="n">param</span><span class="p">,</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">model</span><span class="p">[</span><span class="s1">&#39;vel&#39;</span><span class="p">],</span> <span class="n">model</span><span class="p">[</span><span class="s1">&#39;flux&#39;</span><span class="p">])</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">model</span><span class="p">[</span><span class="s1">&#39;vel&#39;</span><span class="p">],</span> <span class="n">model</span><span class="p">[</span><span class="s1">&#39;V&#39;</span><span class="p">])</span>
+
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="n">param2</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">param</span><span class="p">)</span>
+<span class="n">param2</span><span class="p">[</span><span class="s1">&#39;general&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;res&#39;</span><span class="p">:</span> <span class="mf">65000.</span><span class="p">})</span>
+<span class="n">param2</span><span class="p">[</span><span class="s1">&#39;general&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;vmac&#39;</span><span class="p">:</span> <span class="mf">10.</span><span class="p">})</span>
+<span class="n">model2</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">diskint2</span><span class="o">.</span><span class="n">numerical</span><span class="p">(</span><span class="n">param2</span><span class="p">,</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">model2</span><span class="p">[</span><span class="s1">&#39;vel&#39;</span><span class="p">],</span> <span class="n">model2</span><span class="p">[</span><span class="s1">&#39;flux&#39;</span><span class="p">])</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">model2</span><span class="p">[</span><span class="s1">&#39;vel&#39;</span><span class="p">],</span> <span class="n">model2</span><span class="p">[</span><span class="s1">&#39;V&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+No spectral resolution given, no PDF convolution performed
+No macroturbulence velocity given, no convolution performed
+Using 1000.0 grid point on the surface
+Evaluating with unno method...
+Max shift due to field: 6.99812246808326 vdop
+Max shift due to vsini: 0.0 vdop
+1.958617462625618
+Using 1000.0 grid point on the surface
+Evaluating with unno method...
+Max shift due to field: 6.99812246808326 vdop
+Max shift due to vsini: 0.0 vdop
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[&lt;matplotlib.lines.Line2D at 0x7fe5e2607850&gt;]
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/nblink_diskint2_doc_46_2.png" src="../_images/nblink_diskint2_doc_46_2.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">param</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get_def_param_weak</span><span class="p">()</span>
+<span class="n">param</span><span class="p">[</span><span class="s1">&#39;general&#39;</span><span class="p">][</span><span class="s1">&#39;vsini&#39;</span><span class="p">]</span><span class="o">=</span><span class="mi">10</span>
+<span class="n">param</span><span class="p">[</span><span class="s1">&#39;general&#39;</span><span class="p">][</span><span class="s1">&#39;incl&#39;</span><span class="p">]</span><span class="o">=</span><span class="mi">90</span>
+<span class="n">param</span><span class="o">.</span><span class="n">pprint</span><span class="p">()</span>
+
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">diskint2</span><span class="o">.</span><span class="n">analytical</span><span class="p">(</span><span class="n">param</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">model</span><span class="p">[</span><span class="s1">&#39;vel&#39;</span><span class="p">],</span> <span class="n">model</span><span class="p">[</span><span class="s1">&#39;flux&#39;</span><span class="p">])</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">model</span><span class="p">[</span><span class="s1">&#39;vel&#39;</span><span class="p">],</span> <span class="n">model</span><span class="p">[</span><span class="s1">&#39;V&#39;</span><span class="p">])</span>
+
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="n">param2</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">param</span><span class="p">)</span>
+<span class="n">param2</span><span class="p">[</span><span class="s1">&#39;general&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;res&#39;</span><span class="p">:</span> <span class="mf">65000.</span><span class="p">})</span>
+<span class="n">param2</span><span class="p">[</span><span class="s1">&#39;general&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;vmac&#39;</span><span class="p">:</span> <span class="mf">10.</span><span class="p">})</span>
+<span class="n">model2</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">diskint2</span><span class="o">.</span><span class="n">analytical</span><span class="p">(</span><span class="n">param2</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">model2</span><span class="p">[</span><span class="s1">&#39;vel&#39;</span><span class="p">],</span> <span class="n">model2</span><span class="p">[</span><span class="s1">&#39;flux&#39;</span><span class="p">])</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">model2</span><span class="p">[</span><span class="s1">&#39;vel&#39;</span><span class="p">],</span> <span class="n">model2</span><span class="p">[</span><span class="s1">&#39;V&#39;</span><span class="p">])</span>
+
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">diskint2</span><span class="o">.</span><span class="n">numerical</span><span class="p">(</span><span class="n">param</span><span class="p">,</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">model</span><span class="p">[</span><span class="s1">&#39;vel&#39;</span><span class="p">],</span> <span class="n">model</span><span class="p">[</span><span class="s1">&#39;flux&#39;</span><span class="p">])</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">model</span><span class="p">[</span><span class="s1">&#39;vel&#39;</span><span class="p">],</span> <span class="n">model</span><span class="p">[</span><span class="s1">&#39;V&#39;</span><span class="p">])</span>
+
+<span class="n">model2</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">diskint2</span><span class="o">.</span><span class="n">numerical</span><span class="p">(</span><span class="n">param2</span><span class="p">,</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">model2</span><span class="p">[</span><span class="s1">&#39;vel&#39;</span><span class="p">],</span> <span class="n">model2</span><span class="p">[</span><span class="s1">&#39;flux&#39;</span><span class="p">])</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">model2</span><span class="p">[</span><span class="s1">&#39;vel&#39;</span><span class="p">],</span> <span class="n">model2</span><span class="p">[</span><span class="s1">&#39;V&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{
+  &#34;general&#34;: {
+    &#34;lambda0&#34;: 5000,
+    &#34;vsini&#34;: 10,
+    &#34;vdop&#34;: 10.0,
+    &#34;av&#34;: 0.05,
+    &#34;bnu&#34;: 1.5,
+    &#34;logkappa&#34;: 0.98,
+    &#34;ndop&#34;: 10,
+    &#34;Bpole&#34;: 1000,
+    &#34;incl&#34;: 90,
+    &#34;beta&#34;: 90,
+    &#34;phase&#34;: 0
+  },
+  &#34;weak&#34;: {
+    &#34;geff&#34;: 1.0
+  }
+}
+No spectral resolution given, no PDF convolution performed
+No macroturbulence velocity given, no convolution performed
+1.958617462625618
+No spectral resolution given, no PDF convolution performed
+No macroturbulence velocity given, no convolution performed
+Using 1400 grid point on the surface
+Evaluating with weak approximation...
+1.958617462625618
+Using 1400 grid point on the surface
+Evaluating with weak approximation...
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[&lt;matplotlib.lines.Line2D at 0x1b868b1cbb0&gt;]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/nblink_diskint2_doc_47_2.png" src="../_images/nblink_diskint2_doc_47_2.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/nblink_diskint2_doc_47_3.png" src="../_images/nblink_diskint2_doc_47_3.png" />
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Testing-the-code">
+<h2>Testing the code<a class="headerlink" href="#Testing-the-code" title="Permalink to this heading"></a></h2>
+<p>In the cell below, I prepared a model that can be passed to diskint.</p>
+<p>The pattern for Unno is a triplet with a geff of 1.0.</p>
+<p>In addition to returning the final result itself, I added a line in the disk integration look that returns one of the local profile (e.g. the fifth one in the loop), which was useful for debugging.</p>
+<p>NOTE that once everything is debug, this will be commented out in diskint, so the graph cells below will not work anymore.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">genparam</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;lambda0&#39;</span><span class="p">:</span><span class="mi">5000</span><span class="p">,</span>    <span class="c1"># the central wavelength of the transition</span>
+    <span class="s1">&#39;vsini&#39;</span><span class="p">:</span><span class="mf">30.0</span><span class="p">,</span>         <span class="c1"># the projected rotational velocity</span>
+    <span class="s1">&#39;vdop&#39;</span><span class="p">:</span><span class="mf">10.0</span><span class="p">,</span>          <span class="c1"># the thermal broadening</span>
+    <span class="s1">&#39;av&#39;</span><span class="p">:</span><span class="mf">0.05</span><span class="p">,</span>             <span class="c1"># the damping coefficient of the Voigt profile</span>
+    <span class="s1">&#39;bnu&#39;</span><span class="p">:</span><span class="mf">1.5</span><span class="p">,</span>             <span class="c1"># the slope of the source function with respect to vertical optical depth</span>
+    <span class="s1">&#39;logkappa&#39;</span><span class="p">:</span><span class="mf">0.0</span><span class="p">,</span>          <span class="c1"># the line strength parameter</span>
+    <span class="s1">&#39;ndop&#39;</span><span class="p">:</span><span class="nb">int</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span>       <span class="c1"># the number of sample point per doppler width for the wavelength array</span>
+    <span class="s1">&#39;Bpole&#39;</span><span class="p">:</span><span class="mi">500</span><span class="p">,</span>
+    <span class="s1">&#39;incl&#39;</span><span class="p">:</span><span class="mi">90</span><span class="p">,</span> <span class="c1">#not necessary for loop</span>
+    <span class="s1">&#39;beta&#39;</span><span class="p">:</span><span class="mi">90</span><span class="p">,</span> <span class="c1">#not necessary for loop</span>
+    <span class="s1">&#39;phase&#39;</span><span class="p">:</span><span class="mi">90</span> <span class="c1">#not necessary for loop</span>
+  <span class="p">}</span>
+
+<span class="n">unnoparam</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;down&#39;</span><span class="p">:[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>   <span class="c1"># the s, j, l of the lower level</span>
+    <span class="s1">&#39;up&#39;</span><span class="p">:[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>    <span class="c1"># the s, j, l of the upper level</span>
+    <span class="p">}</span>
+
+<span class="n">weakparam</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;geff&#39;</span><span class="p">:</span><span class="mf">1.0</span>
+    <span class="p">}</span>
+
+<span class="n">param</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;general&#39;</span> <span class="p">:</span> <span class="n">genparam</span><span class="p">,</span>
+       <span class="s1">&#39;weak&#39;</span> <span class="p">:</span> <span class="n">weakparam</span><span class="p">,</span>
+       <span class="s1">&#39;unno&#39;</span><span class="p">:</span> <span class="n">unnoparam</span> <span class="c1"># no necessary for loop</span>
+       <span class="p">}</span>
+
+<span class="n">pat</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">pattern</span><span class="o">.</span><span class="n">zeeman_pattern</span><span class="p">(</span><span class="n">unnoparam</span><span class="p">[</span><span class="s1">&#39;down&#39;</span><span class="p">],</span> <span class="n">unnoparam</span><span class="p">[</span><span class="s1">&#39;up&#39;</span><span class="p">])</span>
+<span class="c1">#rav.pattern.plot_zeeman_pattern(pat)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
+
+<span class="n">tic</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="c1">#model_unno, testI_unno, testV_unno = rav.diskint2.numerical(param, unno=True)</span>
+<span class="n">model_unno</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">diskint2</span><span class="o">.</span><span class="n">numerical</span><span class="p">(</span><span class="n">param</span><span class="p">,</span> <span class="n">unno</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">toc</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">toc</span> <span class="o">-</span> <span class="n">tic</span><span class="p">)</span>
+
+<span class="n">tic</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="c1">#model_weak, testI_weak, testV_weak = rav.diskint2.numerical(param, unno=False)</span>
+<span class="n">model_weak</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">diskint2</span><span class="o">.</span><span class="n">numerical</span><span class="p">(</span><span class="n">param</span><span class="p">,</span> <span class="n">unno</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">toc</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">toc</span> <span class="o">-</span> <span class="n">tic</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Using 2200.0 grid point on the surface
+Max shift due to field: 0.0349906123404163 vdop
+Max shift due to vsini: 3.0 vdop
+0.29845094680786133
+Using 2200.0 grid point on the surface
+0.09066009521484375
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#fig, ax = plt.subplots(1,1)</span>
+
+<span class="c1">#ax.plot(model_unno[&#39;uo&#39;], testV_unno, label=&#39;unno&#39;)</span>
+<span class="c1">#ax.scatter(model_weak[&#39;uo&#39;], testV_weak, label=&#39;weak&#39;)</span>
+<span class="c1">#ax.legend(loc=0)</span>
+
+<span class="c1">#fig, ax = plt.subplots(1,1)</span>
+
+<span class="c1">#ax.plot(model_unno[&#39;uo&#39;], testI_unno, label=&#39;unno&#39;)</span>
+<span class="c1">#ax.scatter(model_weak[&#39;uo&#39;], testI_weak, label=&#39;weak&#39;)</span>
+<span class="c1">#ax.legend(loc=0)</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">model_unno</span><span class="p">[</span><span class="s1">&#39;vel&#39;</span><span class="p">],</span> <span class="n">model_unno</span><span class="p">[</span><span class="s1">&#39;V&#39;</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;unno&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">model_weak</span><span class="p">[</span><span class="s1">&#39;vel&#39;</span><span class="p">],</span> <span class="n">model_weak</span><span class="p">[</span><span class="s1">&#39;V&#39;</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;weak&#39;</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">model_unno</span><span class="p">[</span><span class="s1">&#39;vel&#39;</span><span class="p">],</span> <span class="n">model_unno</span><span class="p">[</span><span class="s1">&#39;flux&#39;</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;unno&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">model_weak</span><span class="p">[</span><span class="s1">&#39;vel&#39;</span><span class="p">],</span> <span class="n">model_weak</span><span class="p">[</span><span class="s1">&#39;flux&#39;</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;weak&#39;</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;matplotlib.legend.Legend at 0x2443ce50220&gt;
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/nblink_diskint2_doc_54_1.png" src="../_images/nblink_diskint2_doc_54_1.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/nblink_diskint2_doc_54_2.png" src="../_images/nblink_diskint2_doc_54_2.png" />
+</div>
+</div>
+</section>
+<section id="Is-it-quick-to-interpolate-or-to-recalculate-w?">
+<h2>Is it quick to interpolate or to recalculate w?<a class="headerlink" href="#Is-it-quick-to-interpolate-or-to-recalculate-w?" title="Permalink to this heading"></a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
+
+<span class="c1">#for vsini = 250, -32 to 32, with 6600 points</span>
+
+<span class="n">all_u</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">32</span><span class="p">,</span><span class="mi">32</span><span class="p">,</span><span class="mi">6600</span><span class="p">)</span>
+<span class="n">small_u</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">7</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span> <span class="mi">10</span><span class="o">*</span><span class="mi">2</span><span class="o">*</span><span class="mi">7</span><span class="p">)</span>
+
+<span class="n">tic</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1000</span><span class="p">):</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">profileI</span><span class="o">.</span><span class="n">voigt_fara</span><span class="p">(</span><span class="n">all_u</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">)</span>
+<span class="n">toc</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">toc</span> <span class="o">-</span> <span class="n">tic</span><span class="p">)</span>
+
+
+<span class="n">w</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">profileI</span><span class="o">.</span><span class="n">voigt_fara</span><span class="p">(</span><span class="n">small_u</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">)</span><span class="o">.</span><span class="n">real</span>
+
+<span class="n">tic</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1000</span><span class="p">):</span>
+    <span class="n">toto</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">localV</span><span class="o">.</span><span class="n">interpol_lin</span><span class="p">(</span><span class="n">w</span><span class="p">,</span>  <span class="n">small_u</span><span class="p">,</span> <span class="n">all_u</span><span class="p">)</span>
+<span class="n">toc</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">toc</span> <span class="o">-</span> <span class="n">tic</span><span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+20.34989094734192
+0.18098068237304688
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="BayesObjects_user.html" class="btn btn-neutral float-left" title="User’s manual for the BayesObjects.py classes" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="geometry_doc.html" class="btn btn-neutral float-right" title="Geometry documentation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, V. Petit.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -6,6 +6,7 @@
   <title>Index &mdash; Raven  documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/template.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
@@ -50,6 +51,17 @@
 <li class="toctree-l1"><a class="reference internal" href="nblink/03-ChiSquareCalcLoop.html">03- Calculating the chi2 with the loop code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="nblink/04-CalculateProbabilities.html">04 - Calculate probabilites from the chi2 files</a></li>
 </ul>
+<p class="caption" role="heading"><span class="caption-text">Standalone tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="nblink/ParamsObject_tutorial.html">Tutorial on how to use the Params Dictionary objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nblink/BayesObjects_user.html">User’s manual for the BayesObjects.py classes</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Underlying physics and statistics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="nblink/diskint2_doc.html">Documentation for diskint2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nblink/geometry_doc.html">Geometry documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nblink/bayes_doc.html">Documentation for the bayesian calculations</a></li>
+</ul>
 <p class="caption" role="heading"><span class="caption-text">API documentation</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="API.html">pyRaven Package</a></li>
@@ -86,10 +98,13 @@
  | <a href="#A"><strong>A</strong></a>
  | <a href="#C"><strong>C</strong></a>
  | <a href="#D"><strong>D</strong></a>
+ | <a href="#E"><strong>E</strong></a>
+ | <a href="#F"><strong>F</strong></a>
  | <a href="#G"><strong>G</strong></a>
  | <a href="#L"><strong>L</strong></a>
  | <a href="#M"><strong>M</strong></a>
  | <a href="#N"><strong>N</strong></a>
+ | <a href="#O"><strong>O</strong></a>
  | <a href="#P"><strong>P</strong></a>
  | <a href="#R"><strong>R</strong></a>
  | <a href="#U"><strong>U</strong></a>
@@ -100,9 +115,17 @@
 <h2 id="_">_</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="API.html#pyRaven.data.DataPacket.__init__">__init__() (pyRaven.data.DataPacket method)</a>
+      <li><a href="API.html#pyRaven.BayesObjects.chi.__init__">__init__() (pyRaven.BayesObjects.chi method)</a>
 
       <ul>
+        <li><a href="API.html#pyRaven.BayesObjects.lnP_mar.__init__">(pyRaven.BayesObjects.lnP_mar method)</a>
+</li>
+        <li><a href="API.html#pyRaven.BayesObjects.lnP_odds.__init__">(pyRaven.BayesObjects.lnP_odds method)</a>
+</li>
+        <li><a href="API.html#pyRaven.BayesObjects.lnP_pars.__init__">(pyRaven.BayesObjects.lnP_pars method)</a>
+</li>
+        <li><a href="API.html#pyRaven.data.DataPacket.__init__">(pyRaven.data.DataPacket method)</a>
+</li>
         <li><a href="API.html#pyRaven.data.LSDprofs.__init__">(pyRaven.data.LSDprofs method)</a>
 </li>
       </ul></li>
@@ -115,11 +138,31 @@
       <li><a href="API.html#pyRaven.diskint2.analytical">analytical() (in module pyRaven.diskint2)</a>
 </li>
   </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="API.html#pyRaven.BayesObjects.lnP_pars.apply_priors">apply_priors() (pyRaven.BayesObjects.lnP_pars method)</a>
+</li>
+  </ul></td>
 </tr></table>
 
 <h2 id="C">C</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="API.html#pyRaven.BayesObjects.chi">chi (class in pyRaven.BayesObjects)</a>
+</li>
+      <li><a href="API.html#pyRaven.BayesObjects.combine_obs">combine_obs() (in module pyRaven.BayesObjects)</a>
+</li>
+      <li><a href="API.html#pyRaven.BayesObjects.create_chi">create_chi() (in module pyRaven.BayesObjects)</a>
+</li>
+      <li><a href="API.html#pyRaven.BayesObjects.create_empty_lnP_odds">create_empty_lnP_odds() (in module pyRaven.BayesObjects)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="API.html#pyRaven.BayesObjects.create_empty_lnP_pars">create_empty_lnP_pars() (in module pyRaven.BayesObjects)</a>
+</li>
+      <li><a href="API.html#pyRaven.BayesObjects.create_lnLH_odds_from_chi">create_lnLH_odds_from_chi() (in module pyRaven.BayesObjects)</a>
+</li>
+      <li><a href="API.html#pyRaven.BayesObjects.create_lnLH_pars_from_chi">create_lnLH_pars_from_chi() (in module pyRaven.BayesObjects)</a>
+</li>
       <li><a href="API.html#pyRaven.data.create_Packet">create_Packet() (in module pyRaven.data)</a>
 </li>
   </ul></td>
@@ -133,6 +176,30 @@
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="API.html#pyRaven.params.MyJSONEncoder.default">default() (pyRaven.params.MyJSONEncoder method)</a>
+</li>
+      <li><a href="API.html#pyRaven.loop_speed.disk_int_loop_numba">disk_int_loop_numba() (in module pyRaven.loop_speed)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="E">E</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="API.html#pyRaven.BayesObjects.exp_check">exp_check() (in module pyRaven.BayesObjects)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="F">F</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="API.html#pyRaven.BayesObjects.lnP_pars.find_best">find_best() (pyRaven.BayesObjects.lnP_pars method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="API.html#pyRaven.fitparams.fitdata">fitdata() (in module pyRaven.fitparams)</a>
+</li>
+      <li><a href="API.html#pyRaven.fitparams.fitdataMCMC">fitdataMCMC() (in module pyRaven.fitparams)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -164,11 +231,21 @@
 </li>
       <li><a href="API.html#pyRaven.diskint2.get_MAG">get_MAG() (in module pyRaven.diskint2)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="API.html#pyRaven.diskint2.get_ngrid">get_ngrid() (in module pyRaven.diskint2)</a>
 </li>
       <li><a href="API.html#pyRaven.diskint2.get_perGaussLorentz">get_perGaussLorentz() (in module pyRaven.diskint2)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="API.html#pyRaven.BayesObjects.get_prior_beta">get_prior_beta() (in module pyRaven.BayesObjects)</a>
+</li>
+      <li><a href="API.html#pyRaven.BayesObjects.get_prior_Bpole">get_prior_Bpole() (in module pyRaven.BayesObjects)</a>
+</li>
+      <li><a href="API.html#pyRaven.BayesObjects.get_prior_incl">get_prior_incl() (in module pyRaven.BayesObjects)</a>
+</li>
+      <li><a href="API.html#pyRaven.BayesObjects.get_prior_noise">get_prior_noise() (in module pyRaven.BayesObjects)</a>
+</li>
+      <li><a href="API.html#pyRaven.BayesObjects.get_prior_phi">get_prior_phi() (in module pyRaven.BayesObjects)</a>
 </li>
       <li><a href="API.html#pyRaven.diskint2.get_resmac_kernel">get_resmac_kernel() (in module pyRaven.diskint2)</a>
 </li>
@@ -196,10 +273,22 @@
 <h2 id="L">L</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="API.html#pyRaven.loop.loop">loop() (in module pyRaven.loop)</a>
+      <li><a href="API.html#pyRaven.BayesObjects.ln_mar_check">ln_mar_check() (in module pyRaven.BayesObjects)</a>
+</li>
+      <li><a href="API.html#pyRaven.BayesObjects.lnP_mar">lnP_mar (class in pyRaven.BayesObjects)</a>
+</li>
+      <li><a href="API.html#pyRaven.BayesObjects.lnP_odds">lnP_odds (class in pyRaven.BayesObjects)</a>
+</li>
+      <li><a href="API.html#pyRaven.BayesObjects.lnP_pars">lnP_pars (class in pyRaven.BayesObjects)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="API.html#pyRaven.loop.loop">loop() (in module pyRaven.loop)</a>
+</li>
+      <li><a href="API.html#pyRaven.loop_speed.loop_speed">loop_speed() (in module pyRaven.loop_speed)</a>
+</li>
+      <li><a href="API.html#pyRaven.loop_speed.loop_speed_wrapper">loop_speed_wrapper() (in module pyRaven.loop_speed)</a>
+</li>
       <li><a href="API.html#pyRaven.loop.loop_wrapper">loop_wrapper() (in module pyRaven.loop)</a>
 </li>
       <li><a href="API.html#pyRaven.data.LSDprofs">LSDprofs (class in pyRaven.data)</a>
@@ -210,19 +299,29 @@
 <h2 id="M">M</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="API.html#pyRaven.BayesObjects.lnP_pars.mar_phase_noise">mar_phase_noise() (pyRaven.BayesObjects.lnP_pars method)</a>
+</li>
       <li><a href="API.html#pyRaven.diskint2.model_convolve_resvmac">model_convolve_resvmac() (in module pyRaven.diskint2)</a>
 </li>
       <li>
     module
 
       <ul>
+        <li><a href="API.html#module-pyRaven.BayesObjects">pyRaven.BayesObjects</a>
+</li>
         <li><a href="API.html#module-pyRaven.data">pyRaven.data</a>
 </li>
         <li><a href="API.html#module-pyRaven.diskint2">pyRaven.diskint2</a>
 </li>
+        <li><a href="API.html#module-pyRaven.fitparams">pyRaven.fitparams</a>
+</li>
         <li><a href="API.html#module-pyRaven.localV">pyRaven.localV</a>
 </li>
         <li><a href="API.html#module-pyRaven.loop">pyRaven.loop</a>
+</li>
+        <li><a href="API.html#module-pyRaven.loop_speed">pyRaven.loop_speed</a>
+</li>
+        <li><a href="API.html#module-pyRaven.misc">pyRaven.misc</a>
 </li>
         <li><a href="API.html#module-pyRaven.params">pyRaven.params</a>
 </li>
@@ -241,7 +340,23 @@
 <h2 id="N">N</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="API.html#pyRaven.BayesObjects.lnP_mar.normalize">normalize() (pyRaven.BayesObjects.lnP_mar method)</a>
+
+      <ul>
+        <li><a href="API.html#pyRaven.BayesObjects.lnP_pars.normalize">(pyRaven.BayesObjects.lnP_pars method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="API.html#pyRaven.diskint2.numerical">numerical() (in module pyRaven.diskint2)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="O">O</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="API.html#pyRaven.BayesObjects.overview_plots">overview_plots() (in module pyRaven.BayesObjects)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -255,8 +370,21 @@
 </li>
       <li><a href="API.html#pyRaven.params.parameters">parameters (class in pyRaven.params)</a>
 </li>
+      <li><a href="API.html#pyRaven.BayesObjects.lnP_mar.plot_corner">plot_corner() (pyRaven.BayesObjects.lnP_mar method)</a>
+</li>
+      <li><a href="API.html#pyRaven.BayesObjects.lnP_pars.plot_mar">plot_mar() (pyRaven.BayesObjects.lnP_pars method)</a>
+</li>
+      <li><a href="API.html#pyRaven.BayesObjects.lnP_pars.plot_prior">plot_prior() (pyRaven.BayesObjects.lnP_pars method)</a>
+</li>
       <li><a href="API.html#pyRaven.params.parameters.pprint">pprint() (pyRaven.params.parameters method)</a>
 </li>
+      <li>
+    pyRaven.BayesObjects
+
+      <ul>
+        <li><a href="API.html#module-pyRaven.BayesObjects">module</a>
+</li>
+      </ul></li>
       <li>
     pyRaven.data
 
@@ -272,19 +400,40 @@
 </li>
       </ul></li>
       <li>
+    pyRaven.fitparams
+
+      <ul>
+        <li><a href="API.html#module-pyRaven.fitparams">module</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
     pyRaven.localV
 
       <ul>
         <li><a href="API.html#module-pyRaven.localV">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     pyRaven.loop
 
       <ul>
         <li><a href="API.html#module-pyRaven.loop">module</a>
+</li>
+      </ul></li>
+      <li>
+    pyRaven.loop_speed
+
+      <ul>
+        <li><a href="API.html#module-pyRaven.loop_speed">module</a>
+</li>
+      </ul></li>
+      <li>
+    pyRaven.misc
+
+      <ul>
+        <li><a href="API.html#module-pyRaven.misc">module</a>
 </li>
       </ul></li>
       <li>
@@ -314,12 +463,20 @@
 <h2 id="R">R</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="API.html#pyRaven.BayesObjects.read_chi">read_chi() (in module pyRaven.BayesObjects)</a>
+</li>
+      <li><a href="API.html#pyRaven.BayesObjects.read_lnP_mar">read_lnP_mar() (in module pyRaven.BayesObjects)</a>
+</li>
+      <li><a href="API.html#pyRaven.BayesObjects.read_lnP_odds">read_lnP_odds() (in module pyRaven.BayesObjects)</a>
+</li>
+      <li><a href="API.html#pyRaven.BayesObjects.read_lnP_pars">read_lnP_pars() (in module pyRaven.BayesObjects)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="API.html#pyRaven.data.read_lsd">read_lsd() (in module pyRaven.data)</a>
 </li>
       <li><a href="API.html#pyRaven.data.read_lsds">read_lsds() (in module pyRaven.data)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="API.html#pyRaven.data.read_lsds_from_sfiles">read_lsds_from_sfiles() (in module pyRaven.data)</a>
 </li>
       <li><a href="API.html#pyRaven.data.read_packet">read_packet() (in module pyRaven.data)</a>
@@ -348,14 +505,26 @@
 <h2 id="W">W</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="API.html#pyRaven.data.DataPacket.write">write() (pyRaven.data.DataPacket method)</a>
+      <li><a href="API.html#pyRaven.BayesObjects.chi.write">write() (pyRaven.BayesObjects.chi method)</a>
 
       <ul>
+        <li><a href="API.html#pyRaven.BayesObjects.lnP_mar.write">(pyRaven.BayesObjects.lnP_mar method)</a>
+</li>
+        <li><a href="API.html#pyRaven.BayesObjects.lnP_odds.write">(pyRaven.BayesObjects.lnP_odds method)</a>
+</li>
+        <li><a href="API.html#pyRaven.BayesObjects.lnP_pars.write">(pyRaven.BayesObjects.lnP_pars method)</a>
+</li>
+        <li><a href="API.html#pyRaven.data.DataPacket.write">(pyRaven.data.DataPacket method)</a>
+</li>
         <li><a href="API.html#pyRaven.data.LSDprofs.write">(pyRaven.data.LSDprofs method)</a>
 </li>
         <li><a href="API.html#pyRaven.params.parameters.write">(pyRaven.params.parameters method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="API.html#pyRaven.BayesObjects.lnP_odds.writef">writef() (pyRaven.BayesObjects.lnP_odds method)</a>
+</li>
   </ul></td>
 </tr></table>
 

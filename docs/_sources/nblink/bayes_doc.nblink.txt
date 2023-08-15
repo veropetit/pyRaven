@@ -1,0 +1,3 @@
+{
+    "path": "../../../DetailedCodeDocumentation/bayes_doc.ipynb"
+}

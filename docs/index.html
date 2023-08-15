@@ -7,6 +7,7 @@
   <title>Documentation for pyRaven &mdash; Raven  documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/template.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
@@ -52,6 +53,17 @@
 <li class="toctree-l1"><a class="reference internal" href="nblink/03-ChiSquareCalcLoop.html">03- Calculating the chi2 with the loop code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="nblink/04-CalculateProbabilities.html">04 - Calculate probabilites from the chi2 files</a></li>
 </ul>
+<p class="caption" role="heading"><span class="caption-text">Standalone tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="nblink/ParamsObject_tutorial.html">Tutorial on how to use the Params Dictionary objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nblink/BayesObjects_user.html">User’s manual for the BayesObjects.py classes</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Underlying physics and statistics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="nblink/diskint2_doc.html">Documentation for diskint2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nblink/geometry_doc.html">Geometry documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nblink/bayes_doc.html">Documentation for the bayesian calculations</a></li>
+</ul>
 <p class="caption" role="heading"><span class="caption-text">API documentation</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="API.html">pyRaven Package</a></li>
@@ -87,29 +99,38 @@
 magnetic dipolar field upper limits from a set of Stokes V spectropolarimetric
 observations from a given star of Petit &amp; Wade 2012 (MNRAS 420 773).</p>
 <div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="Installation.html">Installation</a></li>
-</ul>
 </div>
-</section>
+<a class="button" href="Installation.html">Installation</a><div class="line-block">
+<div class="line"><br /></div>
+</div>
 <section id="how-to-run-pyraven-tutorial">
-<h1>How to run pyRaven tutorial<a class="headerlink" href="#how-to-run-pyraven-tutorial" title="Permalink to this heading"></a></h1>
-<p>If you are interested in the simple application of pyRaven, please follow the tutorials below.</p>
+<h2>How to run pyRaven tutorial<a class="headerlink" href="#how-to-run-pyraven-tutorial" title="Permalink to this heading"></a></h2>
 <div class="toctree-wrapper compound">
-<p class="caption" role="heading"><span class="caption-text">How to run pyRaven tutorial</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="nblink/01-DataSetup.html">01 - Data Setup</a></li>
-<li class="toctree-l1"><a class="reference internal" href="nblink/02-FitIntensity.html">02- Fit of the intensity profiles for single stars</a></li>
-<li class="toctree-l1"><a class="reference internal" href="nblink/03-ChiSquareCalcLoop.html">03- Calculating the chi2 with the loop code</a></li>
-<li class="toctree-l1"><a class="reference internal" href="nblink/04-CalculateProbabilities.html">04 - Calculate probabilites from the chi2 files</a></li>
-</ul>
+</div>
+<p>If you are interested in the simple application of pyRaven, please follow the tutorials below.</p>
+<a class="button" href="01-DataSetup.html">01 - Data Setup</a>
+<a class="button" href="02-FitIntensity.html">02- Fit of the intensity profiles for single stars</a>
+<a class="button" href="03-ChiSquareCalcLoop.html">03- Calculating the chi2 with the loop code</a>
+<a class="button" href="04-CalculateProbabilities.html">04 - Calculate probabilites from the chi2 files</a><div class="line-block">
+<div class="line"><br /></div>
 </div>
 </section>
-<section id="more-advanced-usage">
-<h1>More advanced usage<a class="headerlink" href="#more-advanced-usage" title="Permalink to this heading"></a></h1>
-</section>
-<section id="api-documentaiton">
-<h1>API documentaiton<a class="headerlink" href="#api-documentaiton" title="Permalink to this heading"></a></h1>
+<section id="standalone-tutorials">
+<h2>Standalone tutorials<a class="headerlink" href="#standalone-tutorials" title="Permalink to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+</div>
+<a class="button" href="ParamsObject_tutorial.html">Tutorial on how to use the Params Dictionary objects</a>
+<a class="button" href="BayesObjects_user.html">User’s manual for the BayesObjects.py classes</a><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Underlying physics and statistics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="nblink/diskint2_doc.html">Documentation for diskint2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nblink/geometry_doc.html">Geometry documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nblink/bayes_doc.html">Documentation for the bayesian calculations</a></li>
+</ul>
+</div>
 <div class="toctree-wrapper compound">
 <p class="caption" role="heading"><span class="caption-text">API documentation</span></p>
 <ul>
@@ -119,12 +140,17 @@ observations from a given star of Petit &amp; Wade 2012 (MNRAS 420 773).</p>
 <li class="toctree-l2"><a class="reference internal" href="API.html#module-pyRaven.pattern">pattern module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="API.html#module-pyRaven.profileI">profileI module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="API.html#module-pyRaven.localV">localV module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="API.html#id1">localV module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="API.html#module-pyRaven.diskint2">diskint2 module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="API.html#module-pyRaven.fitparams">fitparams module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="API.html#module-pyRaven.loop">loop module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="API.html#module-pyRaven.loop_speed">loop_speed module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="API.html#module-pyRaven.BayesObjects">BayesObjects module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="API.html#module-pyRaven.misc">misc module</a></li>
 </ul>
 </li>
 </ul>
 </div>
+</section>
 </section>
 <section id="indices-and-tables">
 <h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this heading"></a></h1>
