@@ -132,7 +132,7 @@ def read_chi(fname):
 #########################
 #########################
 
-class lnLH_odds:
+class lnP_odds:
     '''
     Class definition for objects that will store the ln likelihood for the odds ratios
 
@@ -179,7 +179,7 @@ class lnLH_odds:
         with h5py.File(fname, 'w') as f:
             self.writef(f)
 
-def read_lnLH_odds(fname):
+def read_lnP_odds(fname):
     '''
     Function to read in a lnLH_odds object from an h5 file
     
@@ -193,12 +193,12 @@ def read_lnLH_odds(fname):
         incl_arr = np.array(f['incl_arr'])
         obsID = f.attrs.get('obsID')
 
-    return(lnLH_odds(data, beta_arr, Bpole_arr, phi_arr, incl_arr, obsID))
+    return(lnP_odds(data, beta_arr, Bpole_arr, phi_arr, incl_arr, obsID))
 
-def create_empty_lnLH_odds(beta_arr, Bpole_arr, phi_arr, incl_arr, obsID):
+def create_empty_lnP_odds(beta_arr, Bpole_arr, phi_arr, incl_arr, obsID):
     '''
-    Helper function to create an empty LH_odds object. 
-    The lnLH_odds.data will be a np.zeros array of the approprate size for the beta_arr, Bpole_arr, and phi_arr given
+    Helper function to create an empty lnP_odds object. 
+    The lnP_odds.data will be a np.zeros array of the approprate size for the beta_arr, Bpole_arr, and phi_arr given
     
     :param beta_arr: numpy 1D array with grid values for the beta axis (in degree)
     :param Bpole_arr: numpy 1D array with grid values for the Bpole axis (in Gauss)
@@ -207,7 +207,7 @@ def create_empty_lnLH_odds(beta_arr, Bpole_arr, phi_arr, incl_arr, obsID):
     :param obsID: (string or float) the observation ID for this set of chi2s
     '''
     data = np.zeros((beta_arr.size, Bpole_arr.size, phi_arr.size, incl_arr.size))
-    return(lnLH_odds(data, beta_arr, Bpole_arr, phi_arr, incl_arr, obsID))
+    return(lnP_odds(data, beta_arr, Bpole_arr, phi_arr, incl_arr, obsID))
 
 def create_lnLH_odds_from_chi(folder_path, param, datapacket):
     '''
@@ -226,7 +226,7 @@ def create_lnLH_odds_from_chi(folder_path, param, datapacket):
     for S in Stokes:
         # loop over all observations
         for o in range(0,datapacket.nobs):
-            lnLH = create_empty_lnLH_odds(
+            lnLH = create_empty_lnP_odds(
                                     param['grid']['beta_grid'],
                                     param['grid']['Bpole_grid'],
                                     param['grid']['phase_grid'],
@@ -261,9 +261,9 @@ def create_lnLH_odds_from_chi(folder_path, param, datapacket):
 #########################
 #########################
 
-class lnLH_pars(lnLH_odds):
+class lnP_pars(lnP_odds):
     '''
-    Class definition for the lnLH_pars. This class inherits from lnLH_odds.
+    Class definition for the lnP_pars. This class inherits from lnP_odds.
     '''
 
     def __init__(self, data, beta_arr, Bpole_arr, phi_arr, incl_arr, obsID, noise_arr):
@@ -284,7 +284,7 @@ class lnLH_pars(lnLH_odds):
             # writting the noise_arr. 
             f.create_dataset('noise_arr',data=self.noise_arr)
 
-    def find_bestLH(self):
+    def find_best(self):
         '''
         Function to return dictionary witht the parameters of the max likelihood
         (NEED TO: marginalized for the scale noise parameter)
@@ -316,7 +316,7 @@ class lnLH_pars(lnLH_odds):
 
     def plot_mar(self, fig=None, ax=None, right=False, **kwargs):
         '''
-        Function to plot the 1D marginalization for a LH PARS object. 
+        Function to plot the 1D marginalization for a lnP_pars object. 
 
         :param fig: (None) an already created fig object (for two side-by-side graphs). 
             If None and right=False, it will create a single corner plot. 
@@ -447,7 +447,7 @@ class lnLH_pars(lnLH_odds):
         ln_post_mar = ln_mar_check(self.data, axis=(2,4))+ lnd_phi + lnd_noise
 
         #create a ln_post object to return
-        ln_post = lnpost(ln_post_mar,self.beta_arr,self.Bpole_arr,self.incl_arr, self.obsID)
+        ln_post = lnP_mar(ln_post_mar,self.beta_arr,self.Bpole_arr,self.incl_arr, self.obsID)
         return(ln_post)
 
     def normalize(self):
@@ -458,10 +458,10 @@ class lnLH_pars(lnLH_odds):
 
         ln_norm = ln_mar_check(self.data) + lnd_beta+lnd_Bpole+lnd_incl+lnd_phi+lnd_noise 
         
-        return(lnLH_pars(self.data-ln_norm, self.beta_arr,self.Bpole_arr,self.phi_arr, self.incl_arr,self.obsID, self.noise_arr))
+        return(lnP_pars(self.data-ln_norm, self.beta_arr,self.Bpole_arr,self.phi_arr, self.incl_arr,self.obsID, self.noise_arr))
 
 
-def read_lnLH_pars(fname):
+def read_lnP_pars(fname):
     '''
     Function to read in a lnLH_pars object from an h5 file
     
@@ -477,9 +477,9 @@ def read_lnLH_pars(fname):
         noise_arr = np.array(f['noise_arr'])
 
 
-    return(lnLH_pars(data, beta_arr, Bpole_arr, phi_arr, incl_arr, obsID, noise_arr))
+    return(lnP_pars(data, beta_arr, Bpole_arr, phi_arr, incl_arr, obsID, noise_arr))
 
-def create_empty_lnLH_pars(beta_arr, Bpole_arr, phi_arr, incl_arr, obsID, noise_arr):
+def create_empty_lnP_pars(beta_arr, Bpole_arr, phi_arr, incl_arr, obsID, noise_arr):
     '''
     Helper function to create an empty LH_odds object. 
     The lnLH_pars.data will be a np.zeros array of the approprate size for the beta_arr, Bpole_arr, phi_arr, and noise_arr given
@@ -492,7 +492,7 @@ def create_empty_lnLH_pars(beta_arr, Bpole_arr, phi_arr, incl_arr, obsID, noise_
     :param noise_arr: numpy 1D array with grid values for the scale noise parameter (no units)
     '''
     data = np.zeros((beta_arr.size, Bpole_arr.size, phi_arr.size, incl_arr.size, noise_arr.size))
-    return(lnLH_pars(data, beta_arr, Bpole_arr, phi_arr, incl_arr, obsID,noise_arr))
+    return(lnP_pars(data, beta_arr, Bpole_arr, phi_arr, incl_arr, obsID,noise_arr))
 
 def create_lnLH_pars_from_chi(folder_path, param, datapacket):
     '''
@@ -511,7 +511,7 @@ def create_lnLH_pars_from_chi(folder_path, param, datapacket):
     for S in Stokes:
         # loop over all observations
         for o in range(0,datapacket.nobs):
-            lnLH = create_empty_lnLH_pars(
+            lnLH = create_empty_lnP_pars(
                                     param['grid']['beta_grid'],
                                     param['grid']['Bpole_grid'],
                                     param['grid']['phase_grid'],
@@ -593,9 +593,10 @@ def get_prior_noise(noise_arr):
 
 #####################
 #####################
-class lnpost():
+class lnP_mar():
     '''
-    Class to store posterior probabilities (marginalized for phase and noise scale)
+    Class to store (beta, Bpole, incl) probabilities 
+    (so usually lnP_odds or lnP_pars marginalized for phase and noise scale parameter)
     '''
 
     def __init__(self, data, beta_arr, Bpole_arr, incl_arr, obsID):
@@ -638,7 +639,7 @@ class lnpost():
 
         ln_norm = ln_mar_check(self.data) + lnd_beta+lnd_Bpole+lnd_incl 
         
-        return(lnpost(self.data-ln_norm, self.beta_arr,self.Bpole_arr,self.incl_arr,self.obsID))
+        return(lnP_mar(self.data-ln_norm, self.beta_arr,self.Bpole_arr,self.incl_arr,self.obsID))
 
     def plot_corner(self, fig=None, ax=None, right=False):
         '''
@@ -711,7 +712,7 @@ class lnpost():
         plt.tight_layout()
         return(fig, ax)
 
-def read_lnpost(fname):
+def read_lnP_mar(fname):
     '''
     Function to read in a lnpost object from an h5 file
     
@@ -724,7 +725,7 @@ def read_lnpost(fname):
         incl_arr = np.array(f['incl_arr'])
         obsID = np.array(f['obsID'])
 
-    return(lnpost(data, beta_arr, Bpole_arr, incl_arr, obsID))    
+    return(lnP_mar(data, beta_arr, Bpole_arr, incl_arr, obsID))    
 
 def combine_obs(nobs):
     '''
@@ -738,7 +739,7 @@ def combine_obs(nobs):
 
         ### Dealing with the parameter estimation first
         # 1. read in the first observation
-        ln_LH = read_lnLH_pars('lnLH_PARS_{}_obs0.h5'.format(S))
+        ln_LH = read_lnP_pars('lnLH_PARS_{}_obs0.h5'.format(S))
 
         # 2. write the normalized LH to disk
         ln_LH.normalize().write('lnpost_PARS_noprior_{}_obs0.h5'.format(S))
@@ -767,7 +768,7 @@ def combine_obs(nobs):
         if nobs > 1:
             for i in range(1,nobs):
                 # steps 1-3 from above
-                ln_LH = read_lnLH_pars('lnLH_PARS_{}_obs{}.h5'.format(S,i))
+                ln_LH = read_lnP_pars('lnLH_PARS_{}_obs{}.h5'.format(S,i))
                 ln_LH.normalize().write('lnpost_PARS_noprior_{}_obs{}.h5'.format(S,i))
                 ln_post_mar_noprior = ln_LH.mar_phase_noise()
                 ln_post_mar_noprior.normalize().write('lnpost_PARS_mar_noprior_{}_obs{}.h5'.format(S,i))
@@ -811,14 +812,14 @@ def overview_plots(nobs):
         # For each observation, the full parameter 1D marginalization
         for i in range(0,nobs):
             # The posterior with flat prior (aka no prior, with scale noise)
-            lnP = read_lnLH_pars('lnpost_PARS_noprior_N1_obs{}.h5'.format(i))
+            lnP = read_lnP_pars('lnpost_PARS_noprior_N1_obs{}.h5'.format(i))
             fig, ax = lnP.plot_mar(right=True, c='k',ls='--')
-            lnP = read_lnLH_pars('lnpost_PARS_noprior_V_obs{}.h5'.format(i))
+            lnP = read_lnP_pars('lnpost_PARS_noprior_V_obs{}.h5'.format(i))
             fig, ax = lnP.plot_mar(fig=fig, ax=ax, right=False, c='k',ls='--')            
             # The posterior (aka with prior and scale noise)
-            lnP = read_lnLH_pars('lnpost_PARS_wprior_N1_obs{}.h5'.format(i))
+            lnP = read_lnP_pars('lnpost_PARS_wprior_N1_obs{}.h5'.format(i))
             fig, ax = lnP.plot_mar(fig=fig, ax=ax, right=True, c='k')
-            lnP = read_lnLH_pars('lnpost_PARS_wprior_V_obs{}.h5'.format(i))
+            lnP = read_lnP_pars('lnpost_PARS_wprior_V_obs{}.h5'.format(i))
             fig, ax = lnP.plot_mar(fig=fig, ax=ax, right=False, c='k')
             # over plot the priors
             fig, ax = lnP.plot_prior(fig=fig, ax=ax, right=True, c='orchid', alpha=0.5, lw=3 )
@@ -836,9 +837,9 @@ def overview_plots(nobs):
         # For each observation, the corner plot of beta, Bpole, incl. 
         for i in range(0,nobs):
             # No prior, with scale noise
-            lnP = read_lnpost('lnpost_PARS_mar_noprior_N1_obs{}.h5'.format(i))
+            lnP = read_lnP_mar('lnpost_PARS_mar_noprior_N1_obs{}.h5'.format(i))
             fig, ax = lnP.plot_corner(right=True)
-            lnP = read_lnpost('lnpost_PARS_mar_noprior_V_obs{}.h5'.format(i))
+            lnP = read_lnP_mar('lnpost_PARS_mar_noprior_V_obs{}.h5'.format(i))
             fig, ax = lnP.plot_corner(fig=fig, ax=ax, right=False)
             ax[0,0].set_title('Stokes V')
             ax[0,3].set_title('Null')
@@ -849,9 +850,9 @@ def overview_plots(nobs):
             fig.subplots_adjust(top=0.88)
             pdf.savefig()
             # With prior, with scale noise
-            lnP = read_lnpost('lnpost_PARS_mar_wprior_N1_obs{}.h5'.format(i))
+            lnP = read_lnP_mar('lnpost_PARS_mar_wprior_N1_obs{}.h5'.format(i))
             fig, ax = lnP.plot_corner(right=True)
-            lnP = read_lnpost('lnpost_PARS_mar_wprior_V_obs{}.h5'.format(i))
+            lnP = read_lnP_mar('lnpost_PARS_mar_wprior_V_obs{}.h5'.format(i))
             fig, ax = lnP.plot_corner(fig=fig, ax=ax, right=False)
             ax[0,0].set_title('Stokes V')
             ax[0,3].set_title('Null')
@@ -862,9 +863,9 @@ def overview_plots(nobs):
             fig.subplots_adjust(top=0.88)
             pdf.savefig()
 
-        lnP = read_lnpost('lnpost_PARS_mar_noprior_N1.h5')
+        lnP = read_lnP_mar('lnpost_PARS_mar_noprior_N1.h5')
         fig, ax = lnP.plot_corner(right=True)
-        lnP = read_lnpost('lnpost_PARS_mar_noprior_V.h5')
+        lnP = read_lnP_mar('lnpost_PARS_mar_noprior_V.h5')
         fig, ax = lnP.plot_corner(fig=fig, ax=ax, right=False)
         ax[0,0].set_title('Stokes V')
         ax[0,3].set_title('Null')
@@ -875,9 +876,9 @@ def overview_plots(nobs):
         fig.subplots_adjust(top=0.88)
         pdf.savefig()
 
-        lnP = read_lnpost('lnpost_PARS_mar_wprior_N1.h5')
+        lnP = read_lnP_mar('lnpost_PARS_mar_wprior_N1.h5')
         fig, ax = lnP.plot_corner(right=True)
-        lnP = read_lnpost('lnpost_PARS_mar_wprior_V.h5')
+        lnP = read_lnP_mar('lnpost_PARS_mar_wprior_V.h5')
         fig, ax = lnP.plot_corner(fig=fig, ax=ax, right=False)
         ax[0,0].set_title('Stokes V')
         ax[0,3].set_title('Null')
