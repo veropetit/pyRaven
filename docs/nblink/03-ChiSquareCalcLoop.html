@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>03- Calculating the chi2 with the loop code &mdash; Raven  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/nbsphinx-code-cells.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="04 - Calculate probabilites from the chi2 files" href="04-CalculateProbabilities.html" />
+    <link rel="prev" title="02- Fit of the intensity profiles for single stars" href="02-FitIntensity.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Raven
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../Installation.html">Installation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">How to run pyRaven tutorial</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="01-DataSetup.html">01 - Data Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02-FitIntensity.html">02- Fit of the intensity profiles for single stars</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">03- Calculating the chi2 with the loop code</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#0.-Importing-the-necessary-packages">0. Importing the necessary packages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#1.-Code-structure">1. Code structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#2.-Test-of-the-code-(and-later-on,-a-demo)">2. Test of the code (and later on, a demo)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Testing-numba-for-speed">Testing numba for speed</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="04-CalculateProbabilities.html">04 - Calculate probabilites from the chi2 files</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../API.html">pyRaven Package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Raven</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">03- Calculating the chi2 with the loop code</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/nblink/03-ChiSquareCalcLoop.nblink.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="03--Calculating-the-chi2-with-the-loop-code">
+<h1>03- Calculating the chi2 with the loop code<a class="headerlink" href="#03--Calculating-the-chi2-with-the-loop-code" title="Permalink to this heading"></a></h1>
+<p>This notebook document the structure of the loop.py that makes the chi square calculation between the synthetic Stokes V profiles and a pyRaven observation packet, for a grid of magnetic dipole parameter values.</p>
+<section id="0.-Importing-the-necessary-packages">
+<h2>0. Importing the necessary packages<a class="headerlink" href="#0.-Importing-the-necessary-packages" title="Permalink to this heading"></a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">specpolFlow</span> <span class="k">as</span> <span class="nn">pol</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="kn">import</span> <span class="nn">pyRaven</span> <span class="k">as</span> <span class="nn">rav</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+loading specpolFlow package
+</pre></div></div>
+</div>
+</section>
+<section id="1.-Code-structure">
+<h2>1. Code structure<a class="headerlink" href="#1.-Code-structure" title="Permalink to this heading"></a></h2>
+<p>Insert text here</p>
+</section>
+<section id="2.-Test-of-the-code-(and-later-on,-a-demo)">
+<h2>2. Test of the code (and later on, a demo)<a class="headerlink" href="#2.-Test-of-the-code-(and-later-on,-a-demo)" title="Permalink to this heading"></a></h2>
+<p>Importing a test pyRaven data packet that contains <span class="math notranslate nohighlight">\(n\)</span> LSD profiles that have been scaled, normalized, and cut to include only the portion of the line profile that will be used for the calculation of the chi square</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Packet</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">read_packet</span><span class="p">(</span><span class="s1">&#39;ExampleData/ExamplePacket.h5&#39;</span><span class="p">)</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">Packet</span><span class="o">.</span><span class="n">plotI</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/nblink_03-ChiSquareCalcLoop_8_0.png" src="../_images/nblink_03-ChiSquareCalcLoop_8_0.png" />
+</div>
+</div>
+<p>We are here generating the data structures that contains information for the codes: * genparam: general parameters, same as for diskint2 function. However the Bpole, incl, beta, and phase parameters are not necessary here, as they will be set by the gridparam structure. This said, one can still pass a genparam structure that was used for diskint2 – the extra parameters are simply ignored. * weakparam: the lande factor for the weak field approximation * gridparam: contains the arrays defining
+the grid for the dipolar parameters.</p>
+<p>See INSERT LINK HERE for many additional way to create param objects (including from files).</p>
+<p>Here we have set the intensity line profile model parameters to already known values for this dataset. In the middle plot below, we show the model line profile (dashed curve) in the middle panel.</p>
+<p>If you have yet to fit your line profiles to determine the appropriate vsini, vmac, and logkappa, see INSERT LINK HERE.</p>
+<p>We also save the the param to a folder in the repository ExampleData/LoopExample. Although not strickly necessary, it will be useful to make more lengtly calculations with a script on a more powerful computer.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">genparam</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;lambda0&#39;</span><span class="p">:</span><span class="mi">5000</span><span class="p">,</span>    <span class="c1"># the central wavelength of the transition</span>
+    <span class="s1">&#39;vsini&#39;</span><span class="p">:</span><span class="mf">200.0</span><span class="p">,</span>         <span class="c1"># the projected rotational velocity</span>
+    <span class="s1">&#39;vdop&#39;</span><span class="p">:</span><span class="mf">10.0</span><span class="p">,</span>          <span class="c1"># the thermal broadening</span>
+    <span class="s1">&#39;av&#39;</span><span class="p">:</span><span class="mf">0.05</span><span class="p">,</span>             <span class="c1"># the damping coefficient of the Voigt profile</span>
+    <span class="s1">&#39;bnu&#39;</span><span class="p">:</span><span class="mf">1.5</span><span class="p">,</span>             <span class="c1"># the slope of the source function with respect to vertical optical depth</span>
+    <span class="s1">&#39;logkappa&#39;</span><span class="p">:</span><span class="o">-</span><span class="mf">0.20</span><span class="p">,</span>          <span class="c1"># the line strength parameter</span>
+    <span class="s1">&#39;ndop&#39;</span><span class="p">:</span><span class="nb">int</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span>       <span class="c1"># the number of sample point per doppler width for the wavelength array</span>
+    <span class="s1">&#39;res&#39;</span><span class="p">:</span><span class="mi">65000</span><span class="p">,</span>
+    <span class="s1">&#39;vmac&#39;</span><span class="p">:</span><span class="mi">30</span><span class="p">,</span>
+    <span class="s1">&#39;Bpole&#39;</span><span class="p">:</span><span class="mi">1000</span><span class="p">,</span> <span class="c1">#not necessary for loop</span>
+    <span class="s1">&#39;incl&#39;</span><span class="p">:</span><span class="mf">30.</span><span class="p">,</span> <span class="c1">#not necessary for loop</span>
+    <span class="s1">&#39;beta&#39;</span><span class="p">:</span><span class="mi">30</span><span class="p">,</span> <span class="c1">#not necessary for loop</span>
+    <span class="s1">&#39;phase&#39;</span><span class="p">:</span><span class="mf">90.</span> <span class="c1">#not necessary for loop</span>
+  <span class="p">}</span>
+
+<span class="n">weakparam</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;geff&#39;</span><span class="p">:</span><span class="mf">1.0</span>
+    <span class="p">}</span>
+
+<span class="n">gridparam</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="c1">#&#39;Bpole_grid&#39;: np.array([1000, 2000]),</span>
+        <span class="c1">#&#39;incl_grid&#39;: np.array([30,60]),</span>
+        <span class="c1">#&#39;beta_grid&#39;:np.array([30,60]),</span>
+        <span class="c1">#&#39;phase_grid&#39;:np.array([30,60])</span>
+        <span class="s1">&#39;Bpole_grid&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">5000</span><span class="p">,</span><span class="mi">25</span><span class="p">),</span>
+        <span class="s1">&#39;incl_grid&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">180</span><span class="p">,</span><span class="mi">18</span><span class="p">),</span>
+        <span class="s1">&#39;beta_grid&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">180</span><span class="p">,</span><span class="mi">18</span><span class="p">),</span>
+        <span class="s1">&#39;phase_grid&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">360</span><span class="p">,</span><span class="mi">18</span><span class="o">*</span><span class="mi">2</span><span class="p">)</span>
+        <span class="p">}</span>
+
+<span class="n">param</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;general&#39;</span> <span class="p">:</span> <span class="n">genparam</span><span class="p">,</span>
+       <span class="s1">&#39;weak&#39;</span> <span class="p">:</span> <span class="n">weakparam</span><span class="p">,</span>
+       <span class="s1">&#39;grid&#39;</span> <span class="p">:</span> <span class="n">gridparam</span>
+       <span class="p">}</span>
+
+<span class="n">rav</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">parameters</span><span class="p">(</span><span class="n">param</span><span class="p">)</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;ExampleData/LoopExample/param.json&#39;</span><span class="p">)</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">diskint2</span><span class="o">.</span><span class="n">numerical</span><span class="p">(</span><span class="n">param</span><span class="p">)</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">Packet</span><span class="o">.</span><span class="n">plotI</span><span class="p">()</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">model</span><span class="p">[</span><span class="s1">&#39;vel&#39;</span><span class="p">],</span> <span class="n">model</span><span class="p">[</span><span class="s1">&#39;flux&#39;</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+1.958617462625618
+Using 9000.0 grid point on the surface
+Evaluating with weak approximation...
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[&lt;matplotlib.lines.Line2D at 0x7fdef941b1f0&gt;]
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/nblink_03-ChiSquareCalcLoop_10_2.png" src="../_images/nblink_03-ChiSquareCalcLoop_10_2.png" />
+</div>
+</div>
+<p>So now, we have everything needed to run the loop, and it could be done with simply running</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>rav.loop_speed.loop_speed(param, Packet, path=&#39;ExampleData/LoopOutputs/&#39;)
+</pre></div>
+</div>
+<p>However, this can be a bit slow in a Jupyter notebook. Therefore it might be advantageous to run the loop on e.g. a cluster (TRY THE SPEED ON COLLAB?).</p>
+<p>To do this, we can use the script wrapper</p>
+<p>In a folder (outside of this repository, because the size of the created data is too large for github), I have: - DataPacket.h5 - Params.json</p>
+<p>From this folder, I open python (and a screen instance in the terminal beforehand) and run</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>rav.loop_speed.loop_speed_wrapper(&#39;param.json&#39;, &#39;ExamplePacket.h5&#39;)
+</pre></div>
+</div>
+</section>
+<section id="Testing-numba-for-speed">
+<h2>Testing numba for speed<a class="headerlink" href="#Testing-numba-for-speed" title="Permalink to this heading"></a></h2>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">specSigV</span> <span class="o">=</span> <span class="p">[</span><span class="n">Packet</span><span class="o">.</span><span class="n">cutfit</span><span class="o">.</span><span class="n">lsds</span><span class="p">[</span><span class="n">x</span><span class="p">]</span><span class="o">.</span><span class="n">specSigV</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">Packet</span><span class="o">.</span><span class="n">nobs</span><span class="p">)]</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[43]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">numba.typed</span> <span class="kn">import</span> <span class="n">List</span>
+
+<span class="n">specV</span> <span class="o">=</span> <span class="p">[</span><span class="n">Packet</span><span class="o">.</span><span class="n">cutfit</span><span class="o">.</span><span class="n">lsds</span><span class="p">[</span><span class="n">x</span><span class="p">]</span><span class="o">.</span><span class="n">specV</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">Packet</span><span class="o">.</span><span class="n">nobs</span><span class="p">)]</span>
+<span class="c1">#specV = [1,2,3]</span>
+<span class="n">typed_specV</span> <span class="o">=</span> <span class="n">List</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">specV</span><span class="p">:</span> <span class="n">typed_specV</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="c1">#typed_specV = [typed_specV.append(x) for x in specV]</span>
+<span class="c1">#typed_specV.append(5)</span>
+<span class="c1">#typed_specV.append(6)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[44]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">typed_specV</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[44]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+ListType[array(float64, 1d, C)]([[-7.0879750e-06  4.9246705e-05  4.0294135e-05  6.5570600e-05
+ -2.8529650e-05 -4.8545215e-06 -4.3410790e-05 -6.2453150e-05
+  1.2242070e-05 -7.9020500e-06 -1.8947515e-05  1.5739115e-05
+ -1.7739055e-06 -2.7966875e-05 -1.0696445e-05 -5.1117650e-06
+  4.8244520e-05  1.1469800e-05 -3.7814020e-07 -9.1614400e-06
+ -2.4502585e-06 -3.8458480e-05  1.2043105e-05 -2.9018015e-05
+  2.8250815e-05 -4.1572055e-05 -3.8426925e-05 -4.8969040e-05
+ -1.5883060e-05  4.1190120e-05  2.2752250e-05  5.2410600e-05
+  5.9434850e-05 -2.2126155e-05 -4.1107625e-05  4.7150005e-05
+  2.4096885e-05  3.0138515e-05 -1.3931155e-05  1.2793430e-05
+ -3.5649415e-06 -3.8625710e-05  8.9959200e-06 -2.2947500e-05
+ -1.6096520e-05  5.1685500e-05  2.8036040e-06  1.9487245e-06
+ -1.1770995e-05 -7.7295550e-05 -2.7150835e-05  3.8655750e-05
+  2.3079130e-05 -1.0904940e-05 -1.4837510e-05 -1.5716930e-05
+ -3.4417100e-05 -3.1069265e-05 -2.4784035e-05  3.4027995e-05
+  7.2773950e-05 -6.7165450e-06  1.3742140e-05  1.6636835e-06
+  1.9315250e-05 -1.0963070e-05 -6.2182500e-05 -6.9578300e-05
+ -5.0712150e-05 -2.4340195e-05  3.7485285e-05  8.3689400e-05
+  3.4549295e-05 -6.2778200e-05 -3.5446420e-06 -4.4670615e-06
+ -2.6671830e-05 -2.6479350e-05 -1.1435020e-05  2.1067560e-05
+  2.3440345e-05  6.1089700e-05 -2.9886745e-05  1.4420605e-08
+  3.5572700e-06  4.8564945e-05 -8.0291700e-06  4.4197810e-05
+ -1.9468410e-05 -6.7305300e-06  8.4607500e-06 -1.9735720e-05
+ -3.6462285e-05  3.8174495e-05 -2.3056375e-05 -2.9774945e-05
+ -1.9856465e-05  1.7912870e-05 -9.4425000e-06  1.8620530e-05
+ -4.3550740e-05 -1.3051560e-05 -1.8130630e-05  4.0305005e-05
+  3.4302585e-05  8.6065950e-07 -8.5495550e-06 -2.8374275e-05
+ -5.1790400e-05 -1.2761960e-05  1.1606270e-05  4.6363950e-05
+ -4.5234570e-05 -1.6451540e-05  2.2114140e-05  2.7798575e-05
+ -6.8844450e-06  2.5317235e-05  2.6115615e-05 -6.9318550e-06
+ -2.6616225e-05 -4.4042590e-05 -8.1121350e-05  3.9004800e-06
+ -3.5227950e-05 -1.0844520e-05 -8.3368350e-06 -1.8005805e-05
+  3.0822325e-05 -3.2869645e-05  9.4513350e-06 -1.6563985e-05
+ -5.3412500e-06  1.4002815e-04  6.1006800e-05 -1.0570860e-05
+ -1.4525880e-05  2.0260650e-05  2.8697885e-05 -2.5591935e-05
+ -1.3716655e-05 -1.3317295e-06 -1.2558795e-05  2.1361820e-06
+  8.1963600e-05  1.2640550e-05 -1.9312620e-05  4.6881060e-05
+ -2.8509360e-05  1.2938920e-05  9.3390300e-07  2.6406635e-05
+  2.7836365e-05 -2.5898655e-05 -1.5986975e-05  2.0753555e-05
+ -1.9606610e-05 -3.2815585e-07 -4.4431400e-05 -4.7343670e-05
+  1.5769310e-05 -2.2882805e-05 -9.1009250e-06 -8.7356950e-06
+ -1.4427765e-05 -3.0640885e-05  5.8402700e-07  8.3981800e-06
+  7.4467500e-06  1.8646890e-05  1.6095270e-05  1.3254750e-05
+ -5.9636700e-06 -8.6846650e-05  7.8635550e-05 -2.0572075e-05
+  7.7934900e-05  5.0529850e-05  1.0719865e-05  3.6663850e-05
+ -2.1216710e-06  9.2520100e-06  1.1228340e-05 -1.8975580e-05
+  1.0061730e-07  5.2256250e-06  3.9766265e-05 -3.7986550e-06
+  2.7847575e-05  1.5129055e-05  6.5954950e-05 -6.5711900e-05
+ -2.4762150e-05 -2.5859420e-05 -1.6831040e-05  1.1687440e-05
+ -6.7519250e-06 -6.4955800e-05 -4.5960115e-05 -2.1549185e-05
+  2.1157605e-07 -2.5373125e-05 -3.7728390e-05 -4.0071615e-06
+ -7.4795800e-06  3.8079450e-05 -1.5729190e-06  4.6703310e-05
+ -9.7349700e-07  2.4236275e-05  4.6222905e-05  4.8855585e-05
+  3.6086215e-05  2.6276595e-05  1.7590130e-05  1.5946040e-06
+ -1.8231060e-05 -2.5376980e-05 -4.6970500e-05 -1.0391670e-05
+ -3.8774735e-05 -5.6111550e-06 -9.0383750e-06 -8.9406950e-06
+ -7.9403150e-06  5.0972250e-05  2.3978200e-05  2.3337930e-05
+ -1.9923740e-05 -3.8860090e-06  4.4589770e-05  5.1861250e-05
+  1.0768585e-05 -1.2121135e-05  5.5431100e-06  6.8371600e-07
+  2.1649820e-06  7.1057150e-06  1.3371920e-05  2.0853400e-05
+ -1.6457770e-05 -7.0082400e-06 -3.2542260e-05  7.5627000e-05
+  6.4789200e-05  2.9033285e-05  7.9669550e-05  4.4454995e-05
+  3.8370575e-05  4.7924060e-05  1.7788890e-05 -2.9521530e-05
+ -5.5094850e-05 -6.6109200e-06 -3.1465590e-05 -5.2322300e-05
+ -1.8291160e-06 -8.3197950e-05 -4.2024165e-05  1.9713415e-05
+  2.5517150e-05 -1.6512570e-05  1.8497945e-06 -4.5367360e-05
+ -4.1658430e-05  6.6830450e-06 -3.7397665e-05  2.1339235e-06
+ -1.0564155e-06  9.1829050e-07  1.3713455e-05  2.6381770e-06
+  4.7622820e-05  1.9415100e-05 -6.5189200e-06 -3.7000390e-05
+ -7.9087500e-05], [ 1.9050420e-05 -4.1602375e-05  8.9051450e-05  6.5299350e-05
+ -3.3134425e-05 -1.2812725e-05  9.0587350e-06  8.4254000e-05
+ -2.1394705e-06 -4.7936220e-05 -8.6190800e-05 -6.3582400e-05
+ -9.7485000e-05 -6.4871100e-05  1.0259935e-05 -1.3310280e-04
+ -9.1563400e-05 -4.9979515e-05  2.2078190e-05  3.9601690e-06
+ -3.1728710e-05  3.9512240e-05  4.0724940e-05  4.7766040e-05
+ -2.5911805e-05 -4.0882655e-05 -3.3838955e-05 -1.0693650e-04
+ -1.7226805e-05  9.2659800e-05  1.6523900e-05 -7.5639900e-05
+  3.9635800e-05  3.5832150e-05  4.6592050e-05 -5.3859800e-05
+  2.9660105e-05 -1.7471645e-05  3.0751205e-05 -2.2450695e-05
+  5.2597450e-05 -5.6175900e-05 -3.4306540e-05  1.1958900e-06
+ -4.6032190e-05 -1.8001190e-05 -4.0519085e-05 -2.1188365e-06
+ -3.8448570e-07 -3.2729835e-05 -2.4402635e-05 -1.0704435e-05
+ -8.9856500e-05 -5.1523600e-05 -2.4154880e-05 -2.4776795e-06
+ -8.4021800e-06 -1.5545500e-04  1.8388725e-05 -7.5733750e-06
+ -1.2370725e-05  1.4997175e-05  4.7676075e-05  6.1292450e-05
+  1.7901080e-05  5.7863650e-06 -3.4734720e-05 -1.9974570e-05
+ -7.4860050e-05  2.9990085e-05  1.4940485e-05 -2.4210165e-05
+ -6.7585450e-05 -1.6105865e-05  3.6904235e-05  4.7004440e-05
+  6.9570650e-05 -3.3354510e-05  9.2464050e-07 -3.9158560e-05
+ -2.3262580e-06 -5.6492350e-05  1.7626295e-05 -7.4731050e-06
+  5.0758600e-05  8.4385750e-05  6.5979150e-05  7.7788500e-06
+  6.1952450e-05  2.1590050e-05  3.8784850e-05 -1.7297000e-05
+  9.4272050e-05 -1.3654795e-05 -9.7397150e-05  4.2911705e-05
+  1.9041555e-05  1.6734505e-05  4.8090060e-05  8.0690350e-06
+ -1.3108240e-05  3.1434910e-05 -5.7544400e-06 -6.4909050e-05
+  2.0760465e-05  4.2232765e-05 -4.7427835e-05 -2.7854735e-05
+ -8.4783550e-05  3.8283670e-05  7.7057750e-05  3.8089020e-05
+ -2.1848080e-05  1.9621870e-05  1.8604070e-05 -9.1384250e-06
+  3.5808625e-05  2.3310525e-05 -2.1256225e-05  4.1773325e-05
+  2.6721920e-06  3.8200630e-05 -5.6007700e-06 -9.8383200e-06
+  3.6394080e-05 -2.5414520e-05 -5.1975300e-05  2.0107635e-05
+  1.8056435e-05  1.4831585e-05 -2.4091115e-05  1.0121495e-05
+ -4.8063910e-05 -1.3586150e-07  2.7889945e-06 -1.1459870e-04
+  6.2818200e-05  2.2185340e-05  1.6721995e-05  1.7337435e-06
+ -5.2609200e-05  7.2667750e-06  6.0688100e-05  1.0178100e-04
+ -3.3552000e-05 -2.3848400e-05  1.8325300e-05  2.2375550e-05
+  9.2818000e-05  5.8978400e-05  7.2139800e-05 -1.1080045e-05
+ -2.8381395e-05  5.5767600e-05 -4.4620595e-05  3.8130810e-05
+ -1.3057790e-05 -1.9625740e-05  5.7950450e-06  1.9280110e-05
+ -3.9029840e-05  3.9955265e-05  7.6040100e-05 -9.0494500e-05
+ -7.3864850e-06 -5.5426200e-05  7.8272700e-06 -7.2704300e-06
+  1.6689870e-05 -1.5113380e-05  6.3908300e-05  1.0000060e-05
+ -2.3313525e-05 -2.3853675e-05 -1.1861075e-05 -4.6271175e-05
+ -6.8455750e-05  7.2218650e-05  1.7661780e-05 -9.4474050e-05
+ -1.4333465e-04 -7.0853750e-05 -1.8358370e-05  4.9950030e-05
+  8.6937950e-05  4.4452040e-06 -1.0972425e-04 -1.4167215e-05
+  2.8483485e-05  3.1409235e-05  2.8205940e-05  1.3194715e-05
+ -8.6668350e-05 -1.5225645e-04  9.5321450e-05  1.1855900e-05
+ -3.8399305e-05 -2.0852705e-05 -3.6626905e-05  4.4004060e-06
+  1.1563370e-05 -4.9133750e-05 -7.8911500e-06 -2.2593400e-05
+  1.6823750e-05 -2.7886300e-05  9.7484750e-05  4.7273305e-05
+  4.6563305e-05 -2.9967495e-05  4.8176755e-05 -9.7422250e-05
+ -7.2530350e-05 -3.8733040e-05 -2.9332410e-06  2.1864510e-05
+ -1.8626340e-05 -2.9865880e-06 -9.6439950e-05  2.1919765e-05
+  3.5988915e-05  9.7320500e-06  3.1249665e-05  4.1893365e-05
+ -1.0918455e-04 -1.2011380e-05  7.8581750e-05 -1.6328380e-05
+ -6.7803450e-05 -4.8240030e-05  3.8304675e-05 -2.1328875e-05
+ -2.8341875e-05  1.9180425e-05  4.9106975e-05  1.5909880e-05
+  4.0113880e-05  1.4788380e-05  2.6016280e-05 -7.9988500e-05
+ -8.7357100e-05  2.2998735e-05  5.3354800e-05 -5.7881400e-05
+  9.3735450e-08  4.8482185e-05 -2.4800165e-05  3.2070890e-05
+  2.7246990e-05  1.0628250e-04  7.1739400e-05 -1.3094585e-06
+  4.6142690e-05  3.8042145e-05 -1.2865560e-06  1.0416290e-04
+  6.2341300e-06  8.5789700e-07  4.2441300e-05 -6.7038500e-06
+ -2.5187500e-05 -3.8777250e-05  6.9663200e-05  1.1029160e-04
+  6.3750500e-05 -4.2690095e-05 -4.6904695e-05  4.4647055e-06
+  4.3892505e-05  3.2529455e-05  2.0405080e-06  4.9966410e-05
+  9.0851200e-05 -2.6438440e-05  5.4032750e-05  4.1080265e-05
+ -6.5934700e-05  4.2760515e-05], [ 2.1421740e-05  1.7617965e-05  6.2821800e-05  6.3815400e-06
+ -2.9832800e-05 -7.5180200e-06 -2.3422345e-05  3.0555335e-05
+  1.2212910e-05  4.1215440e-05 -3.6008580e-05  9.7284300e-06
+ -7.8288450e-05 -4.8643700e-05 -7.7535450e-05  4.5446610e-05
+  5.5374000e-05  5.3870150e-05 -1.8559310e-05 -3.1184180e-05
+  4.0086745e-05  1.3827225e-05 -9.4589650e-05 -5.1995900e-05
+  1.9719960e-05  5.9298050e-05  2.8936565e-05  2.2338595e-05
+  1.6975870e-05 -7.3853000e-06  7.0916200e-05  6.1344400e-05
+  3.8633785e-05  4.4011110e-05  3.0388790e-05  3.4609665e-05
+ -2.5312555e-06  2.8541620e-05 -1.3965450e-05 -2.9837820e-05
+ -5.6683050e-05 -3.0050465e-05 -3.3476690e-05  4.5698190e-05
+  2.0496820e-05  1.2892545e-05 -2.8626625e-05  2.3225450e-05
+  2.3003630e-05  1.7736760e-05  1.6101435e-05 -8.3419550e-05
+  8.3170600e-06 -1.2610805e-06  2.6332745e-05  3.8201975e-05
+  6.7551600e-05  2.0055630e-05  3.5205210e-05  3.6614135e-05
+ -5.3760350e-06  1.0603495e-05  1.5125720e-05  2.7893850e-05
+  2.1289125e-05 -1.7055945e-05 -3.1743415e-05  4.0439275e-06
+ -3.4911115e-06 -3.8213335e-06 -1.0387955e-05  4.0884820e-06
+  6.9886750e-05  2.2928030e-05 -8.5091450e-06  1.3597285e-05
+ -1.6028840e-05  1.0053540e-05 -1.9932580e-05  5.4889750e-06
+  4.8724375e-05  1.1666250e-05  5.4717050e-05  3.0652010e-05
+  3.2956855e-06  6.7296200e-05  6.6987950e-05 -1.0899905e-06
+ -6.7918550e-06 -2.9072425e-05  1.6109705e-05 -2.0359470e-05
+  3.2758510e-05  2.3644285e-05 -3.7499935e-05 -2.9430955e-05
+  1.9998520e-05  6.6035450e-05  5.3426950e-05  4.5152965e-07
+ -5.5365850e-05  8.4540850e-05  3.7152490e-05  4.4274615e-05
+  6.5460550e-05  6.4694750e-06 -1.5733900e-05 -2.9250620e-05
+  2.3992955e-05  6.6660700e-05  8.6746100e-06 -3.9390860e-05
+ -1.5793330e-05 -6.0534550e-06 -7.6367250e-06  3.4638655e-06
+ -9.1988050e-07 -2.8430640e-05 -2.3548165e-05 -6.0228850e-06
+  2.8067040e-05  1.6009920e-05 -1.1039275e-07  7.9871500e-07
+  1.6769080e-06 -2.9300720e-05  1.2797900e-07  1.7006670e-06
+ -2.6947635e-05 -2.0041655e-05  1.4573470e-05 -2.6466515e-06
+  3.2587525e-05  5.0353400e-05  2.6886630e-05  9.5484100e-05
+ -1.2627010e-05 -6.1058450e-05  3.7235925e-07 -8.1647300e-06
+ -1.6293700e-05 -7.7261500e-05 -8.8120450e-06  2.6525785e-05
+ -2.2966990e-05  2.4254440e-05  3.3915370e-05 -9.3252550e-06
+  2.6135575e-05  2.5803000e-05  1.9399580e-05  2.9539155e-05
+ -4.4467215e-05 -6.6843300e-05 -7.1655550e-05 -4.9203330e-05
+ -2.5218605e-05  2.1965275e-05 -5.1012650e-05  3.4864630e-05
+  3.1422060e-05  4.1709035e-05  9.4569250e-05  8.8736000e-05
+  5.0330400e-06 -7.6702050e-05  1.8709375e-05  4.6044105e-05
+ -5.1508850e-05 -4.3756290e-05  3.6883690e-05  3.3879125e-07
+ -5.0529050e-06 -2.2162730e-05  1.9316100e-05 -1.4583970e-05
+  2.2112455e-05  6.2384700e-05  3.4346010e-05 -3.2472710e-05
+ -4.1667730e-05  6.2030700e-06 -3.9200025e-05 -4.2975250e-05
+ -1.2737820e-05 -3.1477845e-05 -5.6913650e-06 -5.8280550e-05
+ -4.3828110e-05  2.3709720e-05 -4.3617155e-05 -6.3127100e-05
+ -6.6933950e-06 -8.2716650e-05 -1.5758390e-05  8.9334850e-06
+ -4.5524355e-06 -3.3395355e-05  5.4193450e-06  4.7792435e-06
+ -5.5095550e-05 -8.6025850e-05  2.1986380e-05 -2.2409790e-05
+ -5.4245150e-05 -2.9468935e-05  1.0326590e-06 -2.0937380e-05
+  1.9852450e-05  5.3622000e-05 -5.3092800e-05 -3.5649465e-05
+  3.4472660e-05  1.0089540e-05 -4.8303880e-05  2.4378095e-05
+  3.5326325e-05  1.6607850e-05  7.4842800e-06  7.1180750e-05
+  5.9085000e-05 -2.5167635e-05  1.2116540e-05 -7.0526300e-06
+ -2.4098755e-05 -3.1623825e-05 -2.7695945e-05  5.3746600e-05
+  6.0516800e-05 -2.7568515e-05 -2.4954335e-05  1.9666995e-05
+  3.9660120e-05  3.2485700e-05  1.2347925e-05 -2.0880305e-06
+ -2.9038520e-05  8.3698850e-05  5.9307600e-05  3.4794165e-05
+  1.7781295e-05  9.7037700e-06 -1.4204950e-05 -1.8283370e-05
+  4.0138255e-05  2.4414065e-06 -1.0921390e-05  7.6757900e-06
+  6.2673350e-05  1.0524795e-05  1.2509825e-05  6.3445150e-06
+  3.1698645e-06  6.0552450e-06  2.4793585e-05 -2.3669785e-05
+ -9.1305300e-05  2.8502370e-05  3.3597645e-05  7.4498850e-05
+ -4.7737745e-05 -8.8473150e-05 -1.3494665e-06  4.0848285e-05
+  4.0357915e-05 -1.0110455e-05  5.5108450e-05  1.4368800e-05
+ -4.0279875e-05 -8.5791850e-05 -6.7038600e-05 -2.3921990e-05
+ -3.0609660e-05  1.2506565e-05  1.3107145e-05 -4.2552580e-05
+ -2.1101650e-05  2.4405780e-05], ...])
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="02-FitIntensity.html" class="btn btn-neutral float-left" title="02- Fit of the intensity profiles for single stars" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="04-CalculateProbabilities.html" class="btn btn-neutral float-right" title="04 - Calculate probabilites from the chi2 files" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, V. Petit.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

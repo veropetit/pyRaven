@@ -20,7 +20,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="Documentation for diskint2" href="diskint2_doc.html" /> 
+    <link rel="prev" title="04 - Calculate probabilites from the chi2 files" href="nblink/04-CalculateProbabilities.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -45,16 +45,14 @@
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="Installation.html">Installation</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
+<p class="caption" role="heading"><span class="caption-text">How to run pyRaven tutorial</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="data_example.html">Data preparation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="fit_intensity_example.html">Fit of the intensity profiles for single stars</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nblink/01-DataSetup.html">01 - Data Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nblink/02-FitIntensity.html">02- Fit of the intensity profiles for single stars</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nblink/03-ChiSquareCalcLoop.html">03- Calculating the chi2 with the loop code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nblink/04-CalculateProbabilities.html">04 - Calculate probabilites from the chi2 files</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">Documentation:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="diskint2_doc.html">Documentation for diskint2</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">API documentation:</span></p>
+<p class="caption" role="heading"><span class="caption-text">API documentation</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">pyRaven Package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#module-pyRaven.data">data module</a><ul>
@@ -109,22 +107,29 @@
 <li class="toctree-l3"><a class="reference internal" href="#pyRaven.diskint2.get_all_u"><code class="docutils literal notranslate"><span class="pre">get_all_u()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pyRaven.diskint2.get_empty_model"><code class="docutils literal notranslate"><span class="pre">get_empty_model()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pyRaven.diskint2.get_local_weak_interp"><code class="docutils literal notranslate"><span class="pre">get_local_weak_interp()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.diskint2.get_local_weak_interp_Vonly_numba"><code class="docutils literal notranslate"><span class="pre">get_local_weak_interp_Vonly_numba()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pyRaven.diskint2.get_los2rot"><code class="docutils literal notranslate"><span class="pre">get_los2rot()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pyRaven.diskint2.get_ngrid"><code class="docutils literal notranslate"><span class="pre">get_ngrid()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pyRaven.diskint2.get_perGaussLorentz"><code class="docutils literal notranslate"><span class="pre">get_perGaussLorentz()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.diskint2.get_resmac_kernel"><code class="docutils literal notranslate"><span class="pre">get_resmac_kernel()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pyRaven.diskint2.get_rot2mag"><code class="docutils literal notranslate"><span class="pre">get_rot2mag()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.diskint2.get_rotKernel"><code class="docutils literal notranslate"><span class="pre">get_rotKernel()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pyRaven.diskint2.get_small_u"><code class="docutils literal notranslate"><span class="pre">get_small_u()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.diskint2.get_uconv"><code class="docutils literal notranslate"><span class="pre">get_uconv()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pyRaven.diskint2.get_unno_angles"><code class="docutils literal notranslate"><span class="pre">get_unno_angles()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pyRaven.diskint2.get_vel_range_unno"><code class="docutils literal notranslate"><span class="pre">get_vel_range_unno()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pyRaven.diskint2.get_w_unno"><code class="docutils literal notranslate"><span class="pre">get_w_unno()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pyRaven.diskint2.get_w_weak"><code class="docutils literal notranslate"><span class="pre">get_w_weak()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pyRaven.diskint2.grid_ROT"><code class="docutils literal notranslate"><span class="pre">grid_ROT()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.diskint2.model_convolve_resvmac"><code class="docutils literal notranslate"><span class="pre">model_convolve_resvmac()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pyRaven.diskint2.numerical"><code class="docutils literal notranslate"><span class="pre">numerical()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#pyRaven.diskint2.rotconv"><code class="docutils literal notranslate"><span class="pre">rotconv()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.diskint2.pad_V"><code class="docutils literal notranslate"><span class="pre">pad_V()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.diskint2.pad_model"><code class="docutils literal notranslate"><span class="pre">pad_model()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#module-pyRaven.loop">loop module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#pyRaven.loop.loop"><code class="docutils literal notranslate"><span class="pre">loop()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.loop.loop_wrapper"><code class="docutils literal notranslate"><span class="pre">loop_wrapper()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -482,6 +487,7 @@ they will now be in the form of python lists. It is important to transform them 
 - general/ndop
 - general/av
 - general/lambda0</p>
+<p>Note: if the vsini is less then vdop/2, then the function directly returns the non-rotating line profile.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>param</strong> – a parameters dictionary</p>
@@ -626,6 +632,32 @@ where perGaussLorentz(lambda0, vdop) is defined in the explanatory notebook.</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.diskint2.get_local_weak_interp_Vonly_numba">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.diskint2.</span></span><span class="sig-name descname"><span class="pre">get_local_weak_interp_Vonly_numba</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">small_u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w_weak</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dw_weak</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">all_u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uLOS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu_LOS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kappa</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Bz</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.diskint2.get_local_weak_interp_Vonly_numba" title="Permalink to this definition"></a></dt>
+<dd><p>Function to get the local V only (for the loop) from the weak field approximation, by using an interpolation of a 
+fixed profile function in the rest frame.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>small_u</strong> – the uo grid on which the profile is defined</p></li>
+<li><p><strong>w_weak</strong> – the voigt profile (already divided by sqrt(2pi))</p></li>
+<li><p><strong>dw_weak</strong> – the derivative of the voigt profile with respect to uo</p></li>
+<li><p><strong>all_u</strong> – the (larger) dispersion grid on which to interpolate (enough to encompase the vsini) in uo units</p></li>
+<li><p><strong>uLOS</strong> – the (rotational) radial velocity of the grid point in uo units</p></li>
+<li><p><strong>mu_LOS</strong> – the mu angle of the grid point (angle between LOS and normal to surface)</p></li>
+<li><p><strong>bnu</strong> – the slope of the source function with respect to tau_z (the vertical optical depth, the change in slope because of the mu angle is coded in)</p></li>
+<li><p><strong>kappa</strong> – the line strenght parameter</p></li>
+<li><p><strong>Bz</strong> – the Bz of that grid point (in Bpole/2 units)</p></li>
+</ul>
+</dd>
+</dl>
+<p>returns: local_V profile, used for disk integration. 
+The local_V need to be multiplied by the projected area (A_LOS) of the grid point during the integration.
+Furthermore, the local_V needs to be multiplied (can be done after the integration) by geff * Bpole/2 * kappa * perGaussLorentz,
+where perGaussLorentz(lambda0, vdop) is defined in the explanatory notebook.</p>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="pyRaven.diskint2.get_los2rot">
 <span class="sig-prename descclassname"><span class="pre">pyRaven.diskint2.</span></span><span class="sig-name descname"><span class="pre">get_los2rot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">incl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phase</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.diskint2.get_los2rot" title="Permalink to this definition"></a></dt>
 <dd><p>Function to get the rotation matrix that converts from LOS coordinates to ROT coordinates. 
@@ -665,6 +697,22 @@ NOTE: The angles are passed in degrees.</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.diskint2.get_resmac_kernel">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.diskint2.</span></span><span class="sig-name descname"><span class="pre">get_resmac_kernel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">all_u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uconv</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.diskint2.get_resmac_kernel" title="Permalink to this definition"></a></dt>
+<dd><p>Function to calculate a combined gaussian kernel for macroturbulence and spectral resolution
+Returns an astropy kernel object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>all_u</strong> – dispersion array in uo units on which the kernel will be calculated</p></li>
+<li><p><strong>uconv</strong> – the sigma of the gaussian kernel in uo units.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Should be set to ( u_rot**2 + u_res**2 )**0.5</p>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="pyRaven.diskint2.get_rot2mag">
 <span class="sig-prename descclassname"><span class="pre">pyRaven.diskint2.</span></span><span class="sig-name descname"><span class="pre">get_rot2mag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">beta</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.diskint2.get_rot2mag" title="Permalink to this definition"></a></dt>
 <dd><p>Function to get the rotation matrix that converts from ROT coordinates to MAG coordinates. 
@@ -674,6 +722,22 @@ NOTE: The angles are passed in degrees.</p>
 <dd class="field-odd"><p><strong>beta</strong> – the obliquity of the magnetic axis to the rotational axis</p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.diskint2.get_rotKernel">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.diskint2.</span></span><span class="sig-name descname"><span class="pre">get_rotKernel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">uo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">urot</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.diskint2.get_rotKernel" title="Permalink to this definition"></a></dt>
+<dd><p>Helper function to get the rotational covolution profile</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>uo</strong> – (numpy array) the velocity array in u0 units (v/vthermal)</p></li>
+<li><p><strong>S1</strong> – the slope of the source function</p></li>
+</ul>
+</dd>
+</dl>
+<p>(see ADD LINK for conversion between the slope of the source function and epsilon)
+:param urot: the vsini in u0 units (vsini / vthermal)</p>
 </dd></dl>
 
 <dl class="py function">
@@ -688,6 +752,14 @@ NOTE: The angles are passed in degrees.</p>
 </ul>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.diskint2.get_uconv">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.diskint2.</span></span><span class="sig-name descname"><span class="pre">get_uconv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.diskint2.get_uconv" title="Permalink to this definition"></a></dt>
+<dd><p>Function to calculate and return the combined sigma of the gaussian kernel that will 
+perform the convolution for the macroturbulence and the spectral instrument resolution
+:param param: a parameter dictionary</p>
 </dd></dl>
 
 <dl class="py function">
@@ -781,24 +853,75 @@ Returns:
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="pyRaven.diskint2.numerical">
-<span class="sig-prename descclassname"><span class="pre">pyRaven.diskint2.</span></span><span class="sig-name descname"><span class="pre">numerical</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unno</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.diskint2.numerical" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="pyRaven.diskint2.rotconv">
-<span class="sig-prename descclassname"><span class="pre">pyRaven.diskint2.</span></span><span class="sig-name descname"><span class="pre">rotconv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">varepsilon</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">urot</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.diskint2.rotconv" title="Permalink to this definition"></a></dt>
-<dd><p>Function to get the rotational covolution profile</p>
+<dt class="sig sig-object py" id="pyRaven.diskint2.model_convolve_resvmac">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.diskint2.</span></span><span class="sig-name descname"><span class="pre">model_convolve_resvmac</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unno</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.diskint2.model_convolve_resvmac" title="Permalink to this definition"></a></dt>
+<dd><p>Helper function to convolve a model with a kernel. 
+The flux convolution has a fill_value=1.0, and the Stokes convolution have fill_value=0.0. 
+Note – this function does not extend the arrays. The checks on the kernel is performed in the calling function.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>u0</strong> – the velocity array in u0 units (v/vthermal)</p></li>
-<li><p><strong>varepsilon</strong> – the limb-darkening coefficient in the form of the Grey textbook</p></li>
+<li><p><strong>model</strong> – a model object</p></li>
+<li><p><strong>kernel</strong> – an astropy kernel object</p></li>
+<li><p><strong>unno</strong> – (True) flag for a unno calculation. If True, will convolve Q and U.</p></li>
 </ul>
 </dd>
 </dl>
-<p>(see ADD LINK for conversion between the slope of the source function and epsilon)
-:param urot: the vsini in u0 units (vsini / vthermal)</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.diskint2.numerical">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.diskint2.</span></span><span class="sig-name descname"><span class="pre">numerical</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unno</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.diskint2.numerical" title="Permalink to this definition"></a></dt>
+<dd><p>Function to calculated a line profile using a numerical disk integration, 
+either in the weak-field approximation (unno=False, default)
+or with the Unno solution (unno=True).</p>
+<p>The necessary keys in the parameters dictionary object are:
+- general/vsini
+- general/logkappa
+- general/bnu
+- general/vdop
+- general/ndop
+- general/av
+- general/lambda0
+- general/Bpole
+- general/incl
+- general/beta
+- general/phase</p>
+<p>If general/res and general/vmac are not present, the former will be set to infinity and the latter to zero</p>
+<p>For the weak field approximation
+- weak/geff
+For the Unno calculation
+- unno/up
+- unno/down</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.diskint2.pad_V">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.diskint2.</span></span><span class="sig-name descname"><span class="pre">pad_V</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ext_all_u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">all_u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">V</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.diskint2.pad_V" title="Permalink to this definition"></a></dt>
+<dd><p>Helper function for the loop that pads Stokes V to accomodate a convolution</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ext_all_u</strong> – the new uo array</p></li>
+<li><p><strong>all_u</strong> – the existing uo array</p></li>
+<li><p><strong>V</strong> – the Stokes V model defined on all_u</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.diskint2.pad_model">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.diskint2.</span></span><span class="sig-name descname"><span class="pre">pad_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_ext_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unno</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.diskint2.pad_model" title="Permalink to this definition"></a></dt>
+<dd><p>Function to pad a model object with 1.0 (intensity) or 0.0 (Stokes) in order to accomodate a convolution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> – the model to pad</p></li>
+<li><p><strong>input_ext_model</strong> – the extended empty model object</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 </section>
@@ -806,7 +929,7 @@ Returns:
 <span id="loop-module"></span><h2>loop module<a class="headerlink" href="#module-pyRaven.loop" title="Permalink to this heading"></a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="pyRaven.loop.loop">
-<span class="sig-prename descclassname"><span class="pre">pyRaven.loop.</span></span><span class="sig-name descname"><span class="pre">loop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datapacket</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.loop.loop" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">pyRaven.loop.</span></span><span class="sig-name descname"><span class="pre">loop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datapacket</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.loop.loop" title="Permalink to this definition"></a></dt>
 <dd><p>Function to calculate the chi square between 
 all of the LSD profiles in a pyRaven data packet and 
 the Stokes V profiles for a grid of dipole paramters 
@@ -816,7 +939,23 @@ the Stokes V profiles for a grid of dipole paramters
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>param</strong> – For now, see the documentation notebook for the content of the param dictionary.</p></li>
 <li><p><strong>datapacket</strong> – a pyRaven datapacket for a given set of observations</p></li>
-<li><p><strong>ax</strong> – TEMPORARY: an ax linked to a figure in the documentation notebook, for debugging purposes</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.loop.loop_wrapper">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.loop.</span></span><span class="sig-name descname"><span class="pre">loop_wrapper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_param</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_datapacket</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.loop.loop_wrapper" title="Permalink to this definition"></a></dt>
+<dd><p>This function is a wrapper to the loop function. 
+It it designed to be run in a directory that contains a parameters json file, and a DataPacket h5 file. 
+The output are written in the same directory by default.</p>
+<p>This wrapper is useful to generate the chi2 data on a remote server.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file_param</strong> – A json file containing the parameter object (see INSERT LINK)</p></li>
+<li><p><strong>file_datapackt</strong> – A h5 file containing the DataPacket structure</p></li>
 </ul>
 </dd>
 </dl>
@@ -829,7 +968,7 @@ the Stokes V profiles for a grid of dipole paramters
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="diskint2_doc.html" class="btn btn-neutral float-left" title="Documentation for diskint2" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="nblink/04-CalculateProbabilities.html" class="btn btn-neutral float-left" title="04 - Calculate probabilites from the chi2 files" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
   <hr/>

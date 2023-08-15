@@ -20,7 +20,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Data preparation" href="data_example.html" />
+    <link rel="next" title="01 - Data Setup" href="nblink/01-DataSetup.html" />
     <link rel="prev" title="Documentation for pyRaven" href="index.html" /> 
 </head>
 
@@ -45,21 +45,19 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#pre-requisite">Pre-requisite</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#installation-instructions">Installation instructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#instructions">Instructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#dependencies">Dependencies</a></li>
 </ul>
 </li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
+<p class="caption" role="heading"><span class="caption-text">How to run pyRaven tutorial</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="data_example.html">Data preparation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="fit_intensity_example.html">Fit of the intensity profiles for single stars</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nblink/01-DataSetup.html">01 - Data Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nblink/02-FitIntensity.html">02- Fit of the intensity profiles for single stars</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nblink/03-ChiSquareCalcLoop.html">03- Calculating the chi2 with the loop code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nblink/04-CalculateProbabilities.html">04 - Calculate probabilites from the chi2 files</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">Documentation:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="diskint2_doc.html">Documentation for diskint2</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">API documentation:</span></p>
+<p class="caption" role="heading"><span class="caption-text">API documentation</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="API.html">pyRaven Package</a></li>
 </ul>
@@ -90,20 +88,30 @@
              
   <section id="installation">
 <h1>Installation<a class="headerlink" href="#installation" title="Permalink to this heading"></a></h1>
-<section id="pre-requisite">
-<h2>Pre-requisite<a class="headerlink" href="#pre-requisite" title="Permalink to this heading"></a></h2>
-<p>Some prerequisite list here</p>
-<ul class="simple">
-<li><p>requirement 1</p></li>
-<li><p>requirement 2</p></li>
-</ul>
+<section id="instructions">
+<h2>Instructions<a class="headerlink" href="#instructions" title="Permalink to this heading"></a></h2>
+<p>The package is still under development.</p>
+<p>For now, we suggest to clone the repository on your local machine, making sure that the folder in question is included in your $PYTHON_PATH.</p>
 </section>
-<section id="installation-instructions">
-<h2>Installation instructions<a class="headerlink" href="#installation-instructions" title="Permalink to this heading"></a></h2>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>block of code
-to show the terminal commands
-</pre></div>
-</div>
+<section id="dependencies">
+<h2>Dependencies<a class="headerlink" href="#dependencies" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p>specpolflow: (https://github.com/folsomcp/specpolFlow) is also in development. We suggest to use the the same method as above.</p></li>
+<li><p>numpy</p></li>
+<li><p>matplotlib</p></li>
+<li><p>h5py</p></li>
+<li><p>copy</p></li>
+<li><p>scipy</p></li>
+<li><p>astropy.convolution</p></li>
+<li><p>numba</p></li>
+<li><p>time</p></li>
+<li><p>ecmee</p></li>
+<li><p>corner</p></li>
+<li><p>statistics</p></li>
+<li><p>mpl_toolkits</p></li>
+<li><p>sys</p></li>
+<li><p>json</p></li>
+</ul>
 </section>
 </section>
 
@@ -112,7 +120,7 @@ to show the terminal commands
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="index.html" class="btn btn-neutral float-left" title="Documentation for pyRaven" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="data_example.html" class="btn btn-neutral float-right" title="Data preparation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="nblink/01-DataSetup.html" class="btn btn-neutral float-right" title="01 - Data Setup" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
