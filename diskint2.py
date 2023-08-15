@@ -315,18 +315,20 @@ def get_LOS_values(LOS, A, S1, vsini, vdop):
     '''
     Function to calculate the mu angle, a bolean value for visibility, the projected area and velocity of each grid point, 
     along with the integrated continuum flux for profile normalization
+    
+    returns:
+
+    * mu_LOS: angle between the surface normal and the line-of-sight
+    * vis: boolean array, TRUE is the grid point is visible
+    * A_LOS: the projected area of the visible grid points normalized to unity
+    * uLOS: the projected rotational velocity of the grid points in uo units. 
+    * conti_flux: the integrated continuum flux for profile normalization. 
 
     :param LOS: The (3, n_real) grid coordinates in LOS coordinates
     :param A: the area of each grid point
     :param S1: the slope of the source function
     :param vsini: projected rotational equatorial velocity (in km/s)
     :param vdop: the thermal broadening velocity (in km/s)
-    returns
-    * mu_LOS: angle between the surface normal and the line-of-sight
-    * vis: boolean array, TRUE is the grid point is visible
-    * A_LOS: the projected area of the visible grid points normalized to unity
-    * uLOS: the projected rotational velocity of the grid points in uo units. 
-    * conti_flux: the integrated continuum flux for profile normalization. 
     '''
 
     ####################################
@@ -553,8 +555,7 @@ def get_resmac_kernel(all_u, uconv):
     Returns an astropy kernel object. 
 
     :param all_u: dispersion array in uo units on which the kernel will be calculated
-    :param uconv: the sigma of the gaussian kernel in uo units. 
-    Should be set to ( u_rot**2 + u_res**2 )**0.5
+    :param uconv: the sigma of the gaussian kernel in uo units. Should be set to ( u_rot**2 + u_res**2 )**0.5
     '''
     kernel = np.exp(-0.5*all_u**2/uconv**2)/(np.pi**0.5*uconv)
     kernel_object = conv.CustomKernel(kernel)
@@ -808,8 +809,7 @@ def get_rotKernel(uo, S1, urot):
     Helper function to get the rotational covolution profile
 
     :param uo: (numpy array) the velocity array in u0 units (v/vthermal)
-    :param S1: the slope of the source function 
-    (see ADD LINK for conversion between the slope of the source function and epsilon)
+    :param S1: the slope of the source function (see ADD LINK for conversion between the slope of the source function and epsilon)
     :param urot: the vsini in u0 units (vsini / vthermal)
     '''
 
