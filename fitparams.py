@@ -5,6 +5,7 @@ import emcee
 import corner
 from scipy.stats import norm
 import scipy
+from statistics import mode
 
 
 def fitdata(param,DataPacket,guess):
@@ -114,7 +115,7 @@ def fitdataMCMC(param,DataPacket,nsteps,guess):
       0 - otherwise
     '''
     kappa,vsini,vmac=params
-    if kappa<=0.0 or kappa>=10.0 or vsini >= 500.0 or vsini<=0.0 or vmac<0:
+    if kappa<=0.0 or kappa>=10.0 or vsini >= 500.0 or vsini<=0.0 or vmac<=0.0 or vmac>=100.0:
       return(-np.inf)
     else:
       return(0.0)
@@ -153,12 +154,12 @@ def fitdataMCMC(param,DataPacket,nsteps,guess):
       return(prior+lnlike(params,v,I,Ierr))
 
   # Set up the convergence diagonstic plots. At the final step we want all the walkers to be very close together, i.e a straight line at the end.
-  fig, ax = plt.subplots(3,1,figsize=(30,5))
+  fig, ax = plt.subplots(3,1,figsize=(15,5))
   ax[0].set_title('Convergence Diagnostic Plots')
 
 
 
-  fig1, ax1 = plt.subplots(1,1,figsize=(30,10)) #sets up the send set of plots
+  fig1, ax1 = plt.subplots(1,1,figsize=(5,5)) #sets up the send set of plots
 
   #for i in range(1):
   kappa=np.array([])
@@ -194,17 +195,32 @@ def fitdataMCMC(param,DataPacket,nsteps,guess):
   res = [ax[j].axhline(pguess[j]) for j in range(3)]
 
   #save the walker positions at each step (for diagnostics)
-  kappa=np.append(kappa,np.mean(sampler.flatchain[int(2*nsteps/3):], axis=0)[0])
-  vsini=np.append(vsini,np.mean(sampler.flatchain[int(2*nsteps/3):], axis=0)[1])
-  vmac=np.append(vmac,np.mean(sampler.flatchain[int(2*nsteps/3):], axis=0)[2])
+  #kappa=np.append(kappa,np.mean(sampler.flatchain[int(2*nsteps/3):], axis=0)[0])
+  #vsini=np.append(vsini,np.mean(sampler.flatchain[int(2*nsteps/3):], axis=0)[1])
+  #vmac=np.append(vmac,np.mean(sampler.flatchain[int(2*nsteps/3):], axis=0)[2])
+
+  kappa=sampler.flatchain[int(2*100/3):][:,0]
+  vsini=sampler.flatchain[int(2*100/3):][:,1]
+  vmac=sampler.flatchain[int(2*100/3):][:,2]
+  
+  bins=20
+  bin_means = (np.histogram(kappa, bins, weights=kappa)[0]/np.histogram(kappa, bins)[0])
+  kappa=bin_means[np.histogram(kappa, bins)[0]==np.histogram(kappa, bins)[0].max()][0]
+
+  bin_means = (np.histogram(vsini, bins, weights=vsini)[0]/np.histogram(vsini, bins)[0])
+  vsini=bin_means[np.histogram(vsini, bins)[0]==np.histogram(vsini, bins)[0].max()][0]
+
+  bin_means = (np.histogram(vmac, bins, weights=vmac)[0]/np.histogram(vmac, bins)[0])
+  vmac=bin_means[np.histogram(vmac, bins)[0]==np.histogram(vmac, bins)[0].max()][0]
+
   #log_f=np.append(log_f,np.mean(sampler.flatchain, axis=0)[1])
 
   #make the second set of plots
   
-  ax1.plot(v,model(v, kappa[0],vsini[0],vmac[0]))
+  ax1.plot(DataPacket.original.lsds[0].vel-DataPacket.vrad[0],model(DataPacket.original.lsds[0].vel-DataPacket.vrad[0], kappa,vsini,vmac))
   ax1.plot(v,I)
 
-  print('kappa: {} | vsini: {} | vmac: {}'.format(kappa[0],vsini[0],vmac[0]))
+  print('kappa: {} | vsini: {} | vmac: {}'.format(kappa,vsini,vmac))
 
 
   #make the corner plots
