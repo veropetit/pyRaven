@@ -11,28 +11,43 @@ magnetic dipolar field upper limits from a set of Stokes V spectropolarimetric
 observations from a given star of Petit & Wade 2012 (MNRAS 420 773). 
 
 .. toctree::
+   :maxdepth: 1
+
    Installation
    
-   :maxdepth: 1
-   :caption: Contents:
+
+
+How to run pyRaven tutorial
+============================
+
+If you are interested in the simple application of pyRaven, please follow the tutorials below. 
 
 .. toctree::
-   data_example
-   fit_intensity_example
    :maxdepth: 1
-   :caption: Tutorials:
+   :caption: How to run pyRaven tutorial
+
+   nblink/01-DataSetup
+   nblink/02-FitIntensity
+   nblink/03-ChiSquareCalcLoop
+   nblink/04-CalculateProbabilities
+
+
+
+More advanced usage 
+============================
+
+
+
+API documentaiton
+============================
+
 
 .. toctree::
-   diskint2_doc
-   :maxdepth: 1
-   :caption: Documentation:
-
-
-
-.. toctree::
-   API
+   :caption: API documentation
    :maxdepth: 2
-   :caption: API documentation:
+
+   API
+
 
 
 

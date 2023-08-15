@@ -1,13 +1,27 @@
 # Installation
 
-## Pre-requisite
+## Instructions
 
-Some prerequisite list here
+The package is still under development. 
 
-* requirement 1
-* requirement 2
+For now, we suggest to clone the repository on your local machine, making sure that the folder in question is included in your $PYTHON_PATH. 
 
-## Installation instructions
 
-	block of code
-	to show the terminal commands
+## Dependencies
+
+* specpolflow: (https://github.com/folsomcp/specpolFlow) is also in development. We suggest to use the the same method as above. 
+
+* numpy
+* matplotlib
+* h5py
+* copy
+* scipy
+* astropy.convolution
+* numba
+* time
+* ecmee
+* corner
+* statistics
+* mpl_toolkits
+* sys
+* json
