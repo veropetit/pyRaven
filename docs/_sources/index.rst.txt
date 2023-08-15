@@ -39,10 +39,10 @@ If you are interested in the simple application of pyRaven, please follow the tu
 
 .. raw:: html
    
-   <a class="button" href="01-DataSetup.html">01 - Data Setup</a>
-   <a class="button" href="02-FitIntensity.html">02- Fit of the intensity profiles for single stars</a>
-   <a class="button" href="03-ChiSquareCalcLoop.html">03- Calculating the chi2 with the loop code</a>
-   <a class="button" href="04-CalculateProbabilities.html">04 - Calculate probabilites from the chi2 files</a>
+   <a class="button" href="nblink/01-DataSetup.html">01 - Data Setup</a>
+   <a class="button" href="nblink/02-FitIntensity.html">02- Fit of the intensity profiles for single stars</a>
+   <a class="button" href="nblink/03-ChiSquareCalcLoop.html">03- Calculating the chi2 with the loop code</a>
+   <a class="button" href="nblink/04-CalculateProbabilities.html">04 - Calculate probabilites from the chi2 files</a>
 
 |
 
@@ -59,8 +59,8 @@ Standalone tutorials
 
 .. raw:: html
    
-   <a class="button" href="ParamsObject_tutorial.html">Tutorial on how to use the Params Dictionary objects</a>
-   <a class="button" href="BayesObjects_user.html">User’s manual for the BayesObjects.py classes</a>
+   <a class="button" href="nblink/ParamsObject_tutorial.html">Tutorial on how to use the Params Dictionary objects</a>
+   <a class="button" href="nblink/BayesObjects_user.html">User’s manual for the BayesObjects.py classes</a>
 
 |
 
