@@ -2,7 +2,8 @@
 
 This is a python implementation of the Bayesian method for determining magnetic dipolar field upper limits from a set of Stokes V spectropolarimetric observations from a given star of Petit & Wade 2012 (MNRAS 420 773).
 
-Documentation : [veropetit.github.io/pyRaven/](veropetit.github.io/pyRaven/)
+Documentation : [https://veropetit.github.io/pyRaven/](https://veropetit.github.io/pyRaven/)
+
 
 If you are interested in running pyRaven for a dataset, follow the notebooks in the 'HowToUsePyRavenTutorial' folder.
 
