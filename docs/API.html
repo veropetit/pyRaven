@@ -49,7 +49,8 @@
 <p class="caption" role="heading"><span class="caption-text">How to run pyRaven tutorial</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="nblink/01-DataSetup.html">01 - Data Setup</a></li>
-<li class="toctree-l1"><a class="reference internal" href="nblink/02-FitIntensity.html">02- Fit of the intensity profiles for single stars</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nblink/02-FitIntensity.html">Fit of the intensity profiles for single stars</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nblink/02-FitIntensity.html#Fitting-kappa,-vsini,-and-vmac">Fitting kappa, vsini, and vmac</a></li>
 <li class="toctree-l1"><a class="reference internal" href="nblink/03-ChiSquareCalcLoop.html">03- Calculating the chi2 with the loop code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="nblink/04-CalculateProbabilities.html">04 - Calculate probabilites from the chi2 files</a></li>
 </ul>
@@ -142,6 +143,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#module-pyRaven.fitparams">fitparams module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#pyRaven.fitparams.fitdata"><code class="docutils literal notranslate"><span class="pre">fitdata()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pyRaven.fitparams.fitdataMCMC"><code class="docutils literal notranslate"><span class="pre">fitdataMCMC()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.fitparams.fitdata_novsini"><code class="docutils literal notranslate"><span class="pre">fitdata_novsini()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#module-pyRaven.loop">loop module</a><ul>
@@ -1034,6 +1036,26 @@ guess - array of guess values for kappa, vsini, and vmac. Ex: np.array([1.3,250,
 <dt>Outputs:</dt><dd><p>kappa - The average fitted value of kappa
 vsini - The average fitted value of vsini
 vmac - The average fitted value of vmac</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.fitparams.fitdata_novsini">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.fitparams.</span></span><span class="sig-name descname"><span class="pre">fitdata_novsini</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">DataPacket</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">guess</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.fitparams.fitdata_novsini" title="Permalink to this definition"></a></dt>
+<dd><p>This function fits a set of LSD profiles using scipy’s curve fit function.</p>
+<dl>
+<dt>Inputs:</dt><dd><blockquote>
+<div><p>param - input parameter dictionary
+DataPacket - input DataPacket with real data
+guess - array of guess values for kappa and vmac. Ex: np.array([1.3,30])</p>
+</div></blockquote>
+<dl class="simple">
+<dt>Outputs:</dt><dd><p>parameters - array of fit parameters
+covariance - covariance matrix of the fit
+modelout - the best fit model</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
