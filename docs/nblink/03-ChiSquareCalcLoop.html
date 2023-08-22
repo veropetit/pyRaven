@@ -58,7 +58,11 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">03- Calculating the chi2 with the loop code</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#0.-Importing-the-necessary-packages">0. Importing the necessary packages</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#1.-What-is-the-goal-of-this-code?">1. What is the goal of this code?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#2.-Choice-of-grid-parameters,-and-necessary-other-parameters">2. Choice of grid parameters, and necessary other parameters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#2.-Choice-of-grid-parameters,-and-necessary-other-parameters">2. Choice of grid parameters, and necessary other parameters</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#Setting-the-Landé-factor">Setting the Landé factor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Evaluating-the-maximum-Bpole-to-use-in-the-grid">Evaluating the maximum Bpole to use in the grid</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="04-CalculateProbabilities.html">04 - Calculate probabilites from the chi2 files</a></li>
@@ -108,33 +112,26 @@
 <p>This notebook described the use of the loop.py (or loop_speed.py) function that makes the chi square calculation between the synthetic Stokes V profiles and a pyRaven observation packet, for a grid of magnetic dipole parameter values.</p>
 <section id="0.-Importing-the-necessary-packages">
 <h2>0. Importing the necessary packages<a class="headerlink" href="#0.-Importing-the-necessary-packages" title="Permalink to this heading"></a></h2>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">specpolFlow</span> <span class="k">as</span> <span class="nn">pol</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">copy</span>
 
 <span class="kn">import</span> <span class="nn">pyRaven</span> <span class="k">as</span> <span class="nn">rav</span>
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-loading specpolFlow package
-</pre></div></div>
-</div>
 </section>
 <section id="1.-What-is-the-goal-of-this-code?">
 <h2>1. What is the goal of this code?<a class="headerlink" href="#1.-What-is-the-goal-of-this-code?" title="Permalink to this heading"></a></h2>
 <p>The goal of this piece of the bayesian analysis is to create a synthetic Stokes V profile for each parameter set on a grid, and calculate the chi2 between this profile and the observations. These 4D grids of chi2 are saved as h5 files.</p>
-<p>To run this piece of the code, we need 2 things: * An Observation Packet * A parameter dictionary that will contain: - The [‘general’] parameters that define the Stokes I profile (see previous notebook), and the general information that is necessay for the Stokes V profile (e.g. the wavelength of the transition) - The [‘weak’] parameters which contains the parameter for the weak-field solution (as opposed to the unno solution), namely the effective landé factor. Note that the loop only
-performs weak-field calculation. - The [‘grid’] parameters which defines the grid of parameters for the dipolar field model (Bpole, beta, phi, incl – see below)</p>
-<p>The loop function itself takes already loaded Observation Packet object and parameter dictionary object. The loop function writes the chi2 files in the current directory but a path can be specified.</p>
+<p>To run this piece of the code, we need 2 things: * An Observation Packet * A parameter dictionary that will contain: - <strong>The [‘general’] parameters</strong> that define the Stokes I profile (see previous notebook), and the general information that is necessay for the Stokes V profile (e.g. the wavelength of the transition) - <strong>The [‘weak’] parameters</strong> which contains the parameter for the weak-field solution (as opposed to the unno solution), namely the effective landé factor. Note that the loop only
+performs weak-field calculation. - <strong>The [‘grid’] parameters</strong> which defines the grid of parameters for the dipolar field model (Bpole, beta, phi, incl – see below)</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">rav.loop.loop</span></code> function itself takes already loaded Observation Packet object and parameter dictionary object. The loop function writes the chi2 files in the current directory but a path can be specified.</p>
 <p>Here’s an example of a workflow doing the object loading directly:</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>Packet = rav.data.read_packet(&#39;../Data/hd12345.h5&#39;)
 Params = rav.param.read_parameters(&#39;../Data/hd12345.h5&#39;)
@@ -149,20 +146,43 @@ rav.loop_speed.loop_speed(Packet, Params, path=&#39;loop_output/&#39;)
 <p>The code outputs a message at the end of each of the outer-loop on the inclination angle, with the time spent (in seconds).</p>
 <p>There are two versions of the loop code: ‘loop’ and ‘loop_speed’. The latter uses the package ‘numba’ to compile pieces of the inner loops for speed.</p>
 <p>To reduce memory usage, the code will output a chi2 file for each inclination angle value in the grid. It will furthermore create a separate file for each observations, and for each Stokes parameter. The file format is as follow: <code class="docutils literal notranslate"><span class="pre">chi[S]_i[i]obs[o].h5</span></code> where <code class="docutils literal notranslate"><span class="pre">[S]</span></code> is ‘V’ or ‘N1’, <code class="docutils literal notranslate"><span class="pre">[i]</span></code> is the index of the inclination value, and <code class="docutils literal notranslate"><span class="pre">[o]</span></code> is the index of the observation.</p>
-<p>For more information about the structure of a chi2 file, see the tutorial on the BayesObject class (LINK), or the class API (LINK).</p>
+<p>For more information about the structure of a chi2 file, see the tutorial on the BayesObject class <a class="reference external" href="https://veropetit.github.io/pyRaven/nblink/BayesObjects_user.html">https://veropetit.github.io/pyRaven/nblink/BayesObjects_user.html</a>, or the class API <a class="reference external" href="https://veropetit.github.io/pyRaven/API.html#module-pyRaven.BayesObjects">https://veropetit.github.io/pyRaven/API.html#module-pyRaven.BayesObjects</a>.</p>
 </section>
 <section id="2.-Choice-of-grid-parameters,-and-necessary-other-parameters">
 <h2>2. Choice of grid parameters, and necessary other parameters<a class="headerlink" href="#2.-Choice-of-grid-parameters,-and-necessary-other-parameters" title="Permalink to this heading"></a></h2>
 <p>In this section, we discuss the parameters that are required by the loop code.</p>
 <p>We also discuss how to choose the grid of parameters for the dipolar field model. This includes: * how to decide on an upper limit for Bpole * how to decide on a lower limit on the inclination angle.</p>
 <p>As this is a tutorial, this section includes loading and visualzing the DataPacket and the models. Note that this is not strickly necessary for a pyRaven workflow.</p>
-<p>In the cell below, we load and display our example DataPacket from Notebook 01 (LINK) which contains 3 LSD profiles that have been scaled, normalized, and cut to include only the portion of the line profile that will be used for the calculation of the chi square (right-hand graph).</p>
+<p>In the cell below, we load and display our example DataPacket from Notebook 01 (<a class="reference external" href="https://veropetit.github.io/pyRaven/nblink/01-DataSetup.html">in docs</a>, <a class="reference external" href="https://github.com/veropetit/pyRaven/blob/main/HowToUsePyRavenTutorial/01-DataSetup.ipynb">in github</a>) which contains 3 LSD profiles that have been scaled, normalized, and cut to include only the portion of the line profile that will be used for the calculation of the chi square (right-hand graph).</p>
+<p>We also generate a parameter dictionary (explicitely) with the parameters we have decided upon in the previous notebook for the fit to the Stokes I profile. We overplot the fit in dashed black in the two right-hand panels.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Packet</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">read_packet</span><span class="p">(</span><span class="s1">&#39;ExampleData/ExamplePacket.h5&#39;</span><span class="p">)</span>
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">Packet</span><span class="o">.</span><span class="n">plotI</span><span class="p">()</span>
+
+<span class="c1"># Parameters we have settled on in the previous notebook:</span>
+<span class="n">genparam</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;lambda0&#39;</span><span class="p">:</span><span class="mi">5000</span><span class="p">,</span>    <span class="c1"># the central wavelength of the transition</span>
+    <span class="s1">&#39;vsini&#39;</span><span class="p">:</span><span class="mf">200.0</span><span class="p">,</span>         <span class="c1"># the projected rotational velocity</span>
+    <span class="s1">&#39;vdop&#39;</span><span class="p">:</span><span class="mf">10.0</span><span class="p">,</span>          <span class="c1"># the thermal broadening</span>
+    <span class="s1">&#39;av&#39;</span><span class="p">:</span><span class="mf">0.05</span><span class="p">,</span>             <span class="c1"># the damping coefficient of the Voigt profile</span>
+    <span class="s1">&#39;bnu&#39;</span><span class="p">:</span><span class="mf">1.5</span><span class="p">,</span>             <span class="c1"># the slope of the source function with respect to vertical optical depth</span>
+    <span class="s1">&#39;logkappa&#39;</span><span class="p">:</span><span class="o">-</span><span class="mf">0.20</span><span class="p">,</span>          <span class="c1"># the line strength parameter</span>
+    <span class="s1">&#39;ndop&#39;</span><span class="p">:</span><span class="nb">int</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span>       <span class="c1"># the number of sample point per doppler width for the wavelength array</span>
+    <span class="s1">&#39;res&#39;</span><span class="p">:</span><span class="mi">65000</span><span class="p">,</span>
+    <span class="s1">&#39;vmac&#39;</span><span class="p">:</span><span class="mi">30</span><span class="p">,</span>
+  <span class="p">}</span>
+<span class="n">param</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;general&#39;</span> <span class="p">:</span> <span class="n">genparam</span>
+       <span class="p">}</span>
+
+<span class="c1"># Calculate an analytical model and overplot on the last two graphs</span>
+<span class="c1"># (not the first one, as the profiles have been normalized to continuum</span>
+<span class="c1"># and scaled to the LSD weigths we have decided to use)</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">diskint2</span><span class="o">.</span><span class="n">analytical</span><span class="p">(</span><span class="n">param</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">]:</span>
+  <span class="n">item</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">model</span><span class="p">[</span><span class="s1">&#39;vel&#39;</span><span class="p">],</span> <span class="n">model</span><span class="p">[</span><span class="s1">&#39;flux&#39;</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -171,6 +191,52 @@ rav.loop_speed.loop_speed(Packet, Params, path=&#39;loop_output/&#39;)
 </div>
 <div class="output_area docutils container">
 <img alt="../_images/nblink_03-ChiSquareCalcLoop_10_0.png" src="../_images/nblink_03-ChiSquareCalcLoop_10_0.png" />
+</div>
+</div>
+<section id="Setting-the-Landé-factor">
+<h3>Setting the Landé factor<a class="headerlink" href="#Setting-the-Landé-factor" title="Permalink to this heading"></a></h3>
+<p>For the calculation of the synthetic profiles with the weak-field approximation, we have to explicitly set the effective Landé factor. We have already set a wavelength of 5000 A in our ‘general’ parameter dictionary (note – for Stokes I analytical calculation, this parameter is only used to create a wavelength dispersion axis in the output model).</p>
+<p>This mean that in combination with the LSD weigths, the Landé factor is fixed.</p>
+<p>In the example above, we set the intesity weigth (wint) to be 0.1, and the polarization weigth (wpol) to be 60. As wpol = wavelength(nm) * Landé * wint, then this implies that the effective Landé factor for this LSD profile model should be set to 1.2.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">weakparam</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;geff&#39;</span><span class="p">:</span><span class="mf">1.2</span>
+    <span class="p">}</span>
+<span class="n">param</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;general&#39;</span> <span class="p">:</span> <span class="n">genparam</span><span class="p">,</span>
+        <span class="s1">&#39;weak&#39;</span> <span class="p">:</span> <span class="n">weakparam</span>
+       <span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Evaluating-the-maximum-Bpole-to-use-in-the-grid">
+<h3>Evaluating the maximum Bpole to use in the grid<a class="headerlink" href="#Evaluating-the-maximum-Bpole-to-use-in-the-grid" title="Permalink to this heading"></a></h3>
+<p>We need to decide that maximum Bpole to use for our grid of dipolar magnetic field parameters. We can do this by examining the field strengths that would nominally create a Stokes V signature that is quite larger than the noise level is Stokes V and/or in the null profiles.</p>
+<p>To make a Stokes V calculation, we will use the rav.diskint2.numerical function. This function is a standalone to make a single Stokes V calculation. (Note: The loop code that calculates the chi2 do not call this function, as it would not have been efficient. But they share the same set of module functions and the Stokes V calculated in the loop funciton matches that of the numerical function exactly).</p>
+<p>To run rav.diskint2.numerical, we need to define some extra parameters in the ‘general’ parameter dictionary: - The dipolar field strength Bpole in Gauss - The inclination of the rotational axis to the line of sight incl in degree - The obliquity of the magnetic axis to the rotation axis beta in degree - The rotational phase <strong>in degree</strong></p>
+<p>The maximum amplitude of the Stokes V signature will be when the dipole is aligned with line of sight. We will make that happen by setting - incl = 90 - beta = incl - phase = 0 TODO check, might be 90.</p>
+<p>VERO IS CURRENTLY HERE IN THE UPDATING</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># make a copy of the parameters that are defined for the Stokes I fit</span>
+<span class="n">magparam</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">genparam</span><span class="p">)</span>
+<span class="c1"># Add parameters for the dopolar field configuration</span>
+<span class="n">magparam</span><span class="p">[</span><span class="s1">&#39;Bpole&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">5000</span>
+<span class="n">magparam</span><span class="p">[</span><span class="s1">&#39;incl&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">90</span>
+<span class="n">magparam</span><span class="p">[</span><span class="s1">&#39;beta&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">90</span>
+<span class="n">magparam</span><span class="p">[</span><span class="s1">&#39;phase&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="n">param</span> <span class="o">=</span> <span class="n">param</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;general&#39;</span> <span class="p">:</span> <span class="n">magparam</span><span class="p">,</span>
+        <span class="s1">&#39;weak&#39;</span> <span class="p">:</span> <span class="n">weakparam</span>
+       <span class="p">}</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">diskint2</span><span class="o">.</span><span class="n">numerical</span><span class="p">(</span><span class="n">param</span><span class="p">)</span>
+</pre></div>
 </div>
 </div>
 <p>We are here generating the data structures that contains information for the codes: * genparam: general parameters, same as for diskint2 function. However the Bpole, incl, beta, and phase parameters are not necessary here, as they will be set by the gridparam structure. This said, one can still pass a genparam structure that was used for diskint2 – the extra parameters are simply ignored. * weakparam: the lande factor for the weak field approximation * gridparam: contains the arrays defining
@@ -242,7 +308,7 @@ Evaluating with weak approximation...
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/nblink_03-ChiSquareCalcLoop_12_2.png" src="../_images/nblink_03-ChiSquareCalcLoop_12_2.png" />
+<img alt="../_images/nblink_03-ChiSquareCalcLoop_18_2.png" src="../_images/nblink_03-ChiSquareCalcLoop_18_2.png" />
 </div>
 </div>
 <p>So now, we have everything needed to run the loop, and it could be done with simply running</p>
@@ -256,6 +322,7 @@ Evaluating with weak approximation...
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>rav.loop_speed.loop_speed_wrapper(&#39;param.json&#39;, &#39;ExamplePacket.h5&#39;)
 </pre></div>
 </div>
+</section>
 </section>
 </section>
 
