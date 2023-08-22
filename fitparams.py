@@ -46,17 +46,17 @@ def fitdata(param,DataPacket,guess):
       f=np.interp(v,model['vel'],model['flux'])
       return(f)
     
-  x=DataPacket.original.lsds[0].vel-DataPacket.vrad[0]
-  y=DataPacket.original.lsds[0].specI
+  x=DataPacket.scaled.lsds[0].vel#+DataPacket.vrad[0]
+  y=DataPacket.scaled.lsds[0].specI
   if DataPacket.nobs!=1:
     for i in range(1,DataPacket.nobs):
-      x=np.append(x,DataPacket.original.lsds[i].vel-DataPacket.vrad[i])
-      y=np.append(y,DataPacket.original.lsds[i].specI)
+      x=np.append(x,DataPacket.scaled.lsds[i].vel)#+DataPacket.vrad[i])
+      y=np.append(y,DataPacket.scaled.lsds[i].specI)
 
   parameters,covariance = scipy.optimize.curve_fit(model,x,y,guess)
 
   modelout=model(x,parameters[0],parameters[1],parameters[2])
-  modelout=modelout[:DataPacket.original.lsds[0].vel.size]
+  modelout=modelout[:DataPacket.scaled.lsds[0].vel.size]
   return parameters,covariance,modelout
 
 
@@ -170,13 +170,13 @@ def fitdataMCMC(param,DataPacket,nsteps,guess):
   vsiniin=DataPacket.vsini #defining the vsini listed in the data packet
 
 
-  v=DataPacket.original.lsds[0].vel-DataPacket.vrad[0] #defining the velocity array of the data
-  I=DataPacket.original.lsds[0].specI #defining the stokes I array of the data
-  Ierr=DataPacket.original.lsds[0].specSigI #defining the stokes I error of the data
+  v=DataPacket.scaled.lsds[0].vel#+DataPacket.vrad[0] #defining the velocity array of the data
+  I=DataPacket.scaled.lsds[0].specI #defining the stokes I array of the data
+  Ierr=DataPacket.scaled.lsds[0].specSigI #defining the stokes I error of the data
   for i in range(1,DataPacket.nobs):
-    v=np.append(v,DataPacket.original.lsds[i].vel)-DataPacket.vrad[i] #defining the velocity array of the data
-    I=np.append(I,DataPacket.original.lsds[i].specI) #defining the stokes I array of the data
-    Ierr=np.append(Ierr,DataPacket.original.lsds[i].specSigI) #defining the stokes I error of the data
+    v=np.append(v,DataPacket.scaled.lsds[i].vel)#+DataPacket.vrad[i] #defining the velocity array of the data
+    I=np.append(I,DataPacket.scaled.lsds[i].specI) #defining the stokes I array of the data
+    Ierr=np.append(Ierr,DataPacket.scaled.lsds[i].specSigI) #defining the stokes I error of the data
 
   ndim = 3 #number of parameters to fit
   nwalkers= 10 * ndim #number of walkers (10/parameter)
@@ -217,7 +217,7 @@ def fitdataMCMC(param,DataPacket,nsteps,guess):
 
   #make the second set of plots
   
-  ax1.plot(DataPacket.original.lsds[0].vel-DataPacket.vrad[0],model(DataPacket.original.lsds[0].vel-DataPacket.vrad[0], kappa,vsini,vmac))
+  ax1.plot(DataPacket.scaled.lsds[0].vel,model(DataPacket.scaled.lsds[0].vel, kappa,vsini,vmac))
   ax1.plot(v,I)
 
   print('kappa: {} | vsini: {} | vmac: {}'.format(kappa,vsini,vmac))
@@ -271,15 +271,15 @@ def fitdata_novsini(param,DataPacket,guess):
     
   param['general']['vsini']=DataPacket.vsini
 
-  x=DataPacket.original.lsds[0].vel-DataPacket.vrad[0]
-  y=DataPacket.original.lsds[0].specI
+  x=DataPacket.scaled.lsds[0].vel#+DataPacket.vrad[0]
+  y=DataPacket.scaled.lsds[0].specI
   if DataPacket.nobs!=1:
     for i in range(1,DataPacket.nobs):
-      x=np.append(x,DataPacket.original.lsds[i].vel-DataPacket.vrad[i])
-      y=np.append(y,DataPacket.original.lsds[i].specI)
+      x=np.append(x,DataPacket.scaled.lsds[i].vel)#+DataPacket.vrad[i])
+      y=np.append(y,DataPacket.scaled.lsds[i].specI)
 
   parameters,covariance = scipy.optimize.curve_fit(model,x,y,guess)
 
   modelout=model(x,parameters[0],parameters[1])
-  modelout=modelout[:DataPacket.original.lsds[0].vel.size]
+  modelout=modelout[:DataPacket.scaled.lsds[0].vel.size]
   return parameters,covariance,modelout
