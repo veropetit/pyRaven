@@ -100,17 +100,17 @@ class LSDprofs:
 
   def plot(self, fig=None, ax=None, labels=None):
       if fig is None:
-          fig, ax = plt.subplots(4,1)
+        fig, ax = plt.subplots(4,1)
 
       for item in self.lsds:
-          ax[3].plot(item.vel, item.specI)
-          ax[2].plot(item.vel, item.specN1)
-          ax[1].plot(item.vel, item.specN2)
-          ax[0].plot(item.vel, item.specV)
+        ax[3].plot(item.vel, item.specI)
+        ax[2].plot(item.vel, item.specN1)
+        ax[1].plot(item.vel, item.specN2)
+        ax[0].plot(item.vel, item.specV)
           
       lim = np.max([np.abs(ax[0].get_ylim()), np.abs(ax[1].get_ylim()), np.abs(ax[2].get_ylim())] )
       for item in ax.flatten()[0:2]:
-          item.set_ylim(-1*lim, lim)
+        item.set_ylim(-1*lim, lim)
 
       ax[3].set_ylabel('I/Ic')
       ax[2].set_ylabel('N1/Ic')
