@@ -137,6 +137,6 @@ def check_req(param,func):
                         print('Missing {}'.format(weakreq[i]))
                         sys.exit()
             for i in range(len(gridreq)):
-                  if gridreq[i] not in list(param['gridparam'].keys()):
+                  if gridreq[i] not in list(param['grid'].keys()):
                         print('Missing {}'.format(gridreq[i]))
                         sys.exit()
