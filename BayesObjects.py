@@ -209,14 +209,20 @@ def create_empty_lnP_odds(beta_arr, Bpole_arr, phi_arr, incl_arr, obsID):
     data = np.zeros((beta_arr.size, Bpole_arr.size, phi_arr.size, incl_arr.size))
     return(lnP_odds(data, beta_arr, Bpole_arr, phi_arr, incl_arr, obsID))
 
-def create_lnLH_odds_from_chi(folder_path, param, datapacket):
+def create_lnLH_odds_from_chi(folder_path, param, datapacket, output_path):
     '''
     Function to calculate the lnLH_odds from a set of already calcualted chi2. (see REF)
 
-    :param folder_path: the path of the folder that contains the chi2 files
+    :param folder_path: the path of the folder that contains the chi2 files. Default is current directory
     :param param: the parameter object used to calculate the chi2
     :param datapacket: the datapacket used to calculate the chi2 (used to reconstruct the filenames)
+    :paran output_path: the path fo the folder to output the files to. Default is current directory
     '''
+    if folder_path==None:
+        folder_path='.'
+
+    if output_path==None:
+        output_path=','
 
     # one LH file per observation for the odds ratio. 
 
@@ -253,7 +259,7 @@ def create_lnLH_odds_from_chi(folder_path, param, datapacket):
             lnLH.data = lnLH.data+constant_term
 
             # write the LH object to disk
-            lnLH.write('lnLH_ODDS_{}_obs{}.h5'.format(S,o))
+            lnLH.write('{}/lnLH_ODDS_{}_obs{}.h5'.format(output_path,S,o))
 
     return
 
@@ -494,14 +500,21 @@ def create_empty_lnP_pars(beta_arr, Bpole_arr, phi_arr, incl_arr, obsID, noise_a
     data = np.zeros((beta_arr.size, Bpole_arr.size, phi_arr.size, incl_arr.size, noise_arr.size))
     return(lnP_pars(data, beta_arr, Bpole_arr, phi_arr, incl_arr, obsID,noise_arr))
 
-def create_lnLH_pars_from_chi(folder_path, param, datapacket):
+def create_lnLH_pars_from_chi(folder_path, param, datapacket, output_path):
     '''
     Function to calculate the lnLH_pars from a set of already calcualted chi2. (see REF)
 
-    :param folder_path: the path of the folder that contains the chi2 files
+    :param folder_path: the path of the folder that contains the chi2 files. Default is current directory
     :param param: the parameter object used to calculate the chi2. Need to include the 'grid' information
     :param datapacket: the datapacket used to calculate the chi2 (used to reconstruct the filenames)
+    :param output_path: the path of the folder to output the files to. Default is current directory
     '''
+
+    if folder_path==None:
+        folder_path='.'
+
+    if output_path==None:
+        output_path=','
 
     # one lnLH file per observation for the parameter estimation. 
 
@@ -542,7 +555,7 @@ def create_lnLH_pars_from_chi(folder_path, param, datapacket):
             lnLH.data = lnLH.data+constant_term
 
             # write the LH object to disk
-            lnLH.write('lnLH_PARS_{}_obs{}.h5'.format(S,o))
+            lnLH.write('{}/lnLH_PARS_{}_obs{}.h5'.format(output_path,S,o))
 
     return
 
@@ -727,11 +740,17 @@ def read_lnP_mar(fname):
 
     return(lnP_mar(data, beta_arr, Bpole_arr, incl_arr, obsID))    
 
-def combine_obs(nobs):
+def combine_obs(nobs,folder_path):
     '''
     Wrapper function to calculate a variety of posterior probabilities and
     combine the probabilities for multiple observtions. 
+
+    :param nobs: Number of observations
+    :param folder_path: Path of the lnLH and lnpost files. Default is current directory
     '''
+
+    if folder_path==None:
+        folder_path='.'
 
     Stokes = ['V', 'N1']
 
@@ -739,28 +758,28 @@ def combine_obs(nobs):
 
         ### Dealing with the parameter estimation first
         # 1. read in the first observation
-        ln_LH = read_lnP_pars('lnLH_PARS_{}_obs0.h5'.format(S))
+        ln_LH = read_lnP_pars('{}/lnLH_PARS_{}_obs0.h5'.format(folder_path,S))
 
         # 2. write the normalized LH to disk
-        ln_LH.normalize().write('lnpost_PARS_noprior_{}_obs0.h5'.format(S))
+        ln_LH.normalize().write('{}/lnpost_PARS_noprior_{}_obs0.h5'.format(folder_path,S))
 
         # 3. Marginalize for the phase and noise scale (without priors), 
         ln_post_mar_noprior0 = ln_LH.mar_phase_noise()
         
         # 4. Write to disk the normalized verison
-        ln_post_mar_noprior0.normalize().write('lnpost_PARS_mar_noprior_{}_obs0.h5'.format(S))
+        ln_post_mar_noprior0.normalize().write('{}/lnpost_PARS_mar_noprior_{}_obs0.h5'.format(folder_path,S))
 
         # 5. multiply LH by the prior
         ln_post = ln_LH.apply_priors()
         
         # 6. write to disk the normalize version of the posterior for the observation
-        ln_post.normalize().write('lnpost_PARS_wprior_{}_obs0.h5'.format(S))
+        ln_post.normalize().write('{}/lnpost_PARS_wprior_{}_obs0.h5'.format(folder_path,S))
 
         # 7. marginalize the observation for phi and noise scale
         ln_post_mar0 = ln_post.mar_phase_noise()
         
         # 8. Write to disk the normalize marginalized posterior for this observation. 
-        ln_post_mar0.normalize().write('lnpost_PARS_mar_wprior_{}_obs0.h5'.format(S))
+        ln_post_mar0.normalize().write('{}/lnpost_PARS_mar_wprior_{}_obs0.h5'.format(folder_path,S))
         
         # 8. Keeping track of the obsID used
         obsID = [ln_LH.obsID]
@@ -768,19 +787,19 @@ def combine_obs(nobs):
         if nobs > 1:
             for i in range(1,nobs):
                 # steps 1-3 from above
-                ln_LH = read_lnP_pars('lnLH_PARS_{}_obs{}.h5'.format(S,i))
-                ln_LH.normalize().write('lnpost_PARS_noprior_{}_obs{}.h5'.format(S,i))
+                ln_LH = read_lnP_pars('{}/lnLH_PARS_{}_obs{}.h5'.format(folder_path,S,i))
+                ln_LH.normalize().write('{}/lnpost_PARS_noprior_{}_obs{}.h5'.format(folder_path,S,i))
                 ln_post_mar_noprior = ln_LH.mar_phase_noise()
-                ln_post_mar_noprior.normalize().write('lnpost_PARS_mar_noprior_{}_obs{}.h5'.format(S,i))
+                ln_post_mar_noprior.normalize().write('{}/lnpost_PARS_mar_noprior_{}_obs{}.h5'.format(folder_path,S,i))
                 
                 # combine the probabilities into the first observation data structure
                 ln_post_mar_noprior0.data = ln_post_mar_noprior0.data + ln_post_mar_noprior.data
                 
                 # steps 5-8 from above
                 ln_post = ln_LH.apply_priors()
-                ln_post.normalize().write('lnpost_PARS_wprior_{}_obs{}.h5'.format(S,i))
+                ln_post.normalize().write('{}/lnpost_PARS_wprior_{}_obs{}.h5'.format(folder_path,S,i))
                 ln_post_mar = ln_post.mar_phase_noise()
-                ln_post_mar.normalize().write('lnpost_PARS_mar_wprior_{}_obs{}.h5'.format(S,i))
+                ln_post_mar.normalize().write('{}/lnpost_PARS_mar_wprior_{}_obs{}.h5'.format(folder_path,S,i))
 
                 # combine the probabilities into the first observation data structure
                 ln_post_mar0.data = ln_post_mar0.data + ln_post_mar.data
@@ -793,33 +812,39 @@ def combine_obs(nobs):
         ln_post_mar_noprior0.obsID = obsID
 
         #write to combined normalized posterior to disk
-        ln_post_mar0.normalize().write('lnpost_PARS_mar_wprior_{}.h5'.format(S))  
-        ln_post_mar_noprior0.normalize().write('lnpost_PARS_mar_noprior_{}.h5'.format(S))        
+        ln_post_mar0.normalize().write('{}/lnpost_PARS_mar_wprior_{}.h5'.format(folder_path,S))  
+        ln_post_mar_noprior0.normalize().write('{}/lnpost_PARS_mar_noprior_{}.h5'.format(folder_path,S))        
       
     return()
 
-def overview_plots(nobs):
+def overview_plots(nobs, folder_path):
     '''
     Function to create a PDF with overview plots of the probabilities. 
     This function assumed that the files created by the combine_obs function are in the current directory. 
+
+    :param nobs: Number of observations
+    :param folder_path: Path of the lnLH and lnpost files. Default is current directory
     '''
     
+    if folder_path==None:
+        folder_path='.'
+
     # during the 'combine_obs' stage, all of the probabilities have been appropriately normalized. 
     # so this is not necessary to perform here. Just read in the data and plot. 
 
-    with PdfPages('post_summary.pdf') as pdf:
+    with PdfPages('{}/post_summary.pdf'.format(folder_path)) as pdf:
 
         # For each observation, the full parameter 1D marginalization
         for i in range(0,nobs):
             # The posterior with flat prior (aka no prior, with scale noise)
-            lnP = read_lnP_pars('lnpost_PARS_noprior_N1_obs{}.h5'.format(i))
+            lnP = read_lnP_pars('{}/lnpost_PARS_noprior_N1_obs{}.h5'.format(folder_path,i))
             fig, ax = lnP.plot_mar(right=True, c='k',ls='--')
-            lnP = read_lnP_pars('lnpost_PARS_noprior_V_obs{}.h5'.format(i))
+            lnP = read_lnP_pars('{}/lnpost_PARS_noprior_V_obs{}.h5'.format(folder_path,i))
             fig, ax = lnP.plot_mar(fig=fig, ax=ax, right=False, c='k',ls='--')            
             # The posterior (aka with prior and scale noise)
-            lnP = read_lnP_pars('lnpost_PARS_wprior_N1_obs{}.h5'.format(i))
+            lnP = read_lnP_pars('{}/lnpost_PARS_wprior_N1_obs{}.h5'.format(folder_path,i))
             fig, ax = lnP.plot_mar(fig=fig, ax=ax, right=True, c='k')
-            lnP = read_lnP_pars('lnpost_PARS_wprior_V_obs{}.h5'.format(i))
+            lnP = read_lnP_pars('{}/lnpost_PARS_wprior_V_obs{}.h5'.format(folder_path,i))
             fig, ax = lnP.plot_mar(fig=fig, ax=ax, right=False, c='k')
             # over plot the priors
             fig, ax = lnP.plot_prior(fig=fig, ax=ax, right=True, c='orchid', alpha=0.5, lw=3 )
@@ -837,9 +862,9 @@ def overview_plots(nobs):
         # For each observation, the corner plot of beta, Bpole, incl. 
         for i in range(0,nobs):
             # No prior, with scale noise
-            lnP = read_lnP_mar('lnpost_PARS_mar_noprior_N1_obs{}.h5'.format(i))
+            lnP = read_lnP_mar('{}/lnpost_PARS_mar_noprior_N1_obs{}.h5'.format(folder_path,i))
             fig, ax = lnP.plot_corner(right=True)
-            lnP = read_lnP_mar('lnpost_PARS_mar_noprior_V_obs{}.h5'.format(i))
+            lnP = read_lnP_mar('{}/lnpost_PARS_mar_noprior_V_obs{}.h5'.format(folder_path,i))
             fig, ax = lnP.plot_corner(fig=fig, ax=ax, right=False)
             ax[0,0].set_title('Stokes V')
             ax[0,3].set_title('Null')
@@ -850,9 +875,9 @@ def overview_plots(nobs):
             fig.subplots_adjust(top=0.88)
             pdf.savefig()
             # With prior, with scale noise
-            lnP = read_lnP_mar('lnpost_PARS_mar_wprior_N1_obs{}.h5'.format(i))
+            lnP = read_lnP_mar('{}/lnpost_PARS_mar_wprior_N1_obs{}.h5'.format(folder_path,i))
             fig, ax = lnP.plot_corner(right=True)
-            lnP = read_lnP_mar('lnpost_PARS_mar_wprior_V_obs{}.h5'.format(i))
+            lnP = read_lnP_mar('{}/lnpost_PARS_mar_wprior_V_obs{}.h5'.format(folder_path,i))
             fig, ax = lnP.plot_corner(fig=fig, ax=ax, right=False)
             ax[0,0].set_title('Stokes V')
             ax[0,3].set_title('Null')
@@ -863,9 +888,9 @@ def overview_plots(nobs):
             fig.subplots_adjust(top=0.88)
             pdf.savefig()
 
-        lnP = read_lnP_mar('lnpost_PARS_mar_noprior_N1.h5')
+        lnP = read_lnP_mar('{}/lnpost_PARS_mar_noprior_N1.h5'.format(folder_path))
         fig, ax = lnP.plot_corner(right=True)
-        lnP = read_lnP_mar('lnpost_PARS_mar_noprior_V.h5')
+        lnP = read_lnP_mar('{}/lnpost_PARS_mar_noprior_V.h5'.format(folder_path))
         fig, ax = lnP.plot_corner(fig=fig, ax=ax, right=False)
         ax[0,0].set_title('Stokes V')
         ax[0,3].set_title('Null')
@@ -876,9 +901,9 @@ def overview_plots(nobs):
         fig.subplots_adjust(top=0.88)
         pdf.savefig()
 
-        lnP = read_lnP_mar('lnpost_PARS_mar_wprior_N1.h5')
+        lnP = read_lnP_mar('{}/lnpost_PARS_mar_wprior_N1.h5'.format(folder_path))
         fig, ax = lnP.plot_corner(right=True)
-        lnP = read_lnP_mar('lnpost_PARS_mar_wprior_V.h5')
+        lnP = read_lnP_mar('{}/lnpost_PARS_mar_wprior_V.h5'.format(folder_path))
         fig, ax = lnP.plot_corner(fig=fig, ax=ax, right=False)
         ax[0,0].set_title('Stokes V')
         ax[0,3].set_title('Null')
