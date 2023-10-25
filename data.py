@@ -277,7 +277,7 @@ def read_lsds_from_sfiles(fnames):
   '''
   lsds = []
   for fname in fnames:
-    lsds.append(pol.iolsd.read_lsd(fname))
+    lsds.append(pol.read_lsd(fname))
   return(LSDprofs(lsds))
 
 
@@ -377,6 +377,6 @@ def read_lsd(f):
   specN2 = np.array(f['specN2'])
   specSigN2 = np.array(f['specSigN2'])
   header = (f['header'])[()]
-  lsd = pol.iolsd.lsd_prof(vel, specI, specSigI, specV, specSigV, specN1, specSigN1, specN2=specN2, specSigN2=specSigN2, header=header)
+  lsd = pol.LSD(vel, specI, specSigI, specV, specSigV, specN1, specSigN1, specN2=specN2, specSigN2=specSigN2, header=header)
   return lsd
 
