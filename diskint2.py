@@ -547,6 +547,16 @@ def pad_V(ext_all_u, all_u, V):
     ext_V = np.interp(ext_all_u, all_u, V, left=0., right=0.)
     return(ext_V)
 
+def pad_I(ext_all_u, all_u, I):
+    '''
+    Helper function for the loop that pads Stokes I to accomodate a convolution
+    
+    :param ext_all_u: the new uo array
+    :param all_u: the existing uo array
+    :param I: the Stokes I model defined on all_u
+    '''
+    ext_I = np.interp(ext_all_u, all_u, I, left=1., right=1.)
+    return(ext_I)
 
 
 def get_resmac_kernel(all_u, uconv):
