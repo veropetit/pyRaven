@@ -116,7 +116,7 @@ def fitdata_novsini(xs,ys,guess,param):
     #calculates a model profile for each observation
     models=[]
     for i in range(len(lens)-1):
-        models.append(star1(x_[lens[i]:lens[i+1]],kappa1,vmac1,p[2+2*i]))
+        models.append(star1(x_[lens[i]:lens[i+1]],kappa1,vmac1,p[2+i]))
 
     model=np.hstack(models)  
     return model
@@ -135,7 +135,7 @@ def fitdata_novsini(xs,ys,guess,param):
   #defining output arrays
   star1_models=[]
   for n in range(len(xs)):
-    star1_models.append([star1(xs[n],pout[0],pout[1],pout[2+2*n])])
+    star1_models.append([star1(xs[n],pout[0],pout[1],pout[2+n])])
 
   return pout,pcov,star1_models
 
