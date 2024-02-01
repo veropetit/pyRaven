@@ -8,14 +8,14 @@ import scipy
 from statistics import mode
 
 
-def fitdata(param,DataPacket,guess):
+def fitdata(xs,ys,guess,param):
   '''
   This function fits a set of LSD profiles using scipy's curve fit function.
 
   Inputs:
     param - input parameter dictionary
     DataPacket - input DataPacket with real data
-    guess - array of guess values for kappa, vsini, and vmac. Ex: np.array([1.3,250,30])
+    guess - array of guess values for kappa and vmac. Ex: np.array([1.3,30])
 
    Outputs:
     parameters - array of fit parameters
@@ -23,14 +23,17 @@ def fitdata(param,DataPacket,guess):
     modelout - the best fit model
 
   '''
-  def model(v,kappa,vsini,vmac):
+
+  x_data = np.hstack(xs)
+  y_data = np.hstack(ys)
+
+  def star1(v,kappa,vsini,vmac,vrad):
       '''
       This function creates the line profile model that will be fit to the observed profile
 
       Inputs:
         kappa - value of kappa that the walker is on in parameter space
-        vsini - value of vsini that the walker is on in parameter space
-        vmac - value of the vmac that the walker is on in parameter space
+        vmac - value of vmac that the walker is on in parameter space
         v - velocity array of the actual data
 
       Outputs:
@@ -44,21 +47,46 @@ def fitdata(param,DataPacket,guess):
       model=rav.diskint2.analytical(param,False)
 
       #interpolating the model to be size MCMC wants
-      f=np.interp(v,model['vel'],model['flux'])
+      f=np.interp(v,model['vel']+vrad,model['flux'])
       return(f)
+
+  # defines the model used by curvefit
+  def poly(x_, *p):
+    #extracts the constant stellar parameters from the parameter array
+    kappa1=p[0]
+    vsini1=p[1]
+    vmac1=p[2]
+
+    #finds the length of each xs array
+    lens=[0]
+    for i in range(len(xs)):
+        lens.append(lens[i]+len(xs[i]))
     
-  x=DataPacket.scaled.lsds[0].vel#+DataPacket.vrad[0]
-  y=DataPacket.scaled.lsds[0].specI
-  if DataPacket.nobs!=1:
-    for i in range(1,DataPacket.nobs):
-      x=np.append(x,DataPacket.scaled.lsds[i].vel)#+DataPacket.vrad[i])
-      y=np.append(y,DataPacket.scaled.lsds[i].specI)
+    #calculates a model profile for each observation
+    models=[]
+    for i in range(len(lens)-1):
+        models.append(star1(x_[lens[i]:lens[i+1]],kappa1,vsini1,vmac1,p[3+i]))
 
-  parameters,covariance = scipy.optimize.curve_fit(model,x,y,guess)
+    model=np.hstack(models)  
+    return model
+  
+  guess=guess
+  
+  # defines bounds for each parameter. kappa between 0 and infinity, vsini from 0 to 300 km/s, vmac from 0 to 40 vmac, vrads from -infinity to infinity
+  bounds=([0,0,0],[np.inf,300,40])
+  for i in range(len(xs)):
+      bounds[0].append(-np.inf)
+      bounds[1].append(np.inf)
 
-  modelout=model(x,parameters[0],parameters[1],parameters[2])
-  modelout=modelout[:DataPacket.scaled.lsds[0].vel.size]
-  return parameters,covariance,modelout
+  #performs the fitting
+  pout, pcov = scipy.optimize.curve_fit(poly,x_data,y_data,guess,bounds=bounds)
+  
+  #defining output arrays
+  star1_models=[]
+  for n in range(len(xs)):
+    star1_models.append([star1(xs[n],pout[0],pout[1],pout[2],pout[3+n])])
+
+  return pout,pcov,star1_models
 
 
 def fitdata_novsini(xs,ys,guess,param):
