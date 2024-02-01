@@ -218,8 +218,9 @@ def binary_fitting(xs,ys,guess, param1, param2):
     binary=(f1+f2)-1
     return(binary)
 
-  # the model used by curvefit
+  # defines the model used by curvefit
   def poly(x_, *p):
+    #extracts the constant stellar parameters from the parameter array
     kappa1=p[0]
     kappa2=p[1]
     vsini1=p[2]
@@ -227,10 +228,12 @@ def binary_fitting(xs,ys,guess, param1, param2):
     vmac1=p[4]
     vmac2=p[5]
 
+    #finds the length of each xs array
     lens=[0]
     for i in range(len(xs)):
         lens.append(lens[i]+len(xs[i]))
     
+    #calculates a model profile for each observation
     models=[]
     for i in range(len(lens)-1):
         models.append(binary(x_[lens[i]:lens[i+1]],kappa1,kappa2,vsini1,vsini2,vmac1,vmac2,p[6+2*i],p[7+2*i]))
@@ -241,7 +244,7 @@ def binary_fitting(xs,ys,guess, param1, param2):
 
   guess=guess
   
-  # bounds for each parameter. kappa between 0 and infinity, vsini from 0 to 300 km/s, vmac from 0 to 40 vmac, vrads from -infinity to infinity
+  # defines bounds for each parameter. kappa between 0 and infinity, vsini from 0 to 300 km/s, vmac from 0 to 40 vmac, vrads from -infinity to infinity
   bounds=([0,0,0,0,0,0],[np.inf,np.inf,300,300,40,40])
   for i in range(len(xs)):
       bounds[0].append(-np.inf)
@@ -249,8 +252,10 @@ def binary_fitting(xs,ys,guess, param1, param2):
       bounds[1].append(np.inf)
       bounds[1].append(np.inf)
 
+  #performs the fitting
   pout, pcov = scipy.optimize.curve_fit(poly,x_data,y_data,guess,bounds=bounds)
   
+  #defining output arrays
   binary_models=[]
   star1_models=[]
   star2_models=[]
