@@ -61,7 +61,7 @@ def fitdata(param,DataPacket,guess):
   return parameters,covariance,modelout
 
 
-def fitdata_novsini(param,DataPacket,guess):
+def fitdata_novsini(xs,ys,guess,param):
   '''
   This function fits a set of LSD profiles using scipy's curve fit function.
 
@@ -76,7 +76,11 @@ def fitdata_novsini(param,DataPacket,guess):
     modelout - the best fit model
 
   '''
-  def model(v,kappa,vmac):
+
+  x_data = np.hstack(xs)
+  y_data = np.hstack(ys)
+
+  def star1(v,kappa,vmac,vrad):
       '''
       This function creates the line profile model that will be fit to the observed profile
 
@@ -95,24 +99,45 @@ def fitdata_novsini(param,DataPacket,guess):
       model=rav.diskint2.analytical(param,False)
 
       #interpolating the model to be size MCMC wants
-      f=np.interp(v,model['vel'],model['flux'])
+      f=np.interp(v,model['vel']+vrad,model['flux'])
       return(f)
+
+  # defines the model used by curvefit
+  def poly(x_, *p):
+    #extracts the constant stellar parameters from the parameter array
+    kappa1=p[0]
+    vmac1=p[1]
+
+    #finds the length of each xs array
+    lens=[0]
+    for i in range(len(xs)):
+        lens.append(lens[i]+len(xs[i]))
     
-  param['general']['vsini']=DataPacket.vsini
+    #calculates a model profile for each observation
+    models=[]
+    for i in range(len(lens)-1):
+        models.append(star1(x_[lens[i]:lens[i+1]],kappa1,vmac1,p[2+2*i]))
 
-  x=DataPacket.scaled.lsds[0].vel#+DataPacket.vrad[0]
-  y=DataPacket.scaled.lsds[0].specI
-  if DataPacket.nobs!=1:
-    for i in range(1,DataPacket.nobs):
-      x=np.append(x,DataPacket.scaled.lsds[i].vel)#+DataPacket.vrad[i])
-      y=np.append(y,DataPacket.scaled.lsds[i].specI)
+    model=np.hstack(models)  
+    return model
+  
+  guess=guess
+  
+  # defines bounds for each parameter. kappa between 0 and infinity, vmac from 0 to 40 vmac, vrads from -infinity to infinity
+  bounds=([0,0],[np.inf,40])
+  for i in range(len(xs)):
+      bounds[0].append(-np.inf)
+      bounds[1].append(np.inf)
 
-  parameters,covariance = scipy.optimize.curve_fit(model,x,y,guess)
+  #performs the fitting
+  pout, pcov = scipy.optimize.curve_fit(poly,x_data,y_data,guess,bounds=bounds)
+  
+  #defining output arrays
+  star1_models=[]
+  for n in range(len(xs)):
+    star1_models.append([star1(xs[n],pout[0],pout[1],pout[2+2*n])])
 
-  modelout=model(x,parameters[0],parameters[1])
-  modelout=modelout[:DataPacket.scaled.lsds[0].vel.size]
-  return parameters,covariance,modelout
-
+  return pout,pcov,star1_models
 
 
 def binary_fitting(xs,ys,guess, param1, param2):
