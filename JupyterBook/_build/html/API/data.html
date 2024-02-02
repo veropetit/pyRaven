@@ -1,0 +1,615 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>data module &#8212; pyRaven</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" href="../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
+  <script src="../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
+const thebe_selector = ".thebe,.cell"
+const thebe_selector_input = "pre"
+const thebe_selector_output = ".output, .cell_output"
+</script>
+    <script async="async" src="../_static/sphinx-thebe.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'API/data';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="params module" href="params.html" />
+    <link rel="prev" title="02-Fit of the intensity profiles for single stars" href="../SimpleApplication/02-FitIntensity.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+
+<a class="navbar-brand logo" href="../01-intro.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/logo.png" class="logo__image only-light" alt="pyRaven - Home"/>
+    <script>document.write(`<img src="../_static/logo.png" class="logo__image only-dark" alt="pyRaven - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../01-intro.html">
+                    pyRaven
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Simple application</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../SimpleApplication.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../SimpleApplication/01-DataSetup.html">01 - Data Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../SimpleApplication/02-FitIntensity.html">02-Fit of the intensity profiles for single stars</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">API</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">data module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="params.html">params module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bayesobjects.html">BayesObjects module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fitparams.html">fitparams module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pattern.html">pattern module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="profileI.html">profileI module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="localV.html">localV module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="diskint2.html">diskint2 module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="loop.html">loop module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="loop_speed2.html">loop_speed module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="misc.html">misc module</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/API/data.rst" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.rst</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>data module</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section id="module-pyRaven.data">
+<span id="data-module"></span><h1>data module<a class="headerlink" href="#module-pyRaven.data" title="Permalink to this heading">#</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyRaven.data.DataPacket">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyRaven.data.</span></span><span class="sig-name descname"><span class="pre">DataPacket</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">star_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nobs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vrad</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ic</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wint_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wpol_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wint_rav</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wpol_rav</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fitrange</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vsini</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">original</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scaled</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cutfit</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.data.DataPacket" title="Permalink to this definition">#</a></dt>
+<dd><p>Packet of data, convertable back and forth to and h5 file.</p>
+<p>fitrange:
+vsini:
+wint_data:
+wpol_data:
+wint_rav:
+wpol_rav:
+original:
+scaled:
+cutfit:</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyRaven.data.DataPacket.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">star_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nobs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vrad</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ic</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wint_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wpol_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wint_rav</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wpol_rav</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fitrange</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vsini</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">original</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scaled</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cutfit</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.data.DataPacket.__init__" title="Permalink to this definition">#</a></dt>
+<dd><p>Initialization method for DataPacket
+:param self: The object being initialized
+:param fitrange: fitrange for the packet
+:param vsini:
+:param wint_rav:
+:param wpol_rav:
+:param original:
+:param scaled:
+:param cutfit:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyRaven.data.DataPacket.write">
+<span class="sig-name descname"><span class="pre">write</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.data.DataPacket.write" title="Permalink to this definition">#</a></dt>
+<dd><p>Method that writes a data packet to an h5 file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>packet</strong> – DataPacket object being stored in the file</p></li>
+<li><p><strong>fname</strong> – name of the file to be written</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>none</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyRaven.data.LSDprofs">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyRaven.data.</span></span><span class="sig-name descname"><span class="pre">LSDprofs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lsds</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.data.LSDprofs" title="Permalink to this definition">#</a></dt>
+<dd><p>Holds a list of LSD profiles</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>lsds</strong> – List of lsd profiles objects</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyRaven.data.LSDprofs.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lsds</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.data.LSDprofs.__init__" title="Permalink to this definition">#</a></dt>
+<dd><p>Initialization method for LSDprofs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>self</strong> – object being initialized</p></li>
+<li><p><strong>lsds</strong> – list of lsd profiles objects</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyRaven.data.LSDprofs.write">
+<span class="sig-name descname"><span class="pre">write</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_names</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.data.LSDprofs.write" title="Permalink to this definition">#</a></dt>
+<dd><p>Helper function that writes the contents of an LSDProfs object to an h5 file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>f</strong> – h5 file being written</p></li>
+<li><p><strong>lsds</strong> – LSDprofs object being stored in the file</p></li>
+<li><p><strong>obs_names</strong> – (List of string) the IDs to be used for each observations</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>none</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.data.create_Packet">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.data.</span></span><span class="sig-name descname"><span class="pre">create_Packet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">star_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nobs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vrad</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ic</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wint_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wpol_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wint_rav</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wpol_rav</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fitrange</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vsini</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">original</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.data.create_Packet" title="Permalink to this definition">#</a></dt>
+<dd><p>Create a new DataPacket from meta information and a LSDprof object with the original LSD profiles. 
+The creator function will calculate the scaled (radial velocity correction, normalization, LSD weigth scaling) version of the LSD profiles
+based on the meta information provided.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>star_name</strong> – (string) the name (or ID) for the star</p></li>
+<li><p><strong>nobs</strong> – (int) the number of LSD profiles to be analyzed together</p></li>
+<li><p><strong>obs_names</strong> – (list of strings) ID for the observations to be used in e.g. graphs (e.g. filename, obs number, etc)</p></li>
+<li><p><strong>vrad</strong> – (1D array) radial velocity for the LSD profiles to put them in the stellar reference frame (if the LSD profiles are already in the star reference frame, just put an array of zeros)</p></li>
+<li><p><strong>Ic</strong> – (1D array) continuum normalization values for the LSD profiles (if the LSD profiles are already normalized, just input an array of ones)</p></li>
+<li><p><strong>wint_data</strong> – (1D array) the intensity weigth that was used to calculate the LSD profiles</p></li>
+<li><p><strong>wpol_data</strong> – (1D array) the polarization weigth that was used to calculate the LSD profiles</p></li>
+<li><p><strong>wint_rav</strong> – (float) the common LSD intensity weigth that will be used for all of the observations</p></li>
+<li><p><strong>wpol_rav</strong> – (float) the common LSD intensity weigth that will be used for all of the observations</p></li>
+<li><p><strong>fitrange</strong> – (float) the velocity range around the line center that will be use for the fitting</p></li>
+<li><p><strong>vsini</strong> – (float) the vsini of the star (RIGHT NOW, ONLY FOR DISPLAY PURPOSES)</p></li>
+<li><p><strong>original</strong> – (LSDprofs object) the original LSD profiles</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.data.read_lsd">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.data.</span></span><span class="sig-name descname"><span class="pre">read_lsd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.data.read_lsd" title="Permalink to this definition">#</a></dt>
+<dd><p>Helper function that reads an lsd_prof from an h5 file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>f</strong> – the h5 file with the data</p></li>
+<li><p><strong>name</strong> – name of the LSDprofs object the data is a part of, with the index in the list</p></li>
+</ul>
+</dd>
+<dt class="field-even">Rtype lsd_prof<span class="colon">:</span></dt>
+<dd class="field-even"><p></p></dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.data.read_lsds">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.data.</span></span><span class="sig-name descname"><span class="pre">read_lsds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_names</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.data.read_lsds" title="Permalink to this definition">#</a></dt>
+<dd><p>Helper function that reads an LSDprofs object from an h5 file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>f</strong> – the h5 file with the data</p></li>
+<li><p><strong>name</strong> – name of the LSDprof object (e.g. original, scaled, or cutfit)</p></li>
+<li><p><strong>nobs</strong> – the number of LSD profiles in the LSDprof object.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Rtype LSDprof<span class="colon">:</span></dt>
+<dd class="field-even"><p></p></dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.data.read_lsds_from_sfiles">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.data.</span></span><span class="sig-name descname"><span class="pre">read_lsds_from_sfiles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fnames</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.data.read_lsds_from_sfiles" title="Permalink to this definition">#</a></dt>
+<dd><p>Function to create a LSDprof object from a list of filenames for LSD profiles in the .s format</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.data.read_packet">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.data.</span></span><span class="sig-name descname"><span class="pre">read_packet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.data.read_packet" title="Permalink to this definition">#</a></dt>
+<dd><p>Function that reads an h5 file and produces a DataPacket object from the data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>fname</strong> – name of the h5 file being read</p>
+</dd>
+<dt class="field-even">Rtype DataPacket<span class="colon">:</span></dt>
+<dd class="field-even"><p></p></dd>
+</dl>
+</dd></dl>
+
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./API"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../SimpleApplication/02-FitIntensity.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">02-Fit of the intensity profiles for single stars</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="params.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">params module</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Petit et al.
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2022.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

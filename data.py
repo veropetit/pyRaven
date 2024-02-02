@@ -224,7 +224,8 @@ class DataPacket:
       vrad=self.vrad[i]
       Ic=self.Ic[i]
       lsd=self.original.lsds[i]
-      color = next(ax[0]._get_lines.prop_cycler)['color']
+      #color = next(ax[0]._get_lines.prop_cycler)['color']
+      color = ax[0]._get_lines.get_next_color()
 
       ax[0].plot(lsd.vel, lsd.specI, c=color,
                 label='Obs: {}, vrad: {}, Ic: {}'.format(i+1, vrad, Ic))

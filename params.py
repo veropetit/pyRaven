@@ -29,11 +29,19 @@ class parameters(dict):
         with open(fname, "w") as f:
             json.dump(self, f, separators=(',', ':'), sort_keys=True, indent=4, cls=MyJSONEncoder)
 
+    def dump(self):
+        ''' Helper method to glue the dictionary in markdown'''
+        return(json.dumps(self, indent=2,default=str))
+
     def pprint(self):
         '''
         Method to pretty-print a `parameters` dictionary in a readable manner
         '''
         print(json.dumps(self, indent=2,default=str))
+
+    def __str__(self):
+        '''overloading the str function for a nice display'''
+        return(json.dumps(self, indent=2,default=str))
 
 def read_parameters(fname):
     '''
@@ -64,11 +72,13 @@ def get_def_param_fitI():
     genparam = {
     'lambda0':5000,    # the central wavelength of the transition
     'vsini':50.0,         # the projected rotational velocity
+    'vmac':5.0,         # the gaussian macroturbulence velocity
     'vdop':10.0,          # the thermal broadening
     'av':0.05,             # the damping coefficient of the Voigt profile
     'bnu':1.5,             # the slope of the source function with respect to vertical optical depth
     'logkappa':0.98,          # the line strength parameter
-    'ndop':int(10)       # the number of sample point per doppler width for the wavelength array
+    'ndop':int(10),       # the number of sample point per doppler width for the wavelength array
+    'res':65000,       # the spectral resolution lambda0 / gaussian FWHM.
     }
     return(parameters({'general' : genparam}))
 
@@ -80,16 +90,18 @@ def get_def_param_weak():
 
     genparam = {
     'lambda0':5000,    # the central wavelength of the transition
-    'vsini':50.0,         # the projected rotational velocity
-    'vdop':10.0,          # the thermal broadening
-    'av':0.05,             # the damping coefficient of the Voigt profile
-    'bnu':1.5,             # the slope of the source function with respect to vertical optical depth
-    'logkappa':0.98,          # the line strength parameter
-    'ndop':int(10),       # the number of sample point per doppler width for the wavelength array
-    'Bpole':1000,       # dipolar field strength in Gauss
-    'incl':90,          # inclination of the rotation axis to the LOS
-    'beta':90,          # obliquity of the field to the rotation axis
-    'phase':0           # rotational phase
+    'vsini':50.0,      # the projected rotational velocity
+    'vmac':5.0,        # the gaussian macroturbulence velocity
+    'vdop':10.0,       # the thermal broadening
+    'av':0.05,         # the damping coefficient of the Voigt profile
+    'bnu':1.5,         # the slope of the source function with respect to vertical optical depth
+    'logkappa':0.98,   # the line strength parameter
+    'ndop':int(10),    # the number of sample point per doppler width for the wavelength array
+    'res':65000,       # the spectral resolution lambda0 / gaussian FWHM.
+    'Bpole':1000,      # dipolar field strength in Gauss
+    'incl':90,         # inclination of the rotation axis to the LOS
+    'beta':90,         # obliquity of the field to the rotation axis
+    'phase':0          # rotational phase
     }
     weakparam = {
         'geff':1.0

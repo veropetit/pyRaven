@@ -1,0 +1,25 @@
+# Table of contents
+# Learn more at https://jupyterbook.org/customize/toc.html
+
+format: jb-book
+root: 01-intro
+parts:
+  - caption: Simple application
+    chapters:
+    - file: SimpleApplication
+    - file: SimpleApplication/01-DataSetup
+    - file: SimpleApplication/02-FitIntensity  
+  - caption: API
+    chapters:
+    - file: API/data.rst
+    - file: API/params.rst
+    - file: API/bayesobjects.rst
+    - file: API/fitparams.rst
+    - file: API/pattern.rst
+    - file: API/profileI.rst
+    - file: API/localV.rst
+    - file: API/diskint2.rst
+    - file: API/loop.rst
+    #- file: API/loop_speed.rst
+    - file: API/loop_speed2.rst
+    - file: API/misc.rst

@@ -1,0 +1,710 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>03- Calculating the chi2 with the loop code &#8212; pyRaven</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" href="../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
+  <script src="../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
+const thebe_selector = ".thebe,.cell"
+const thebe_selector_input = "pre"
+const thebe_selector_output = ".output, .cell_output"
+</script>
+    <script async="async" src="../_static/sphinx-thebe.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'SimpleApplication/03-ChiSquareCalcLoop';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+
+<a class="navbar-brand logo" href="../01-intro.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/logo.png" class="logo__image only-light" alt="pyRaven - Home"/>
+    <script>document.write(`<img src="../_static/logo.png" class="logo__image only-dark" alt="pyRaven - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../01-intro.html">
+                    pyRaven
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Simple application</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../SimpleApplication.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="01-DataSetup.html">01 - Data Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02-FitIntensity.html">02-Fit of the intensity profiles for single stars</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">API</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../API/data.html">data module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../API/params.html">params module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../API/bayesobjects.html">BayesObjects module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../API/fitparams.html">fitparams module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../API/pattern.html">pattern module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../API/profileI.html">profileI module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../API/localV.html">localV module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../API/diskint2.html">diskint2 module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../API/loop.html">loop module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../API/loop_speed2.html">loop_speed module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../API/misc.html">misc module</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/SimpleApplication/03-ChiSquareCalcLoop.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>03- Calculating the chi2 with the loop code</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#importing-the-necessary-packages">0. Importing the necessary packages</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-is-the-goal-of-this-code">1. What is the goal of this code?</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#choice-of-grid-parameters-and-necessary-other-parameters">2. Choice of grid parameters, and necessary other parameters</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#setting-the-lande-factor">2.1 Setting the Landé factor</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#evaluating-the-maximum-bpole-to-use-in-the-grid">2.2 Evaluating the maximum Bpole to use in the grid</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#determining-the-limits-on-the-inclination-based-on-vsini-and-critical-velocity">2.3 Determining the limits on the inclination based on vsini and critical velocity</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="calculating-the-chi2-with-the-loop-code">
+<h1>03- Calculating the chi2 with the loop code<a class="headerlink" href="#calculating-the-chi2-with-the-loop-code" title="Permalink to this heading">#</a></h1>
+<p>This notebook described the use of the <a class="reference external" href="http://loop.py">loop.py</a> (or loop_speed.py) function that makes the chi square calculation between the synthetic Stokes V profiles and a pyRaven observation packet, for a grid of magnetic dipole parameter values.</p>
+<section id="importing-the-necessary-packages">
+<h2>0. Importing the necessary packages<a class="headerlink" href="#importing-the-necessary-packages" title="Permalink to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">specpolFlow</span> <span class="k">as</span> <span class="nn">pol</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+
+<span class="kn">import</span> <span class="nn">pyRaven</span> <span class="k">as</span> <span class="nn">rav</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="what-is-the-goal-of-this-code">
+<h2>1. What is the goal of this code?<a class="headerlink" href="#what-is-the-goal-of-this-code" title="Permalink to this heading">#</a></h2>
+<p>The goal of this piece of the bayesian analysis is to create a synthetic Stokes V profile for each parameter set on a grid, and calculate the chi2 between this profile and the observations. These 4D grids of chi2 are saved as h5 files.</p>
+<p>To run this piece of the code, we need 2 things:</p>
+<ul class="simple">
+<li><p>An Observation Packet</p></li>
+<li><p>A parameter dictionary that will contain:</p>
+<ul>
+<li><p><strong>The [‘general’] parameters</strong> that define the Stokes I profile (see previous notebook), and the general information that is necessay for the Stokes V profile (e.g. the wavelength of the transition)</p></li>
+<li><p><strong>The [‘weak’] parameters</strong> which contains the parameter for the weak-field solution (as opposed to the unno solution), namely the effective landé factor. Note that the loop only performs weak-field calculation.</p></li>
+<li><p><strong>The [‘grid’] parameters</strong> which defines the grid of parameters for the dipolar field model (Bpole, beta, phi, incl – see below)</p></li>
+</ul>
+</li>
+</ul>
+<p>The <code class="docutils literal notranslate"><span class="pre">rav.loop.loop</span></code> function itself takes already loaded Observation Packet object and parameter dictionary object. The loop function writes the chi2 files in the current directory but a path can be specified.</p>
+<p>Here’s an example of a workflow doing the object loading directly:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Packet</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">read_packet</span><span class="p">(</span><span class="s1">&#39;../Data/hd12345.h5&#39;</span><span class="p">)</span>
+<span class="n">Params</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">read_parameters</span><span class="p">(</span><span class="s1">&#39;../Data/hd12345.h5&#39;</span><span class="p">)</span>
+<span class="n">rav</span><span class="o">.</span><span class="n">loop_speed</span><span class="o">.</span><span class="n">loop_speed</span><span class="p">(</span><span class="n">Packet</span><span class="p">,</span> <span class="n">Params</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s1">&#39;loop_output/&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We also provide a wrapper function that will take filenames as input for the packet and the parameters dictionary, for example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rav</span><span class="o">.</span><span class="n">loop_speed</span><span class="o">.</span><span class="n">loop_speed_wrapper</span><span class="p">(</span><span class="s1">&#39;packet.h5&#39;</span><span class="p">,</span> <span class="s1">&#39;params.jason&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Note that this is the most time consuming part of the bayesian analysis. The larger your parameter grid, and the larger the star’s vsini, the more time it will take.</p>
+<p>The code outputs a message at the end of each of the outer-loop on the inclination angle, with the time spent (in seconds).</p>
+<p>There are two versions of the loop code: ‘loop’ and ‘loop_speed’. The latter uses the package ‘numba’ to compile pieces of the inner loops for speed.</p>
+<p>To reduce memory usage, the code will output a chi2 file for each inclination angle value in the grid. It will furthermore create a separate file for each observations, and for each Stokes parameter.
+The file format is as follow: <code class="docutils literal notranslate"><span class="pre">chi[S]_i[i]obs[o].h5</span></code> where <code class="docutils literal notranslate"><span class="pre">[S]</span></code> is ‘V’ or ‘N1’, <code class="docutils literal notranslate"><span class="pre">[i]</span></code> is the index of the inclination value, and <code class="docutils literal notranslate"><span class="pre">[o]</span></code> is the index of the observation.</p>
+<p>For more information about the structure of a chi2 file, see the tutorial on the BayesObject class <a class="reference external" href="https://veropetit.github.io/pyRaven/nblink/BayesObjects_user.html">https://veropetit.github.io/pyRaven/nblink/BayesObjects_user.html</a>, or the class API <a class="reference external" href="https://veropetit.github.io/pyRaven/API.html#module-pyRaven.BayesObjects">https://veropetit.github.io/pyRaven/API.html#module-pyRaven.BayesObjects</a>.</p>
+</section>
+<section id="choice-of-grid-parameters-and-necessary-other-parameters">
+<h2>2. Choice of grid parameters, and necessary other parameters<a class="headerlink" href="#choice-of-grid-parameters-and-necessary-other-parameters" title="Permalink to this heading">#</a></h2>
+<p>In this section, we discuss the parameters that are required by the loop code.</p>
+<p>We also discuss how to choose the grid of parameters for the dipolar field model. This includes:</p>
+<ul class="simple">
+<li><p>how to decide on an upper limit for Bpole</p></li>
+<li><p>how to decide on a lower limit on the inclination angle.</p></li>
+</ul>
+<p>As this is a tutorial, this section includes loading and visualzing the DataPacket and the models. Note that this is not strickly necessary for a pyRaven workflow.</p>
+<p>In the cell below, we load and display our example DataPacket from Notebook 01 (<a class="reference external" href="https://veropetit.github.io/pyRaven/nblink/01-DataSetup.html">in docs</a>, <a class="reference external" href="https://github.com/veropetit/pyRaven/blob/main/HowToUsePyRavenTutorial/01-DataSetup.ipynb">in github</a>) which contains 3 LSD profiles that have been scaled, normalized, and cut to include only the portion of the line profile that will be used for the calculation of the chi square (right-hand graph).</p>
+<p>We also generate a parameter dictionary (explicitely) with the parameters we have decided upon in the previous notebook for the fit to the Stokes I profile. We overplot the fit in dashed black in the two right-hand panels.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Packet</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">read_packet</span><span class="p">(</span><span class="s1">&#39;ExampleData/ExamplePacket.h5&#39;</span><span class="p">)</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">Packet</span><span class="o">.</span><span class="n">plotI</span><span class="p">()</span>
+
+<span class="c1"># Parameters we have settled on in the previous notebook:</span>
+<span class="n">genparam</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;lambda0&#39;</span><span class="p">:</span><span class="mi">5000</span><span class="p">,</span>    <span class="c1"># the central wavelength of the transition</span>
+    <span class="s1">&#39;vsini&#39;</span><span class="p">:</span><span class="mf">200.0</span><span class="p">,</span>         <span class="c1"># the projected rotational velocity</span>
+    <span class="s1">&#39;vdop&#39;</span><span class="p">:</span><span class="mf">10.0</span><span class="p">,</span>          <span class="c1"># the thermal broadening</span>
+    <span class="s1">&#39;av&#39;</span><span class="p">:</span><span class="mf">0.05</span><span class="p">,</span>             <span class="c1"># the damping coefficient of the Voigt profile</span>
+    <span class="s1">&#39;bnu&#39;</span><span class="p">:</span><span class="mf">1.5</span><span class="p">,</span>             <span class="c1"># the slope of the source function with respect to vertical optical depth</span>
+    <span class="s1">&#39;logkappa&#39;</span><span class="p">:</span><span class="o">-</span><span class="mf">0.20</span><span class="p">,</span>          <span class="c1"># the line strength parameter</span>
+    <span class="s1">&#39;ndop&#39;</span><span class="p">:</span><span class="nb">int</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span>       <span class="c1"># the number of sample point per doppler width for the wavelength array</span>
+    <span class="s1">&#39;res&#39;</span><span class="p">:</span><span class="mi">65000</span><span class="p">,</span>
+    <span class="s1">&#39;vmac&#39;</span><span class="p">:</span><span class="mi">30</span><span class="p">,</span>
+  <span class="p">}</span>
+<span class="n">param</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;general&#39;</span> <span class="p">:</span> <span class="n">genparam</span>
+       <span class="p">}</span>
+
+<span class="c1"># Calculate an analytical model and overplot on the last two graphs</span>
+<span class="c1"># (not the first one, as the profiles have been normalized to continuum</span>
+<span class="c1"># and scaled to the LSD weigths we have decided to use)</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">diskint2</span><span class="o">.</span><span class="n">analytical</span><span class="p">(</span><span class="n">param</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">]:</span>
+  <span class="n">item</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">model</span><span class="p">[</span><span class="s1">&#39;vel&#39;</span><span class="p">],</span> <span class="n">model</span><span class="p">[</span><span class="s1">&#39;flux&#39;</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/123e4a4fcdf9b0129abfc033fa4ff5303f2684309d1cfef356407b131a1a69d1.png" src="../_images/123e4a4fcdf9b0129abfc033fa4ff5303f2684309d1cfef356407b131a1a69d1.png" />
+</div>
+</div>
+<section id="setting-the-lande-factor">
+<h3>2.1 Setting the Landé factor<a class="headerlink" href="#setting-the-lande-factor" title="Permalink to this heading">#</a></h3>
+<p>For the calculation of the synthetic profiles with the weak-field approximation, we have to explicitly set the effective Landé factor. We have already set a wavelength of 5000 A in our ‘general’ parameter dictionary (note – for Stokes I analytical calculation, this parameter is only used to create a wavelength dispersion axis in the output model).</p>
+<p>This mean that in combination with the LSD weigths, the Landé factor is fixed.</p>
+<p>In the example above, we set the intesity weigth (wint) to be 0.1, and the polarization weigth (wpol) to be 60. As wpol = wavelength(nm) * Landé * wint, then this implies that the effective Landé factor for this LSD profile model should be set to 1.2.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">weakparam</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;geff&#39;</span><span class="p">:</span><span class="mf">1.2</span>
+    <span class="p">}</span>
+<span class="n">param</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;general&#39;</span> <span class="p">:</span> <span class="n">genparam</span><span class="p">,</span>
+        <span class="s1">&#39;weak&#39;</span> <span class="p">:</span> <span class="n">weakparam</span>
+       <span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="evaluating-the-maximum-bpole-to-use-in-the-grid">
+<h3>2.2 Evaluating the maximum Bpole to use in the grid<a class="headerlink" href="#evaluating-the-maximum-bpole-to-use-in-the-grid" title="Permalink to this heading">#</a></h3>
+<p>We need to decide that maximum Bpole to use for our grid of dipolar magnetic field parameters. We can do this by examining the field strengths that would nominally create a Stokes V signature that is quite larger than the noise level is Stokes V and/or in the null profiles.</p>
+<p>To make a Stokes V calculation, we will use the rav.diskint2.numerical function. This function is a standalone to make a single Stokes V calculation. (Note: The loop code that calculates the chi2 do not call this function, as it would not have been efficient. But they share the same set of module functions and the Stokes V calculated in the loop funciton matches that of the numerical function exactly).</p>
+<p>To run rav.diskint2.numerical, we need to define some extra parameters in the ‘general’ parameter dictionary:</p>
+<ul class="simple">
+<li><p>The dipolar field strength Bpole in Gauss</p></li>
+<li><p>The inclination of the rotational axis to the line of sight incl in degree</p></li>
+<li><p>The obliquity of the magnetic axis to the rotation axis beta in degree</p></li>
+<li><p>The rotational phase <em><strong>in degree</strong></em></p></li>
+</ul>
+<p>The maximum amplitude of the Stokes V signature will be when the dipole is aligned with line of sight. We will make that happen by setting</p>
+<ul class="simple">
+<li><p>incl = 90 (degrees)</p></li>
+<li><p>beta = 90 (degrees)</p></li>
+<li><p>phase = 0 (degree)</p></li>
+</ul>
+<p>Here, we will want to find the value of Bpole that will generate a Stokes V profile that is aprreciably above the noise level of your LSD profiles (if there is no obvious Stokes V signal present), or above the Stokes V signature.</p>
+<p>In the example above, 5000 gauss seems reasonable for the goal of the project that was associated with these data. This choice depends on your own research project goal, and should be discussed in your paper.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># make a copy of the parameters that are defined for the Stokes I fit</span>
+<span class="n">magparam</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">genparam</span><span class="p">)</span>
+<span class="c1"># Add parameters for the dopolar field configuration</span>
+<span class="n">magparam</span><span class="p">[</span><span class="s1">&#39;Bpole&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">5000</span>
+<span class="n">magparam</span><span class="p">[</span><span class="s1">&#39;incl&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">90</span>
+<span class="n">magparam</span><span class="p">[</span><span class="s1">&#39;beta&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">90</span>
+<span class="n">magparam</span><span class="p">[</span><span class="s1">&#39;phase&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">90</span>
+
+<span class="n">param</span> <span class="o">=</span> <span class="n">param</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;general&#39;</span> <span class="p">:</span> <span class="n">magparam</span><span class="p">,</span>
+        <span class="s1">&#39;weak&#39;</span> <span class="p">:</span> <span class="n">weakparam</span>
+       <span class="p">}</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">diskint2</span><span class="o">.</span><span class="n">numerical</span><span class="p">(</span><span class="n">param</span><span class="p">)</span>
+
+<span class="c1"># Make a graph of the Scaled LSD profiles in the data Packet</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">Packet</span><span class="o">.</span><span class="n">scaled</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+<span class="c1"># Overplot the calculated model</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">model</span><span class="p">[</span><span class="s1">&#39;vel&#39;</span><span class="p">],</span> <span class="n">model</span><span class="p">[</span><span class="s1">&#39;flux&#39;</span><span class="p">],</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">ax</span><span class="o">.</span><span class="n">flatten</span><span class="p">()[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]:</span>
+       <span class="n">item</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">model</span><span class="p">[</span><span class="s1">&#39;vel&#39;</span><span class="p">],</span> <span class="n">model</span><span class="p">[</span><span class="s1">&#39;V&#39;</span><span class="p">],</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/4ea70311ae67254d085734762abc1a078b9b1f1cbfa2372ad2a4da7144b03c00.png" src="../_images/4ea70311ae67254d085734762abc1a078b9b1f1cbfa2372ad2a4da7144b03c00.png" />
+</div>
+</div>
+</section>
+<section id="determining-the-limits-on-the-inclination-based-on-vsini-and-critical-velocity">
+<h3>2.3 Determining the limits on the inclination based on vsini and critical velocity<a class="headerlink" href="#determining-the-limits-on-the-inclination-based-on-vsini-and-critical-velocity" title="Permalink to this heading">#</a></h3>
+<p>There are two reasons to limit the range of inclinations in the bayesian grid.</p>
+<ol class="arabic simple">
+<li><p>The default prior probability distribution used in pyRaven is a sin(i) distribution, to reflect the expected randomness of the rotational axis with respect to Earth. This means that the prior probability density at 0 and 180 degree will be exactly zero. This in itself is not a scientific issue. However, because of the large range of values encoutered in probability densities, all of the calculation are done in logarithmic space. Python does not mind too much, as the transformation from ln(P) to P during marginalization and normalization have been designed to avoid overflow. Very underflow probability densities are handeled as -inf in log space, and return 0 when exponentiated. However, this procedure will return a ‘division by zero’ warning. Additionally, the <code class="docutils literal notranslate"><span class="pre">BayesObjects.exp_check()</span></code> and <code class="docutils literal notranslate"><span class="pre">BayesObject.ln_mar_check()</span></code> used throughout the code will also return a direct warning that a nan or inf was encourtered, so that you can verify that this did not happen for an unexpected reason. In principle, this should not happen, as there is also a physical reason for the grid of inclination not to go to 0 or 180.</p></li>
+<li></li>
+</ol>
+<p>BELOW STILL NEED CLEANUP</p>
+<p>We are here generating the data structures that contains information for the codes:</p>
+<ul class="simple">
+<li><p>genparam: general parameters, same as for diskint2 function. However the Bpole, incl, beta, and phase parameters are not necessary here, as they will be set by the gridparam structure. This said, one can still pass a genparam structure that was used for diskint2 – the extra parameters are simply ignored.</p></li>
+<li><p>weakparam: the lande factor for the weak field approximation</p></li>
+<li><p>gridparam: contains the arrays defining the grid for the dipolar parameters.</p></li>
+</ul>
+<p>See INSERT LINK HERE for many additional way to create param objects (including from files).</p>
+<p>Here we have set the intensity line profile model parameters to already known values for this dataset. In the middle plot below, we show the model line profile (dashed curve) in the middle panel.</p>
+<p>If you have yet to fit your line profiles to determine the appropriate vsini, vmac, and logkappa, see INSERT LINK HERE.</p>
+<p>We also save the the param to a folder in the repository ExampleData/LoopExample. Although not strickly necessary, it will be useful to make more lengtly calculations with a script on a more powerful computer.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">genparam</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;lambda0&#39;</span><span class="p">:</span><span class="mi">5000</span><span class="p">,</span>    <span class="c1"># the central wavelength of the transition</span>
+    <span class="s1">&#39;vsini&#39;</span><span class="p">:</span><span class="mf">200.0</span><span class="p">,</span>         <span class="c1"># the projected rotational velocity</span>
+    <span class="s1">&#39;vdop&#39;</span><span class="p">:</span><span class="mf">10.0</span><span class="p">,</span>          <span class="c1"># the thermal broadening</span>
+    <span class="s1">&#39;av&#39;</span><span class="p">:</span><span class="mf">0.05</span><span class="p">,</span>             <span class="c1"># the damping coefficient of the Voigt profile</span>
+    <span class="s1">&#39;bnu&#39;</span><span class="p">:</span><span class="mf">1.5</span><span class="p">,</span>             <span class="c1"># the slope of the source function with respect to vertical optical depth</span>
+    <span class="s1">&#39;logkappa&#39;</span><span class="p">:</span><span class="o">-</span><span class="mf">0.20</span><span class="p">,</span>          <span class="c1"># the line strength parameter</span>
+    <span class="s1">&#39;ndop&#39;</span><span class="p">:</span><span class="nb">int</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span>       <span class="c1"># the number of sample point per doppler width for the wavelength array</span>
+    <span class="s1">&#39;res&#39;</span><span class="p">:</span><span class="mi">65000</span><span class="p">,</span>
+    <span class="s1">&#39;vmac&#39;</span><span class="p">:</span><span class="mi">30</span><span class="p">,</span>
+  <span class="p">}</span>
+
+<span class="n">weakparam</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;geff&#39;</span><span class="p">:</span><span class="mf">1.0</span>
+    <span class="p">}</span>
+
+<span class="n">gridparam</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;Bpole_grid&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">5000</span><span class="p">,</span><span class="mi">25</span><span class="p">),</span>
+        <span class="s1">&#39;incl_grid&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">180</span><span class="p">,</span><span class="mi">18</span><span class="p">),</span>
+        <span class="s1">&#39;beta_grid&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">180</span><span class="p">,</span><span class="mi">18</span><span class="p">),</span>
+        <span class="s1">&#39;phase_grid&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">360</span><span class="p">,</span><span class="mi">18</span><span class="o">*</span><span class="mi">2</span><span class="p">)</span>
+        <span class="p">}</span>
+    
+<span class="n">param</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;general&#39;</span> <span class="p">:</span> <span class="n">genparam</span><span class="p">,</span>
+       <span class="s1">&#39;weak&#39;</span> <span class="p">:</span> <span class="n">weakparam</span><span class="p">,</span>
+       <span class="s1">&#39;grid&#39;</span> <span class="p">:</span> <span class="n">gridparam</span>
+       <span class="p">}</span>
+
+<span class="n">rav</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">parameters</span><span class="p">(</span><span class="n">param</span><span class="p">)</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;ExampleData/LoopExample/param.json&#39;</span><span class="p">)</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">diskint2</span><span class="o">.</span><span class="n">numerical</span><span class="p">(</span><span class="n">param</span><span class="p">)</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">Packet</span><span class="o">.</span><span class="n">plotI</span><span class="p">()</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">model</span><span class="p">[</span><span class="s1">&#39;vel&#39;</span><span class="p">],</span> <span class="n">model</span><span class="p">[</span><span class="s1">&#39;flux&#39;</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>1.958617462625618
+Using 9000.0 grid point on the surface
+Evaluating with weak approximation...
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&lt;matplotlib.lines.Line2D at 0x7fdef941b1f0&gt;]
+</pre></div>
+</div>
+<img alt="../_images/d147564dffde62115ad06017d1a73b1a294f6e6cf368b8bb8c0a76574f06f811.png" src="../_images/d147564dffde62115ad06017d1a73b1a294f6e6cf368b8bb8c0a76574f06f811.png" />
+</div>
+</div>
+<p>So now, we have everything needed to run the loop, and it could be done with simply running</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rav</span><span class="o">.</span><span class="n">loop_speed</span><span class="o">.</span><span class="n">loop_speed</span><span class="p">(</span><span class="n">param</span><span class="p">,</span> <span class="n">Packet</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s1">&#39;ExampleData/LoopOutputs/&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>However, this can be a bit slow in a Jupyter notebook. Therefore it might be advantageous to run the loop on e.g. a cluster (TRY THE SPEED ON COLLAB?).</p>
+<p>To do this, we can use the script wrapper</p>
+<p>In a folder (outside of this repository, because the size of the created data is too large for github), I have:</p>
+<ul class="simple">
+<li><p>DataPacket.h5</p></li>
+<li><p>Params.json</p></li>
+</ul>
+<p>From this folder, I open python (and a screen instance in the terminal beforehand) and run</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rav</span><span class="o">.</span><span class="n">loop_speed</span><span class="o">.</span><span class="n">loop_speed_wrapper</span><span class="p">(</span><span class="s1">&#39;param.json&#39;</span><span class="p">,</span> <span class="s1">&#39;ExamplePacket.h5&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./SimpleApplication"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#importing-the-necessary-packages">0. Importing the necessary packages</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-is-the-goal-of-this-code">1. What is the goal of this code?</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#choice-of-grid-parameters-and-necessary-other-parameters">2. Choice of grid parameters, and necessary other parameters</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#setting-the-lande-factor">2.1 Setting the Landé factor</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#evaluating-the-maximum-bpole-to-use-in-the-grid">2.2 Evaluating the maximum Bpole to use in the grid</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#determining-the-limits-on-the-inclination-based-on-vsini-and-critical-velocity">2.3 Determining the limits on the inclination based on vsini and critical velocity</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Petit et al.
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2022.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
