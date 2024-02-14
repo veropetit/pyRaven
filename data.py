@@ -89,6 +89,13 @@ class LSDprofs:
     return(lsd_cut)
 
   def plotI(self, ax, label=[]):
+    '''
+    Class function to add the intensity profiles of a lsds object to an existing plot.
+
+    :param ax: the ax object in which to add the profiles
+    :param label: (default []) if the array is not empty, labels to use for each of the curves. 
+     
+    '''
     for i in range(0,len(self.lsds)):
       if not(label):
         ax.plot(self.lsds[i].vel, self.lsds[i].specI)
