@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>03- Calculating the chi2 with the loop code &mdash; Raven  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/nbsphinx-code-cells.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/template.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="04 - Calculate probabilites from the chi2 files" href="04-CalculateProbabilities.html" />
+    <link rel="prev" title="Fit of the intensity profiles for single stars" href="02-FitIntensity.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Raven
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../Installation.html">Installation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">How to run pyRaven tutorial</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="01-DataSetup.html">01 - Data Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02-FitIntensity.html">Fit of the intensity profiles for single stars</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">03- Calculating the chi2 with the loop code</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#0.-Importing-the-necessary-packages">0. Importing the necessary packages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#1.-What-is-the-goal-of-this-code?">1. What is the goal of this code?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#2.-Choice-of-grid-parameters,-and-necessary-other-parameters">2. Choice of grid parameters, and necessary other parameters</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#2.1-Setting-the-Landé-factor">2.1 Setting the Landé factor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#2.2-Evaluating-the-maximum-Bpole-to-use-in-the-grid">2.2 Evaluating the maximum Bpole to use in the grid</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#2.3-Determining-the-limits-on-the-inclination-based-on-vsini-and-critical-velocity">2.3 Determining the limits on the inclination based on vsini and critical velocity</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="04-CalculateProbabilities.html">04 - Calculate probabilites from the chi2 files</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Standalone tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="ParamsObject_tutorial.html">Tutorial on how to use the Params Dictionary objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="BayesObjects_user.html">User’s manual for the BayesObjects.py classes</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Underlying physics and statistics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="diskint2_doc.html">Documentation for diskint2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="geometry_doc.html">Geometry documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bayes_doc.html">Documentation for the bayesian calculations</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../API.html">pyRaven Package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Raven</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">03- Calculating the chi2 with the loop code</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/nblink/03-ChiSquareCalcLoop.nblink.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="03--Calculating-the-chi2-with-the-loop-code">
+<h1>03- Calculating the chi2 with the loop code<a class="headerlink" href="#03--Calculating-the-chi2-with-the-loop-code" title="Permalink to this heading"></a></h1>
+<p>This notebook described the use of the loop.py (or loop_speed.py) function that makes the chi square calculation between the synthetic Stokes V profiles and a pyRaven observation packet, for a grid of magnetic dipole parameter values.</p>
+<section id="0.-Importing-the-necessary-packages">
+<h2>0. Importing the necessary packages<a class="headerlink" href="#0.-Importing-the-necessary-packages" title="Permalink to this heading"></a></h2>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">specpolFlow</span> <span class="k">as</span> <span class="nn">pol</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+
+<span class="kn">import</span> <span class="nn">pyRaven</span> <span class="k">as</span> <span class="nn">rav</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="1.-What-is-the-goal-of-this-code?">
+<h2>1. What is the goal of this code?<a class="headerlink" href="#1.-What-is-the-goal-of-this-code?" title="Permalink to this heading"></a></h2>
+<p>The goal of this piece of the bayesian analysis is to create a synthetic Stokes V profile for each parameter set on a grid, and calculate the chi2 between this profile and the observations. These 4D grids of chi2 are saved as h5 files.</p>
+<p>To run this piece of the code, we need 2 things: * An Observation Packet * A parameter dictionary that will contain: - <strong>The [‘general’] parameters</strong> that define the Stokes I profile (see previous notebook), and the general information that is necessay for the Stokes V profile (e.g. the wavelength of the transition) - <strong>The [‘weak’] parameters</strong> which contains the parameter for the weak-field solution (as opposed to the unno solution), namely the effective landé factor. Note that the loop only
+performs weak-field calculation. - <strong>The [‘grid’] parameters</strong> which defines the grid of parameters for the dipolar field model (Bpole, beta, phi, incl – see below)</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">rav.loop.loop</span></code> function itself takes already loaded Observation Packet object and parameter dictionary object. The loop function writes the chi2 files in the current directory but a path can be specified.</p>
+<p>Here’s an example of a workflow doing the object loading directly:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>Packet = rav.data.read_packet(&#39;../Data/hd12345.h5&#39;)
+Params = rav.param.read_parameters(&#39;../Data/hd12345.h5&#39;)
+rav.loop_speed.loop_speed(Packet, Params, path=&#39;loop_output/&#39;)
+</pre></div>
+</div>
+<p>We also provide a wrapper function that will take filenames as input for the packet and the parameters dictionary, for example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>rav.loop_speed.loop_speed_wrapper(&#39;packet.h5&#39;, &#39;params.jason&#39;)
+</pre></div>
+</div>
+<p>Note that this is the most time consuming part of the bayesian analysis. The larger your parameter grid, and the larger the star’s vsini, the more time it will take.</p>
+<p>The code outputs a message at the end of each of the outer-loop on the inclination angle, with the time spent (in seconds).</p>
+<p>There are two versions of the loop code: ‘loop’ and ‘loop_speed’. The latter uses the package ‘numba’ to compile pieces of the inner loops for speed.</p>
+<p>To reduce memory usage, the code will output a chi2 file for each inclination angle value in the grid. It will furthermore create a separate file for each observations, and for each Stokes parameter. The file format is as follow: <code class="docutils literal notranslate"><span class="pre">chi[S]_i[i]obs[o].h5</span></code> where <code class="docutils literal notranslate"><span class="pre">[S]</span></code> is ‘V’ or ‘N1’, <code class="docutils literal notranslate"><span class="pre">[i]</span></code> is the index of the inclination value, and <code class="docutils literal notranslate"><span class="pre">[o]</span></code> is the index of the observation.</p>
+<p>For more information about the structure of a chi2 file, see the tutorial on the BayesObject class <a class="reference external" href="https://veropetit.github.io/pyRaven/nblink/BayesObjects_user.html">https://veropetit.github.io/pyRaven/nblink/BayesObjects_user.html</a>, or the class API <a class="reference external" href="https://veropetit.github.io/pyRaven/API.html#module-pyRaven.BayesObjects">https://veropetit.github.io/pyRaven/API.html#module-pyRaven.BayesObjects</a>.</p>
+</section>
+<section id="2.-Choice-of-grid-parameters,-and-necessary-other-parameters">
+<h2>2. Choice of grid parameters, and necessary other parameters<a class="headerlink" href="#2.-Choice-of-grid-parameters,-and-necessary-other-parameters" title="Permalink to this heading"></a></h2>
+<p>In this section, we discuss the parameters that are required by the loop code.</p>
+<p>We also discuss how to choose the grid of parameters for the dipolar field model. This includes: * how to decide on an upper limit for Bpole * how to decide on a lower limit on the inclination angle.</p>
+<p>As this is a tutorial, this section includes loading and visualzing the DataPacket and the models. Note that this is not strickly necessary for a pyRaven workflow.</p>
+<p>In the cell below, we load and display our example DataPacket from Notebook 01 (<a class="reference external" href="https://veropetit.github.io/pyRaven/nblink/01-DataSetup.html">in docs</a>, <a class="reference external" href="https://github.com/veropetit/pyRaven/blob/main/HowToUsePyRavenTutorial/01-DataSetup.ipynb">in github</a>) which contains 3 LSD profiles that have been scaled, normalized, and cut to include only the portion of the line profile that will be used for the calculation of the chi square (right-hand graph).</p>
+<p>We also generate a parameter dictionary (explicitely) with the parameters we have decided upon in the previous notebook for the fit to the Stokes I profile. We overplot the fit in dashed black in the two right-hand panels.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Packet</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">read_packet</span><span class="p">(</span><span class="s1">&#39;ExampleData/ExamplePacket.h5&#39;</span><span class="p">)</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">Packet</span><span class="o">.</span><span class="n">plotI</span><span class="p">()</span>
+
+<span class="c1"># Parameters we have settled on in the previous notebook:</span>
+<span class="n">genparam</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;lambda0&#39;</span><span class="p">:</span><span class="mi">5000</span><span class="p">,</span>    <span class="c1"># the central wavelength of the transition</span>
+    <span class="s1">&#39;vsini&#39;</span><span class="p">:</span><span class="mf">200.0</span><span class="p">,</span>         <span class="c1"># the projected rotational velocity</span>
+    <span class="s1">&#39;vdop&#39;</span><span class="p">:</span><span class="mf">10.0</span><span class="p">,</span>          <span class="c1"># the thermal broadening</span>
+    <span class="s1">&#39;av&#39;</span><span class="p">:</span><span class="mf">0.05</span><span class="p">,</span>             <span class="c1"># the damping coefficient of the Voigt profile</span>
+    <span class="s1">&#39;bnu&#39;</span><span class="p">:</span><span class="mf">1.5</span><span class="p">,</span>             <span class="c1"># the slope of the source function with respect to vertical optical depth</span>
+    <span class="s1">&#39;logkappa&#39;</span><span class="p">:</span><span class="o">-</span><span class="mf">0.20</span><span class="p">,</span>          <span class="c1"># the line strength parameter</span>
+    <span class="s1">&#39;ndop&#39;</span><span class="p">:</span><span class="nb">int</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span>       <span class="c1"># the number of sample point per doppler width for the wavelength array</span>
+    <span class="s1">&#39;res&#39;</span><span class="p">:</span><span class="mi">65000</span><span class="p">,</span>
+    <span class="s1">&#39;vmac&#39;</span><span class="p">:</span><span class="mi">30</span><span class="p">,</span>
+  <span class="p">}</span>
+<span class="n">param</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;general&#39;</span> <span class="p">:</span> <span class="n">genparam</span>
+       <span class="p">}</span>
+
+<span class="c1"># Calculate an analytical model and overplot on the last two graphs</span>
+<span class="c1"># (not the first one, as the profiles have been normalized to continuum</span>
+<span class="c1"># and scaled to the LSD weigths we have decided to use)</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">diskint2</span><span class="o">.</span><span class="n">analytical</span><span class="p">(</span><span class="n">param</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">]:</span>
+  <span class="n">item</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">model</span><span class="p">[</span><span class="s1">&#39;vel&#39;</span><span class="p">],</span> <span class="n">model</span><span class="p">[</span><span class="s1">&#39;flux&#39;</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/nblink_03-ChiSquareCalcLoop_10_0.png" src="../_images/nblink_03-ChiSquareCalcLoop_10_0.png" />
+</div>
+</div>
+<section id="2.1-Setting-the-Landé-factor">
+<h3>2.1 Setting the Landé factor<a class="headerlink" href="#2.1-Setting-the-Landé-factor" title="Permalink to this heading"></a></h3>
+<p>For the calculation of the synthetic profiles with the weak-field approximation, we have to explicitly set the effective Landé factor. We have already set a wavelength of 5000 A in our ‘general’ parameter dictionary (note – for Stokes I analytical calculation, this parameter is only used to create a wavelength dispersion axis in the output model).</p>
+<p>This mean that in combination with the LSD weigths, the Landé factor is fixed.</p>
+<p>In the example above, we set the intesity weigth (wint) to be 0.1, and the polarization weigth (wpol) to be 60. As wpol = wavelength(nm) * Landé * wint, then this implies that the effective Landé factor for this LSD profile model should be set to 1.2.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">weakparam</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;geff&#39;</span><span class="p">:</span><span class="mf">1.2</span>
+    <span class="p">}</span>
+<span class="n">param</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;general&#39;</span> <span class="p">:</span> <span class="n">genparam</span><span class="p">,</span>
+        <span class="s1">&#39;weak&#39;</span> <span class="p">:</span> <span class="n">weakparam</span>
+       <span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="2.2-Evaluating-the-maximum-Bpole-to-use-in-the-grid">
+<h3>2.2 Evaluating the maximum Bpole to use in the grid<a class="headerlink" href="#2.2-Evaluating-the-maximum-Bpole-to-use-in-the-grid" title="Permalink to this heading"></a></h3>
+<p>We need to decide that maximum Bpole to use for our grid of dipolar magnetic field parameters. We can do this by examining the field strengths that would nominally create a Stokes V signature that is quite larger than the noise level is Stokes V and/or in the null profiles.</p>
+<p>To make a Stokes V calculation, we will use the rav.diskint2.numerical function. This function is a standalone to make a single Stokes V calculation. (Note: The loop code that calculates the chi2 do not call this function, as it would not have been efficient. But they share the same set of module functions and the Stokes V calculated in the loop funciton matches that of the numerical function exactly).</p>
+<p>To run rav.diskint2.numerical, we need to define some extra parameters in the ‘general’ parameter dictionary: - The dipolar field strength Bpole in Gauss - The inclination of the rotational axis to the line of sight incl in degree - The obliquity of the magnetic axis to the rotation axis beta in degree - The rotational phase <strong>in degree</strong></p>
+<p>The maximum amplitude of the Stokes V signature will be when the dipole is aligned with line of sight. We will make that happen by setting - incl = 90 (degrees) - beta = 90 (degrees) - phase = 0 (degree)</p>
+<p>Here, we will want to find the value of Bpole that will generate a Stokes V profile that is aprreciably above the noise level of your LSD profiles (if there is no obvious Stokes V signal present), or above the Stokes V signature.</p>
+<p>In the example above, 5000 gauss seems reasonable for the goal of the project that was associated with these data. This choice depends on your own research project goal, and should be discussed in your paper.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># make a copy of the parameters that are defined for the Stokes I fit</span>
+<span class="n">magparam</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">genparam</span><span class="p">)</span>
+<span class="c1"># Add parameters for the dopolar field configuration</span>
+<span class="n">magparam</span><span class="p">[</span><span class="s1">&#39;Bpole&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">5000</span>
+<span class="n">magparam</span><span class="p">[</span><span class="s1">&#39;incl&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">90</span>
+<span class="n">magparam</span><span class="p">[</span><span class="s1">&#39;beta&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">90</span>
+<span class="n">magparam</span><span class="p">[</span><span class="s1">&#39;phase&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">90</span>
+
+<span class="n">param</span> <span class="o">=</span> <span class="n">param</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;general&#39;</span> <span class="p">:</span> <span class="n">magparam</span><span class="p">,</span>
+        <span class="s1">&#39;weak&#39;</span> <span class="p">:</span> <span class="n">weakparam</span>
+       <span class="p">}</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">diskint2</span><span class="o">.</span><span class="n">numerical</span><span class="p">(</span><span class="n">param</span><span class="p">)</span>
+
+<span class="c1"># Make a graph of the Scaled LSD profiles in the data Packet</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">Packet</span><span class="o">.</span><span class="n">scaled</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+<span class="c1"># Overplot the calculated model</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">model</span><span class="p">[</span><span class="s1">&#39;vel&#39;</span><span class="p">],</span> <span class="n">model</span><span class="p">[</span><span class="s1">&#39;flux&#39;</span><span class="p">],</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">ax</span><span class="o">.</span><span class="n">flatten</span><span class="p">()[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]:</span>
+       <span class="n">item</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">model</span><span class="p">[</span><span class="s1">&#39;vel&#39;</span><span class="p">],</span> <span class="n">model</span><span class="p">[</span><span class="s1">&#39;V&#39;</span><span class="p">],</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/nblink_03-ChiSquareCalcLoop_16_0.png" src="../_images/nblink_03-ChiSquareCalcLoop_16_0.png" />
+</div>
+</div>
+</section>
+<section id="2.3-Determining-the-limits-on-the-inclination-based-on-vsini-and-critical-velocity">
+<h3>2.3 Determining the limits on the inclination based on vsini and critical velocity<a class="headerlink" href="#2.3-Determining-the-limits-on-the-inclination-based-on-vsini-and-critical-velocity" title="Permalink to this heading"></a></h3>
+<p>There are two reasons to limit the range of inclinations in the bayesian grid.</p>
+<ol class="arabic simple">
+<li><p>The default prior probability distribution used in pyRaven is a sin(i) distribution, to reflect the expected randomness of the rotational axis with respect to Earth. This means that the prior probability density at 0 and 180 degree will be exactly zero. This in itself is not a scientific issue. However, because of the large range of values encoutered in probability densities, all of the calculation are done in logarithmic space. Python does not mind too much, as the transformation from ln(P)
+to P during marginalization and normalization have been designed to avoid overflow. Very underflow probability densities are handeled as -inf in log space, and return 0 when exponentiated. However, this procedure will return a ‘division by zero’ warning. Additionally, the <code class="docutils literal notranslate"><span class="pre">BayesObjects.exp_check()</span></code> and <code class="docutils literal notranslate"><span class="pre">BayesObject.ln_mar_check()</span></code> used throughout the code will also return a direct warning that a nan or inf was encourtered, so that you can verify that this did not happen for an unexpected
+reason. In principle, this should not happen, as there is also a physical reason for the grid of inclination not to go to 0 or 180.</p></li>
+<li></li>
+</ol>
+<p>BELOW STILL NEED CLEANUP</p>
+<p>We are here generating the data structures that contains information for the codes: * genparam: general parameters, same as for diskint2 function. However the Bpole, incl, beta, and phase parameters are not necessary here, as they will be set by the gridparam structure. This said, one can still pass a genparam structure that was used for diskint2 – the extra parameters are simply ignored. * weakparam: the lande factor for the weak field approximation * gridparam: contains the arrays defining
+the grid for the dipolar parameters.</p>
+<p>See INSERT LINK HERE for many additional way to create param objects (including from files).</p>
+<p>Here we have set the intensity line profile model parameters to already known values for this dataset. In the middle plot below, we show the model line profile (dashed curve) in the middle panel.</p>
+<p>If you have yet to fit your line profiles to determine the appropriate vsini, vmac, and logkappa, see INSERT LINK HERE.</p>
+<p>We also save the the param to a folder in the repository ExampleData/LoopExample. Although not strickly necessary, it will be useful to make more lengtly calculations with a script on a more powerful computer.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">genparam</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;lambda0&#39;</span><span class="p">:</span><span class="mi">5000</span><span class="p">,</span>    <span class="c1"># the central wavelength of the transition</span>
+    <span class="s1">&#39;vsini&#39;</span><span class="p">:</span><span class="mf">200.0</span><span class="p">,</span>         <span class="c1"># the projected rotational velocity</span>
+    <span class="s1">&#39;vdop&#39;</span><span class="p">:</span><span class="mf">10.0</span><span class="p">,</span>          <span class="c1"># the thermal broadening</span>
+    <span class="s1">&#39;av&#39;</span><span class="p">:</span><span class="mf">0.05</span><span class="p">,</span>             <span class="c1"># the damping coefficient of the Voigt profile</span>
+    <span class="s1">&#39;bnu&#39;</span><span class="p">:</span><span class="mf">1.5</span><span class="p">,</span>             <span class="c1"># the slope of the source function with respect to vertical optical depth</span>
+    <span class="s1">&#39;logkappa&#39;</span><span class="p">:</span><span class="o">-</span><span class="mf">0.20</span><span class="p">,</span>          <span class="c1"># the line strength parameter</span>
+    <span class="s1">&#39;ndop&#39;</span><span class="p">:</span><span class="nb">int</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span>       <span class="c1"># the number of sample point per doppler width for the wavelength array</span>
+    <span class="s1">&#39;res&#39;</span><span class="p">:</span><span class="mi">65000</span><span class="p">,</span>
+    <span class="s1">&#39;vmac&#39;</span><span class="p">:</span><span class="mi">30</span><span class="p">,</span>
+  <span class="p">}</span>
+
+<span class="n">weakparam</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;geff&#39;</span><span class="p">:</span><span class="mf">1.0</span>
+    <span class="p">}</span>
+
+<span class="n">gridparam</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;Bpole_grid&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">5000</span><span class="p">,</span><span class="mi">25</span><span class="p">),</span>
+        <span class="s1">&#39;incl_grid&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">180</span><span class="p">,</span><span class="mi">18</span><span class="p">),</span>
+        <span class="s1">&#39;beta_grid&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">180</span><span class="p">,</span><span class="mi">18</span><span class="p">),</span>
+        <span class="s1">&#39;phase_grid&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">360</span><span class="p">,</span><span class="mi">18</span><span class="o">*</span><span class="mi">2</span><span class="p">)</span>
+        <span class="p">}</span>
+
+<span class="n">param</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;general&#39;</span> <span class="p">:</span> <span class="n">genparam</span><span class="p">,</span>
+       <span class="s1">&#39;weak&#39;</span> <span class="p">:</span> <span class="n">weakparam</span><span class="p">,</span>
+       <span class="s1">&#39;grid&#39;</span> <span class="p">:</span> <span class="n">gridparam</span>
+       <span class="p">}</span>
+
+<span class="n">rav</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">parameters</span><span class="p">(</span><span class="n">param</span><span class="p">)</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;ExampleData/LoopExample/param.json&#39;</span><span class="p">)</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">diskint2</span><span class="o">.</span><span class="n">numerical</span><span class="p">(</span><span class="n">param</span><span class="p">)</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">Packet</span><span class="o">.</span><span class="n">plotI</span><span class="p">()</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">model</span><span class="p">[</span><span class="s1">&#39;vel&#39;</span><span class="p">],</span> <span class="n">model</span><span class="p">[</span><span class="s1">&#39;flux&#39;</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+1.958617462625618
+Using 9000.0 grid point on the surface
+Evaluating with weak approximation...
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[&lt;matplotlib.lines.Line2D at 0x7fdef941b1f0&gt;]
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/nblink_03-ChiSquareCalcLoop_21_2.png" src="../_images/nblink_03-ChiSquareCalcLoop_21_2.png" />
+</div>
+</div>
+<p>So now, we have everything needed to run the loop, and it could be done with simply running</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>rav.loop_speed.loop_speed(param, Packet, path=&#39;ExampleData/LoopOutputs/&#39;)
+</pre></div>
+</div>
+<p>However, this can be a bit slow in a Jupyter notebook. Therefore it might be advantageous to run the loop on e.g. a cluster (TRY THE SPEED ON COLLAB?).</p>
+<p>To do this, we can use the script wrapper</p>
+<p>In a folder (outside of this repository, because the size of the created data is too large for github), I have: - DataPacket.h5 - Params.json</p>
+<p>From this folder, I open python (and a screen instance in the terminal beforehand) and run</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>rav.loop_speed.loop_speed_wrapper(&#39;param.json&#39;, &#39;ExamplePacket.h5&#39;)
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="02-FitIntensity.html" class="btn btn-neutral float-left" title="Fit of the intensity profiles for single stars" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="04-CalculateProbabilities.html" class="btn btn-neutral float-right" title="04 - Calculate probabilites from the chi2 files" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, V. Petit.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

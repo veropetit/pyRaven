@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tutorial on how to use the Params Dictionary objects &mdash; Raven  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/nbsphinx-code-cells.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/template.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="User’s manual for the BayesObjects.py classes" href="BayesObjects_user.html" />
+    <link rel="prev" title="04 - Calculate probabilites from the chi2 files" href="04-CalculateProbabilities.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Raven
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../Installation.html">Installation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">How to run pyRaven tutorial</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="01-DataSetup.html">01 - Data Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02-FitIntensity.html">Fit of the intensity profiles for single stars</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03-ChiSquareCalcLoop.html">03- Calculating the chi2 with the loop code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04-CalculateProbabilities.html">04 - Calculate probabilites from the chi2 files</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Standalone tutorials</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Tutorial on how to use the Params Dictionary objects</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#1.-Generating-your-own-param-dictionary">1. Generating your own param dictionary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#2.-Generating-a-param-dictionary-and-reading/writing-.json's">2. Generating a param dictionary and reading/writing .json’s</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#3.-Generate-a-param-dictionary-from-the-defaults-and-modifying-it-as-needed">3. Generate a param dictionary from the defaults and modifying it as needed</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="BayesObjects_user.html">User’s manual for the BayesObjects.py classes</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Underlying physics and statistics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="diskint2_doc.html">Documentation for diskint2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="geometry_doc.html">Geometry documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bayes_doc.html">Documentation for the bayesian calculations</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../API.html">pyRaven Package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Raven</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Tutorial on how to use the Params Dictionary objects</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/nblink/ParamsObject_tutorial.nblink.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="Tutorial-on-how-to-use-the-Params-Dictionary-objects">
+<h1>Tutorial on how to use the Params Dictionary objects<a class="headerlink" href="#Tutorial-on-how-to-use-the-Params-Dictionary-objects" title="Permalink to this heading"></a></h1>
+<p>In this tutorial the structure and usability of the param class explained in detail.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="c1">#import itertools</span>
+<span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">display</span>
+<span class="kn">import</span> <span class="nn">pyRaven</span> <span class="k">as</span> <span class="nn">rav</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">h5py</span> <span class="k">as</span> <span class="nn">h5</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+loading specpolFlow package
+</pre></div></div>
+</div>
+<p>A lot of the main codes in pyRaven rely on a dictionary to pass the necessary parameters necessary for computations. This notebook will walk through the creation and features of these dictionaries.</p>
+<p>The parameters class is a dictionary of dictionaries. The outermost layer of the dictionary contains the following keys: * genparam - general parameters used throughout pyRaven calculations * unnoparam - parameters used in unno method for disk integration * weakparam - parameters used in the weak field limit method for disk integration * gridparam - parameters used in loop over all possible Bpole, inclination, phase, and obliquity</p>
+<p>Not all of these dictionaries are needed for every calculation, for example when using the <code class="docutils literal notranslate"><span class="pre">weakparam</span></code> method the <code class="docutils literal notranslate"><span class="pre">unnoparam</span></code> dictionary is not used. Regardless of if you include the <code class="docutils literal notranslate"><span class="pre">unnoparam</span></code> dictionary or not, the code will not use it.</p>
+<p>Within each subdictionary there are a set of keys and corresponding values that are actually used by the code. Again, as will the subdictionaries themeselves, if a certain code or method doesn’t use any specific parameter then that parameter can either be included or excluded. For example, inside the <code class="docutils literal notranslate"><span class="pre">genparam</span></code> dictionary we have the keys <code class="docutils literal notranslate"><span class="pre">Bpole</span></code>, <code class="docutils literal notranslate"><span class="pre">incl</span></code>, <code class="docutils literal notranslate"><span class="pre">beta</span></code>, and <code class="docutils literal notranslate"><span class="pre">phase</span></code>. These parameters are only used in the loop code and as such have no effect on the other calculations regardless
+of if they are included or not. The <code class="docutils literal notranslate"><span class="pre">params.md</span></code> file has a break down of the minimum dictionaries and keys needed for a specific calculation.</p>
+<p>There are three main methods that can be used to create dictionaries for a star: 1. You can generate your own param dictionary using our structure 2. You can generate your own param dictionary and save it as a <code class="docutils literal notranslate"><span class="pre">.json</span></code>, coping it and making changes as needed 3. You can generate a param dictionary from the defaults and change them as needed.</p>
+<p>The examples used in this notebook are for the weak approximation method or <code class="docutils literal notranslate"><span class="pre">diskint2</span> <span class="pre">weak</span></code> as it is refered to in <code class="docutils literal notranslate"><span class="pre">params.md</span></code>.</p>
+<section id="1.-Generating-your-own-param-dictionary">
+<h2>1. Generating your own param dictionary<a class="headerlink" href="#1.-Generating-your-own-param-dictionary" title="Permalink to this heading"></a></h2>
+<p>The next cell gives an example of how to create a param dictionary using our structure If a sample contains multiple stars, a loop over all stars can be created to make a new param dictionary for each without saving it as a <code class="docutils literal notranslate"><span class="pre">.json</span></code>.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#subdictionaries</span>
+<span class="n">genparam</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;lambda0&#39;</span><span class="p">:</span><span class="mi">5000</span><span class="p">,</span>    <span class="c1"># the central wavelength of the transition</span>
+    <span class="s1">&#39;vsini&#39;</span><span class="p">:</span><span class="mf">50.0</span><span class="p">,</span>         <span class="c1"># the projected rotational velocity</span>
+    <span class="s1">&#39;vdop&#39;</span><span class="p">:</span><span class="mf">10.0</span><span class="p">,</span>          <span class="c1"># the thermal broadening</span>
+    <span class="s1">&#39;av&#39;</span><span class="p">:</span><span class="mf">0.05</span><span class="p">,</span>             <span class="c1"># the damping coefficient of the Voigt profile</span>
+    <span class="s1">&#39;bnu&#39;</span><span class="p">:</span><span class="mf">1.5</span><span class="p">,</span>             <span class="c1"># the slope of the source function with respect to vertical optical depth</span>
+    <span class="s1">&#39;logkappa&#39;</span><span class="p">:</span><span class="mf">0.98</span><span class="p">,</span>          <span class="c1"># the line strength parameter</span>
+    <span class="s1">&#39;ndop&#39;</span><span class="p">:</span><span class="nb">int</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span>       <span class="c1"># the number of sample point per doppler width for the wavelength array</span>
+    <span class="s1">&#39;Bpole&#39;</span><span class="p">:</span><span class="mi">1000</span><span class="p">,</span> <span class="c1">#not necessary for loop</span>
+    <span class="s1">&#39;incl&#39;</span><span class="p">:</span><span class="mf">30.</span><span class="p">,</span> <span class="c1">#not necessary for loop</span>
+    <span class="s1">&#39;beta&#39;</span><span class="p">:</span><span class="mi">30</span><span class="p">,</span> <span class="c1">#not necessary for loop</span>
+    <span class="s1">&#39;phase&#39;</span><span class="p">:</span><span class="mf">90.</span> <span class="c1">#not necessary for loop</span>
+  <span class="p">}</span>
+
+<span class="n">weakparam</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;geff&#39;</span><span class="p">:</span><span class="mf">1.0</span>
+    <span class="p">}</span>
+
+<span class="c1"># The actual dictionary</span>
+<span class="n">param</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;general&#39;</span> <span class="p">:</span> <span class="n">genparam</span><span class="p">,</span>
+       <span class="s1">&#39;weak&#39;</span> <span class="p">:</span> <span class="n">weakparam</span><span class="p">,</span>
+       <span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<p>This dictionaries can then be passed directly into the pyRaven code, as is done in the next cell.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rav</span><span class="o">.</span><span class="n">diskint2</span><span class="o">.</span><span class="n">analytical</span><span class="p">(</span><span class="n">param</span><span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+array([(-2.66851226e+10, -160., -16. , 0.99979752, 0.),
+       (-2.65183406e+10, -159., -15.9, 0.99979036, 0.),
+       (-2.63515585e+10, -158., -15.8, 0.99978308, 0.),
+       (-2.61847765e+10, -157., -15.7, 0.99977568, 0.),
+       (-2.60179944e+10, -156., -15.6, 0.99976816, 0.),
+       (-2.58512124e+10, -155., -15.5, 0.99976053, 0.),
+       (-2.56844303e+10, -154., -15.4, 0.99975277, 0.),
+       (-2.55176483e+10, -153., -15.3, 0.99974489, 0.),
+       (-2.53508662e+10, -152., -15.2, 0.99973689, 0.),
+       (-2.51840842e+10, -151., -15.1, 0.99972876, 0.),
+       (-2.50173021e+10, -150., -15. , 0.99972051, 0.),
+       (-2.48505201e+10, -149., -14.9, 0.99971214, 0.),
+       (-2.46837380e+10, -148., -14.8, 0.99970364, 0.),
+       (-2.45169560e+10, -147., -14.7, 0.99969501, 0.),
+       (-2.43501739e+10, -146., -14.6, 0.99968624, 0.),
+       (-2.41833919e+10, -145., -14.5, 0.99967735, 0.),
+       (-2.40166099e+10, -144., -14.4, 0.99966832, 0.),
+       (-2.38498278e+10, -143., -14.3, 0.99965916, 0.),
+       (-2.36830458e+10, -142., -14.2, 0.99964986, 0.),
+       (-2.35162637e+10, -141., -14.1, 0.99964042, 0.),
+       (-2.33494817e+10, -140., -14. , 0.99963083, 0.),
+       (-2.31826996e+10, -139., -13.9, 0.9996211 , 0.),
+       (-2.30159176e+10, -138., -13.8, 0.99961122, 0.),
+       (-2.28491355e+10, -137., -13.7, 0.99960119, 0.),
+       (-2.26823535e+10, -136., -13.6, 0.999591  , 0.),
+       (-2.25155714e+10, -135., -13.5, 0.99958066, 0.),
+       (-2.23487894e+10, -134., -13.4, 0.99957015, 0.),
+       (-2.21820073e+10, -133., -13.3, 0.99955948, 0.),
+       (-2.20152253e+10, -132., -13.2, 0.99954864, 0.),
+       (-2.18484432e+10, -131., -13.1, 0.99953762, 0.),
+       (-2.16816612e+10, -130., -13. , 0.99952643, 0.),
+       (-2.15148791e+10, -129., -12.9, 0.99951505, 0.),
+       (-2.13480971e+10, -128., -12.8, 0.99950348, 0.),
+       (-2.11813150e+10, -127., -12.7, 0.99949171, 0.),
+       (-2.10145330e+10, -126., -12.6, 0.99947975, 0.),
+       (-2.08477509e+10, -125., -12.5, 0.99946757, 0.),
+       (-2.06809689e+10, -124., -12.4, 0.99945519, 0.),
+       (-2.05141869e+10, -123., -12.3, 0.99944258, 0.),
+       (-2.03474048e+10, -122., -12.2, 0.99942974, 0.),
+       (-2.01806228e+10, -121., -12.1, 0.99941667, 0.),
+       (-2.00138407e+10, -120., -12. , 0.99940335, 0.),
+       (-1.98470587e+10, -119., -11.9, 0.99938978, 0.),
+       (-1.96802766e+10, -118., -11.8, 0.99937595, 0.),
+       (-1.95134946e+10, -117., -11.7, 0.99936185, 0.),
+       (-1.93467125e+10, -116., -11.6, 0.99934747, 0.),
+       (-1.91799305e+10, -115., -11.5, 0.99933281, 0.),
+       (-1.90131484e+10, -114., -11.4, 0.99931785, 0.),
+       (-1.88463664e+10, -113., -11.3, 0.9993026 , 0.),
+       (-1.86795843e+10, -112., -11.2, 0.99928704, 0.),
+       (-1.85128023e+10, -111., -11.1, 0.99927122, 0.),
+       (-1.83460202e+10, -110., -11. , 0.99925531, 0.),
+       (-1.81792382e+10, -109., -10.9, 0.99923885, 0.),
+       (-1.80124561e+10, -108., -10.8, 0.99922179, 0.),
+       (-1.78456741e+10, -107., -10.7, 0.99920412, 0.),
+       (-1.76788920e+10, -106., -10.6, 0.99918579, 0.),
+       (-1.75121100e+10, -105., -10.5, 0.99916677, 0.),
+       (-1.73453280e+10, -104., -10.4, 0.99914703, 0.),
+       (-1.71785459e+10, -103., -10.3, 0.99912652, 0.),
+       (-1.70117639e+10, -102., -10.2, 0.9991052 , 0.),
+       (-1.68449818e+10, -101., -10.1, 0.99908302, 0.),
+       (-1.66781998e+10, -100., -10. , 0.99905994, 0.),
+       (-1.65114177e+10,  -99.,  -9.9, 0.99903589, 0.),
+       (-1.63446357e+10,  -98.,  -9.8, 0.99901082, 0.),
+       (-1.61778536e+10,  -97.,  -9.7, 0.99898467, 0.),
+       (-1.60110716e+10,  -96.,  -9.6, 0.99895737, 0.),
+       (-1.58442895e+10,  -95.,  -9.5, 0.99892884, 0.),
+       (-1.56775075e+10,  -94.,  -9.4, 0.99889899, 0.),
+       (-1.55107254e+10,  -93.,  -9.3, 0.99886774, 0.),
+       (-1.53439434e+10,  -92.,  -9.2, 0.99883499, 0.),
+       (-1.51771613e+10,  -91.,  -9.1, 0.99880063, 0.),
+       (-1.50103793e+10,  -90.,  -9. , 0.99876453, 0.),
+       (-1.48435972e+10,  -89.,  -8.9, 0.99872657, 0.),
+       (-1.46768152e+10,  -88.,  -8.8, 0.99868659, 0.),
+       (-1.45100331e+10,  -87.,  -8.7, 0.99864443, 0.),
+       (-1.43432511e+10,  -86.,  -8.6, 0.99859989, 0.),
+       (-1.41764690e+10,  -85.,  -8.5, 0.99855278, 0.),
+       (-1.40096870e+10,  -84.,  -8.4, 0.99850283, 0.),
+       (-1.38429050e+10,  -83.,  -8.3, 0.99844977, 0.),
+       (-1.36761229e+10,  -82.,  -8.2, 0.99839325, 0.),
+       (-1.35093409e+10,  -81.,  -8.1, 0.99833286, 0.),
+       (-1.33425588e+10,  -80.,  -8. , 0.99826809, 0.),
+       (-1.31757768e+10,  -79.,  -7.9, 0.99819831, 0.),
+       (-1.30089947e+10,  -78.,  -7.8, 0.99812264, 0.),
+       (-1.28422127e+10,  -77.,  -7.7, 0.99803997, 0.),
+       (-1.26754306e+10,  -76.,  -7.6, 0.99794874, 0.),
+       (-1.25086486e+10,  -75.,  -7.5, 0.99784681, 0.),
+       (-1.23418665e+10,  -74.,  -7.4, 0.99773119, 0.),
+       (-1.21750845e+10,  -73.,  -7.3, 0.99759778, 0.),
+       (-1.20083024e+10,  -72.,  -7.2, 0.99744095, 0.),
+       (-1.18415204e+10,  -71.,  -7.1, 0.99725315, 0.),
+       (-1.16747383e+10,  -70.,  -7. , 0.99702449, 0.),
+       (-1.15079563e+10,  -69.,  -6.9, 0.99674253, 0.),
+       (-1.13411742e+10,  -68.,  -6.8, 0.99639218, 0.),
+       (-1.11743922e+10,  -67.,  -6.7, 0.99595608, 0.),
+       (-1.10076101e+10,  -66.,  -6.6, 0.99541536, 0.),
+       (-1.08408281e+10,  -65.,  -6.5, 0.99475074, 0.),
+       (-1.06740460e+10,  -64.,  -6.4, 0.99394384, 0.),
+       (-1.05072640e+10,  -63.,  -6.3, 0.99297841, 0.),
+       (-1.03404820e+10,  -62.,  -6.2, 0.99184111, 0.),
+       (-1.01736999e+10,  -61.,  -6.1, 0.99052199, 0.),
+       (-1.00069179e+10,  -60.,  -6. , 0.98901449, 0.),
+       (-9.84013581e+09,  -59.,  -5.9, 0.98731506, 0.),
+       (-9.67335376e+09,  -58.,  -5.8, 0.98542277, 0.),
+       (-9.50657171e+09,  -57.,  -5.7, 0.98333879, 0.),
+       (-9.33978967e+09,  -56.,  -5.6, 0.9810659 , 0.),
+       (-9.17300762e+09,  -55.,  -5.5, 0.97860815, 0.),
+       (-9.00622557e+09,  -54.,  -5.4, 0.97597051, 0.),
+       (-8.83944352e+09,  -53.,  -5.3, 0.97315869, 0.),
+       (-8.67266148e+09,  -52.,  -5.2, 0.97017894, 0.),
+       (-8.50587943e+09,  -51.,  -5.1, 0.96703803, 0.),
+       (-8.33909738e+09,  -50.,  -5. , 0.96374316, 0.),
+       (-8.17231533e+09,  -49.,  -4.9, 0.96030195, 0.),
+       (-8.00553328e+09,  -48.,  -4.8, 0.95672252, 0.),
+       (-7.83875124e+09,  -47.,  -4.7, 0.95301354, 0.),
+       (-7.67196919e+09,  -46.,  -4.6, 0.94918431, 0.),
+       (-7.50518714e+09,  -45.,  -4.5, 0.94524493, 0.),
+       (-7.33840509e+09,  -44.,  -4.4, 0.94120642, 0.),
+       (-7.17162305e+09,  -43.,  -4.3, 0.93708091, 0.),
+       (-7.00484100e+09,  -42.,  -4.2, 0.9328819 , 0.),
+       (-6.83805895e+09,  -41.,  -4.1, 0.92862436, 0.),
+       (-6.67127690e+09,  -40.,  -4. , 0.924325  , 0.),
+       (-6.50449486e+09,  -39.,  -3.9, 0.92000225, 0.),
+       (-6.33771281e+09,  -38.,  -3.8, 0.91567626, 0.),
+       (-6.17093076e+09,  -37.,  -3.7, 0.91136856, 0.),
+       (-6.00414871e+09,  -36.,  -3.6, 0.9071015 , 0.),
+       (-5.83736667e+09,  -35.,  -3.5, 0.90289734, 0.),
+       (-5.67058462e+09,  -34.,  -3.4, 0.8987771 , 0.),
+       (-5.50380257e+09,  -33.,  -3.3, 0.89475944, 0.),
+       (-5.33702052e+09,  -32.,  -3.2, 0.89085964, 0.),
+       (-5.17023848e+09,  -31.,  -3.1, 0.88708909, 0.),
+       (-5.00345643e+09,  -30.,  -3. , 0.88345523, 0.),
+       (-4.83667438e+09,  -29.,  -2.9, 0.87996199, 0.),
+       (-4.66989233e+09,  -28.,  -2.8, 0.87661055, 0.),
+       (-4.50311029e+09,  -27.,  -2.7, 0.87340007, 0.),
+       (-4.33632824e+09,  -26.,  -2.6, 0.8703285 , 0.),
+       (-4.16954619e+09,  -25.,  -2.5, 0.86739312, 0.),
+       (-4.00276414e+09,  -24.,  -2.4, 0.86459099, 0.),
+       (-3.83598209e+09,  -23.,  -2.3, 0.86191918, 0.),
+       (-3.66920005e+09,  -22.,  -2.2, 0.85937495, 0.),
+       (-3.50241800e+09,  -21.,  -2.1, 0.85695581, 0.),
+       (-3.33563595e+09,  -20.,  -2. , 0.85465953, 0.),
+       (-3.16885390e+09,  -19.,  -1.9, 0.85248414, 0.),
+       (-3.00207186e+09,  -18.,  -1.8, 0.85042793, 0.),
+       (-2.83528981e+09,  -17.,  -1.7, 0.84848937, 0.),
+       (-2.66850776e+09,  -16.,  -1.6, 0.84666714, 0.),
+       (-2.50172571e+09,  -15.,  -1.5, 0.84496006, 0.),
+       (-2.33494367e+09,  -14.,  -1.4, 0.84336712, 0.),
+       (-2.16816162e+09,  -13.,  -1.3, 0.8418874 , 0.),
+       (-2.00137957e+09,  -12.,  -1.2, 0.8405201 , 0.),
+       (-1.83459752e+09,  -11.,  -1.1, 0.8392645 , 0.),
+       (-1.66781548e+09,  -10.,  -1. , 0.83811999, 0.),
+       (-1.50103343e+09,   -9.,  -0.9, 0.83708602, 0.),
+       (-1.33425138e+09,   -8.,  -0.8, 0.83616209, 0.),
+       (-1.16746933e+09,   -7.,  -0.7, 0.83534779, 0.),
+       (-1.00068729e+09,   -6.,  -0.6, 0.83464277, 0.),
+       (-8.33905238e+08,   -5.,  -0.5, 0.83404671, 0.),
+       (-6.67123190e+08,   -4.,  -0.4, 0.83355937, 0.),
+       (-5.00341143e+08,   -3.,  -0.3, 0.83318053, 0.),
+       (-3.33559095e+08,   -2.,  -0.2, 0.83291004, 0.),
+       (-1.66777048e+08,   -1.,  -0.1, 0.8327478 , 0.),
+       ( 5.00000000e+03,    0.,   0. , 0.83269372, 0.),
+       ( 1.66787048e+08,    1.,   0.1, 0.8327478 , 0.),
+       ( 3.33569095e+08,    2.,   0.2, 0.83291004, 0.),
+       ( 5.00351143e+08,    3.,   0.3, 0.83318053, 0.),
+       ( 6.67133190e+08,    4.,   0.4, 0.83355937, 0.),
+       ( 8.33915238e+08,    5.,   0.5, 0.83404671, 0.),
+       ( 1.00069729e+09,    6.,   0.6, 0.83464277, 0.),
+       ( 1.16747933e+09,    7.,   0.7, 0.83534779, 0.),
+       ( 1.33426138e+09,    8.,   0.8, 0.83616209, 0.),
+       ( 1.50104343e+09,    9.,   0.9, 0.83708602, 0.),
+       ( 1.66782548e+09,   10.,   1. , 0.83811999, 0.),
+       ( 1.83460752e+09,   11.,   1.1, 0.8392645 , 0.),
+       ( 2.00138957e+09,   12.,   1.2, 0.8405201 , 0.),
+       ( 2.16817162e+09,   13.,   1.3, 0.8418874 , 0.),
+       ( 2.33495367e+09,   14.,   1.4, 0.84336712, 0.),
+       ( 2.50173571e+09,   15.,   1.5, 0.84496006, 0.),
+       ( 2.66851776e+09,   16.,   1.6, 0.84666714, 0.),
+       ( 2.83529981e+09,   17.,   1.7, 0.84848937, 0.),
+       ( 3.00208186e+09,   18.,   1.8, 0.85042793, 0.),
+       ( 3.16886390e+09,   19.,   1.9, 0.85248414, 0.),
+       ( 3.33564595e+09,   20.,   2. , 0.85465953, 0.),
+       ( 3.50242800e+09,   21.,   2.1, 0.85695581, 0.),
+       ( 3.66921005e+09,   22.,   2.2, 0.85937495, 0.),
+       ( 3.83599209e+09,   23.,   2.3, 0.86191918, 0.),
+       ( 4.00277414e+09,   24.,   2.4, 0.86459099, 0.),
+       ( 4.16955619e+09,   25.,   2.5, 0.86739312, 0.),
+       ( 4.33633824e+09,   26.,   2.6, 0.8703285 , 0.),
+       ( 4.50312029e+09,   27.,   2.7, 0.87340007, 0.),
+       ( 4.66990233e+09,   28.,   2.8, 0.87661055, 0.),
+       ( 4.83668438e+09,   29.,   2.9, 0.87996199, 0.),
+       ( 5.00346643e+09,   30.,   3. , 0.88345523, 0.),
+       ( 5.17024848e+09,   31.,   3.1, 0.88708909, 0.),
+       ( 5.33703052e+09,   32.,   3.2, 0.89085964, 0.),
+       ( 5.50381257e+09,   33.,   3.3, 0.89475944, 0.),
+       ( 5.67059462e+09,   34.,   3.4, 0.8987771 , 0.),
+       ( 5.83737667e+09,   35.,   3.5, 0.90289734, 0.),
+       ( 6.00415871e+09,   36.,   3.6, 0.9071015 , 0.),
+       ( 6.17094076e+09,   37.,   3.7, 0.91136856, 0.),
+       ( 6.33772281e+09,   38.,   3.8, 0.91567626, 0.),
+       ( 6.50450486e+09,   39.,   3.9, 0.92000225, 0.),
+       ( 6.67128690e+09,   40.,   4. , 0.924325  , 0.),
+       ( 6.83806895e+09,   41.,   4.1, 0.92862436, 0.),
+       ( 7.00485100e+09,   42.,   4.2, 0.9328819 , 0.),
+       ( 7.17163305e+09,   43.,   4.3, 0.93708091, 0.),
+       ( 7.33841509e+09,   44.,   4.4, 0.94120642, 0.),
+       ( 7.50519714e+09,   45.,   4.5, 0.94524493, 0.),
+       ( 7.67197919e+09,   46.,   4.6, 0.94918431, 0.),
+       ( 7.83876124e+09,   47.,   4.7, 0.95301354, 0.),
+       ( 8.00554328e+09,   48.,   4.8, 0.95672252, 0.),
+       ( 8.17232533e+09,   49.,   4.9, 0.96030195, 0.),
+       ( 8.33910738e+09,   50.,   5. , 0.96374316, 0.),
+       ( 8.50588943e+09,   51.,   5.1, 0.96703803, 0.),
+       ( 8.67267148e+09,   52.,   5.2, 0.97017894, 0.),
+       ( 8.83945352e+09,   53.,   5.3, 0.97315869, 0.),
+       ( 9.00623557e+09,   54.,   5.4, 0.97597051, 0.),
+       ( 9.17301762e+09,   55.,   5.5, 0.97860815, 0.),
+       ( 9.33979967e+09,   56.,   5.6, 0.9810659 , 0.),
+       ( 9.50658171e+09,   57.,   5.7, 0.98333879, 0.),
+       ( 9.67336376e+09,   58.,   5.8, 0.98542277, 0.),
+       ( 9.84014581e+09,   59.,   5.9, 0.98731506, 0.),
+       ( 1.00069279e+10,   60.,   6. , 0.98901449, 0.),
+       ( 1.01737099e+10,   61.,   6.1, 0.99052199, 0.),
+       ( 1.03404920e+10,   62.,   6.2, 0.99184111, 0.),
+       ( 1.05072740e+10,   63.,   6.3, 0.99297841, 0.),
+       ( 1.06740560e+10,   64.,   6.4, 0.99394384, 0.),
+       ( 1.08408381e+10,   65.,   6.5, 0.99475074, 0.),
+       ( 1.10076201e+10,   66.,   6.6, 0.99541536, 0.),
+       ( 1.11744022e+10,   67.,   6.7, 0.99595608, 0.),
+       ( 1.13411842e+10,   68.,   6.8, 0.99639218, 0.),
+       ( 1.15079663e+10,   69.,   6.9, 0.99674253, 0.),
+       ( 1.16747483e+10,   70.,   7. , 0.99702449, 0.),
+       ( 1.18415304e+10,   71.,   7.1, 0.99725315, 0.),
+       ( 1.20083124e+10,   72.,   7.2, 0.99744095, 0.),
+       ( 1.21750945e+10,   73.,   7.3, 0.99759778, 0.),
+       ( 1.23418765e+10,   74.,   7.4, 0.99773119, 0.),
+       ( 1.25086586e+10,   75.,   7.5, 0.99784681, 0.),
+       ( 1.26754406e+10,   76.,   7.6, 0.99794874, 0.),
+       ( 1.28422227e+10,   77.,   7.7, 0.99803997, 0.),
+       ( 1.30090047e+10,   78.,   7.8, 0.99812264, 0.),
+       ( 1.31757868e+10,   79.,   7.9, 0.99819831, 0.),
+       ( 1.33425688e+10,   80.,   8. , 0.99826809, 0.),
+       ( 1.35093509e+10,   81.,   8.1, 0.99833286, 0.),
+       ( 1.36761329e+10,   82.,   8.2, 0.99839325, 0.),
+       ( 1.38429150e+10,   83.,   8.3, 0.99844977, 0.),
+       ( 1.40096970e+10,   84.,   8.4, 0.99850283, 0.),
+       ( 1.41764790e+10,   85.,   8.5, 0.99855278, 0.),
+       ( 1.43432611e+10,   86.,   8.6, 0.99859989, 0.),
+       ( 1.45100431e+10,   87.,   8.7, 0.99864443, 0.),
+       ( 1.46768252e+10,   88.,   8.8, 0.99868659, 0.),
+       ( 1.48436072e+10,   89.,   8.9, 0.99872657, 0.),
+       ( 1.50103893e+10,   90.,   9. , 0.99876453, 0.),
+       ( 1.51771713e+10,   91.,   9.1, 0.99880063, 0.),
+       ( 1.53439534e+10,   92.,   9.2, 0.99883499, 0.),
+       ( 1.55107354e+10,   93.,   9.3, 0.99886774, 0.),
+       ( 1.56775175e+10,   94.,   9.4, 0.99889899, 0.),
+       ( 1.58442995e+10,   95.,   9.5, 0.99892884, 0.),
+       ( 1.60110816e+10,   96.,   9.6, 0.99895737, 0.),
+       ( 1.61778636e+10,   97.,   9.7, 0.99898467, 0.),
+       ( 1.63446457e+10,   98.,   9.8, 0.99901082, 0.),
+       ( 1.65114277e+10,   99.,   9.9, 0.99903589, 0.),
+       ( 1.66782098e+10,  100.,  10. , 0.99905994, 0.),
+       ( 1.68449918e+10,  101.,  10.1, 0.99908302, 0.),
+       ( 1.70117739e+10,  102.,  10.2, 0.9991052 , 0.),
+       ( 1.71785559e+10,  103.,  10.3, 0.99912652, 0.),
+       ( 1.73453380e+10,  104.,  10.4, 0.99914703, 0.),
+       ( 1.75121200e+10,  105.,  10.5, 0.99916677, 0.),
+       ( 1.76789020e+10,  106.,  10.6, 0.99918579, 0.),
+       ( 1.78456841e+10,  107.,  10.7, 0.99920412, 0.),
+       ( 1.80124661e+10,  108.,  10.8, 0.99922179, 0.),
+       ( 1.81792482e+10,  109.,  10.9, 0.99923885, 0.),
+       ( 1.83460302e+10,  110.,  11. , 0.99925531, 0.),
+       ( 1.85128123e+10,  111.,  11.1, 0.99927122, 0.),
+       ( 1.86795943e+10,  112.,  11.2, 0.99928704, 0.),
+       ( 1.88463764e+10,  113.,  11.3, 0.9993026 , 0.),
+       ( 1.90131584e+10,  114.,  11.4, 0.99931785, 0.),
+       ( 1.91799405e+10,  115.,  11.5, 0.99933281, 0.),
+       ( 1.93467225e+10,  116.,  11.6, 0.99934747, 0.),
+       ( 1.95135046e+10,  117.,  11.7, 0.99936185, 0.),
+       ( 1.96802866e+10,  118.,  11.8, 0.99937595, 0.),
+       ( 1.98470687e+10,  119.,  11.9, 0.99938978, 0.),
+       ( 2.00138507e+10,  120.,  12. , 0.99940335, 0.),
+       ( 2.01806328e+10,  121.,  12.1, 0.99941667, 0.),
+       ( 2.03474148e+10,  122.,  12.2, 0.99942974, 0.),
+       ( 2.05141969e+10,  123.,  12.3, 0.99944258, 0.),
+       ( 2.06809789e+10,  124.,  12.4, 0.99945519, 0.),
+       ( 2.08477609e+10,  125.,  12.5, 0.99946757, 0.),
+       ( 2.10145430e+10,  126.,  12.6, 0.99947975, 0.),
+       ( 2.11813250e+10,  127.,  12.7, 0.99949171, 0.),
+       ( 2.13481071e+10,  128.,  12.8, 0.99950348, 0.),
+       ( 2.15148891e+10,  129.,  12.9, 0.99951505, 0.),
+       ( 2.16816712e+10,  130.,  13. , 0.99952643, 0.),
+       ( 2.18484532e+10,  131.,  13.1, 0.99953762, 0.),
+       ( 2.20152353e+10,  132.,  13.2, 0.99954864, 0.),
+       ( 2.21820173e+10,  133.,  13.3, 0.99955948, 0.),
+       ( 2.23487994e+10,  134.,  13.4, 0.99957015, 0.),
+       ( 2.25155814e+10,  135.,  13.5, 0.99958066, 0.),
+       ( 2.26823635e+10,  136.,  13.6, 0.999591  , 0.),
+       ( 2.28491455e+10,  137.,  13.7, 0.99960119, 0.),
+       ( 2.30159276e+10,  138.,  13.8, 0.99961122, 0.),
+       ( 2.31827096e+10,  139.,  13.9, 0.9996211 , 0.),
+       ( 2.33494917e+10,  140.,  14. , 0.99963083, 0.),
+       ( 2.35162737e+10,  141.,  14.1, 0.99964042, 0.),
+       ( 2.36830558e+10,  142.,  14.2, 0.99964986, 0.),
+       ( 2.38498378e+10,  143.,  14.3, 0.99965916, 0.),
+       ( 2.40166199e+10,  144.,  14.4, 0.99966832, 0.),
+       ( 2.41834019e+10,  145.,  14.5, 0.99967735, 0.),
+       ( 2.43501839e+10,  146.,  14.6, 0.99968624, 0.),
+       ( 2.45169660e+10,  147.,  14.7, 0.99969501, 0.),
+       ( 2.46837480e+10,  148.,  14.8, 0.99970364, 0.),
+       ( 2.48505301e+10,  149.,  14.9, 0.99971214, 0.),
+       ( 2.50173121e+10,  150.,  15. , 0.99972051, 0.),
+       ( 2.51840942e+10,  151.,  15.1, 0.99972876, 0.),
+       ( 2.53508762e+10,  152.,  15.2, 0.99973689, 0.),
+       ( 2.55176583e+10,  153.,  15.3, 0.99974489, 0.),
+       ( 2.56844403e+10,  154.,  15.4, 0.99975277, 0.),
+       ( 2.58512224e+10,  155.,  15.5, 0.99976053, 0.),
+       ( 2.60180044e+10,  156.,  15.6, 0.99976816, 0.),
+       ( 2.61847865e+10,  157.,  15.7, 0.99977568, 0.),
+       ( 2.63515685e+10,  158.,  15.8, 0.99978308, 0.),
+       ( 2.65183506e+10,  159.,  15.9, 0.99979036, 0.),
+       ( 2.66851326e+10,  160.,  16. , 0.99979752, 0.)],
+      dtype=[(&#39;wave&#39;, &#39;&lt;f8&#39;), (&#39;vel&#39;, &#39;&lt;f8&#39;), (&#39;uo&#39;, &#39;&lt;f8&#39;), (&#39;flux&#39;, &#39;&lt;f8&#39;), (&#39;V&#39;, &#39;&lt;f8&#39;)])
+</pre></div></div>
+</div>
+<p>We can also change individual subdictionaries by passing the subdictionary key and the key of the item we wish to change. For example, if we wanted vsini=40 km/s we could do the following:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">param</span><span class="p">[</span><span class="s1">&#39;general&#39;</span><span class="p">][</span><span class="s1">&#39;vsini&#39;</span><span class="p">]</span><span class="o">=</span><span class="mi">40</span>
+
+<span class="n">param</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{&#39;general&#39;: {&#39;lambda0&#39;: 5000,
+  &#39;vsini&#39;: 40,
+  &#39;vdop&#39;: 10.0,
+  &#39;av&#39;: 0.05,
+  &#39;bnu&#39;: 1.5,
+  &#39;logkappa&#39;: 0.98,
+  &#39;ndop&#39;: 10,
+  &#39;Bpole&#39;: 1000,
+  &#39;incl&#39;: 30.0,
+  &#39;beta&#39;: 30,
+  &#39;phase&#39;: 90.0},
+ &#39;weak&#39;: {&#39;geff&#39;: 1.0}}
+</pre></div></div>
+</div>
+</section>
+<section id="2.-Generating-a-param-dictionary-and-reading/writing-.json's">
+<h2>2. Generating a param dictionary and reading/writing .json’s<a class="headerlink" href="#2.-Generating-a-param-dictionary-and-reading/writing-.json's" title="Permalink to this heading"></a></h2>
+<p>The second method that can be used is to create a single dictionary that can the be saved to a <code class="docutils literal notranslate"><span class="pre">.json</span></code> file and then copying and modifying the file for each star in a sample. The two cells below give an example of writing and reading dictionaries.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">genparam</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;lambda0&#39;</span><span class="p">:</span><span class="mi">5000</span><span class="p">,</span>    <span class="c1"># the central wavelength of the transition</span>
+    <span class="s1">&#39;vsini&#39;</span><span class="p">:</span><span class="mf">50.0</span><span class="p">,</span>         <span class="c1"># the projected rotational velocity</span>
+    <span class="s1">&#39;vdop&#39;</span><span class="p">:</span><span class="mf">10.0</span><span class="p">,</span>          <span class="c1"># the thermal broadening</span>
+    <span class="s1">&#39;av&#39;</span><span class="p">:</span><span class="mf">0.05</span><span class="p">,</span>             <span class="c1"># the damping coefficient of the Voigt profile</span>
+    <span class="s1">&#39;bnu&#39;</span><span class="p">:</span><span class="mf">1.5</span><span class="p">,</span>             <span class="c1"># the slope of the source function with respect to vertical optical depth</span>
+    <span class="s1">&#39;logkappa&#39;</span><span class="p">:</span><span class="mf">0.98</span><span class="p">,</span>          <span class="c1"># the line strength parameter</span>
+    <span class="s1">&#39;ndop&#39;</span><span class="p">:</span><span class="nb">int</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span>       <span class="c1"># the number of sample point per doppler width for the wavelength array</span>
+    <span class="s1">&#39;Bpole&#39;</span><span class="p">:</span><span class="mi">1000</span><span class="p">,</span> <span class="c1">#not necessary for loop</span>
+    <span class="s1">&#39;incl&#39;</span><span class="p">:</span><span class="mf">30.</span><span class="p">,</span> <span class="c1">#not necessary for loop</span>
+    <span class="s1">&#39;beta&#39;</span><span class="p">:</span><span class="mi">30</span><span class="p">,</span> <span class="c1">#not necessary for loop</span>
+    <span class="s1">&#39;phase&#39;</span><span class="p">:</span><span class="mf">90.</span> <span class="c1">#not necessary for loop</span>
+  <span class="p">}</span>
+
+<span class="n">weakparam</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;geff&#39;</span><span class="p">:</span><span class="mf">1.0</span>
+    <span class="p">}</span>
+
+<span class="c1"># The actual dictionary</span>
+<span class="n">param</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;general&#39;</span> <span class="p">:</span> <span class="n">genparam</span><span class="p">,</span>
+       <span class="s1">&#39;weak&#39;</span> <span class="p">:</span> <span class="n">weakparam</span><span class="p">,</span>
+       <span class="p">}</span>
+
+<span class="n">param</span><span class="o">=</span><span class="n">rav</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">parameters</span><span class="p">(</span><span class="n">param</span><span class="p">)</span>
+
+<span class="n">param</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;ExampleData/params_tutorial.json&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">param</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">read_parameters</span><span class="p">(</span><span class="s1">&#39;ExampleData/params_tutorial.json&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">pprint</span></code> function prints the output dictionary in a nicely formated structure for visualization.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[29]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">param</span><span class="o">.</span><span class="n">pprint</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{
+  &#34;general&#34;: {
+    &#34;Bpole&#34;: 1000,
+    &#34;av&#34;: 0.05,
+    &#34;beta&#34;: 30,
+    &#34;bnu&#34;: 1.5,
+    &#34;incl&#34;: 30.0,
+    &#34;lambda0&#34;: 5000,
+    &#34;logkappa&#34;: 0.98,
+    &#34;ndop&#34;: 10,
+    &#34;phase&#34;: 90.0,
+    &#34;vdop&#34;: 10.0,
+    &#34;vsini&#34;: 50.0
+  },
+  &#34;weak&#34;: {
+    &#34;geff&#34;: 1.0
+  }
+}
+</pre></div></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">parameter</span></code> class functions very similarly to python dictionaries. As such, we can change the values of subdictionaries and the values within subdictionaries. For example we can set <code class="docutils literal notranslate"><span class="pre">vsini</span></code> to be 40 with the following code:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[30]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">param</span><span class="p">[</span><span class="s1">&#39;general&#39;</span><span class="p">][</span><span class="s1">&#39;vsini&#39;</span><span class="p">]</span><span class="o">=</span><span class="mi">40</span>
+
+<span class="n">param</span><span class="o">.</span><span class="n">pprint</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{
+  &#34;general&#34;: {
+    &#34;Bpole&#34;: 1000,
+    &#34;av&#34;: 0.05,
+    &#34;beta&#34;: 30,
+    &#34;bnu&#34;: 1.5,
+    &#34;incl&#34;: 30.0,
+    &#34;lambda0&#34;: 5000,
+    &#34;logkappa&#34;: 0.98,
+    &#34;ndop&#34;: 10,
+    &#34;phase&#34;: 90.0,
+    &#34;vdop&#34;: 10.0,
+    &#34;vsini&#34;: 40
+  },
+  &#34;weak&#34;: {
+    &#34;geff&#34;: 1.0
+  }
+}
+</pre></div></div>
+</div>
+</section>
+<section id="3.-Generate-a-param-dictionary-from-the-defaults-and-modifying-it-as-needed">
+<h2>3. Generate a param dictionary from the defaults and modifying it as needed<a class="headerlink" href="#3.-Generate-a-param-dictionary-from-the-defaults-and-modifying-it-as-needed" title="Permalink to this heading"></a></h2>
+<p>pyRaven already has two functions set up to give you a default input param dictionary. We can simply call this function and modifiy it for each star in our sample. This saves you from writing up the entire dictionary in our structure.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[35]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">param</span><span class="o">=</span><span class="n">rav</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get_def_param_weak</span><span class="p">()</span>
+<span class="n">param</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[35]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{&#39;general&#39;: {&#39;lambda0&#39;: 5000,
+  &#39;vsini&#39;: 50.0,
+  &#39;vdop&#39;: 10.0,
+  &#39;av&#39;: 0.05,
+  &#39;bnu&#39;: 1.5,
+  &#39;logkappa&#39;: 0.98,
+  &#39;ndop&#39;: 10,
+  &#39;Bpole&#39;: 1000,
+  &#39;incl&#39;: 90,
+  &#39;beta&#39;: 90,
+  &#39;phase&#39;: 0},
+ &#39;weak&#39;: {&#39;geff&#39;: 1.0}}
+</pre></div></div>
+</div>
+<p>If we want to change vsini to 40 we can do:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[36]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">param</span><span class="p">[</span><span class="s1">&#39;general&#39;</span><span class="p">][</span><span class="s1">&#39;vsini&#39;</span><span class="p">]</span><span class="o">=</span><span class="mi">40</span>
+
+<span class="n">param</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[36]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{&#39;general&#39;: {&#39;lambda0&#39;: 5000,
+  &#39;vsini&#39;: 40,
+  &#39;vdop&#39;: 10.0,
+  &#39;av&#39;: 0.05,
+  &#39;bnu&#39;: 1.5,
+  &#39;logkappa&#39;: 0.98,
+  &#39;ndop&#39;: 10,
+  &#39;Bpole&#39;: 1000,
+  &#39;incl&#39;: 90,
+  &#39;beta&#39;: 90,
+  &#39;phase&#39;: 0},
+ &#39;weak&#39;: {&#39;geff&#39;: 1.0}}
+</pre></div></div>
+</div>
+<p>We can also write and read it to and from a <code class="docutils literal notranslate"><span class="pre">.json</span></code> file.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[37]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">param</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;ExampleData/params_tutorial.json&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[38]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">param</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">read_parameters</span><span class="p">(</span><span class="s1">&#39;ExampleData/params_tutorial.json&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[39]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">param</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[39]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{&#39;general&#39;: {&#39;Bpole&#39;: 1000,
+  &#39;av&#39;: 0.05,
+  &#39;beta&#39;: 90,
+  &#39;bnu&#39;: 1.5,
+  &#39;incl&#39;: 90,
+  &#39;lambda0&#39;: 5000,
+  &#39;logkappa&#39;: 0.98,
+  &#39;ndop&#39;: 10,
+  &#39;phase&#39;: 0,
+  &#39;vdop&#39;: 10.0,
+  &#39;vsini&#39;: 40},
+ &#39;weak&#39;: {&#39;geff&#39;: 1.0}}
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="04-CalculateProbabilities.html" class="btn btn-neutral float-left" title="04 - Calculate probabilites from the chi2 files" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="BayesObjects_user.html" class="btn btn-neutral float-right" title="User’s manual for the BayesObjects.py classes" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, V. Petit.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

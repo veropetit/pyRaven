@@ -1,0 +1,49 @@
+#pyRaven
+#Settings for packaging the project with setuptools, for distribution with PyPI.
+#For just using a local version of the code this can be safely ignored
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+#Include only specific folders or modules
+[tool.setuptools.packages.find]
+# All the following settings are optional:
+#where = ["src"]  # ["."] by default
+include = ["pyRaven*"]  # ["*"] by default
+
+[project]
+name = "spyRaven"
+version = "0.0.1"
+authors = [ {name="pyRaven Team", email="vpetit@udel.edu"},
+]
+description = "Bayesian analysis for stellar spectropolarimetric data"
+readme = "README.md"
+requires-python = ">=3.9"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Astronomy",
+    "License :: OSI Approved :: GNU General Public License v2 (GPLv2)",
+    "Programming Language :: Python :: 3",
+]
+dependencies = [
+    "numpy",
+    "scipy",
+    "matplotlib",
+    "astropy",
+    "specpolFlow",
+    "h5py",
+    "numba",
+    "copy",
+    "emcee",
+    "corner",
+    "statistics",
+    "mpl_toolkits",
+    "sys",
+    "json",
+]
+
+[project.urls]
+Homepage = "https://github.com/veropetit/pyRaven"
+Documentation = "https://veropetit.github.io/pyRaven"

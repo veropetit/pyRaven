@@ -8,9 +8,10 @@ logo: logo.png
 # Force re-execution of notebooks on each build.
 # See https://jupyterbook.org/content/execute.html
 execute:
-  execute_notebooks: auto
-  exclude_patterns:
-    - 'SimpleApplication/*'
+  execute_notebooks: off
+  only_build_toc_files: true
+  #exclude_patterns:
+  #  - 'SimpleApplication/*'
 
 # Define the name of the latex output file for PDF builds
 latex:
