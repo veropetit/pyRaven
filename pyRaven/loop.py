@@ -3,7 +3,6 @@ from scipy.special import erf
 from astropy.convolution import Gaussian1DKernel, convolve
 import astropy.convolution as conv
 
-import pyRaven as rav
 import time
 from numba import njit
 

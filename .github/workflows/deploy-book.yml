@@ -38,7 +38,7 @@ jobs:
     # to have the requirements in a file
     - name: Install dependencies
       run: |
-        #pip install -r docs-jb-env.yml
+        pip install -r docs-jb-env.yml
         pip install "git+https://github.com/folsomcp/SpecpolFlow"
         pip install "git+https://github.com/veropetit/pyRaven"
 
