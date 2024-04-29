@@ -8,3 +8,4 @@ emcee
 corner
 numpy
 numba
+copy
