@@ -18,5 +18,4 @@ data copy.py
 docs-src/build
 
 JupyterBook/SimpleApplication/ExampleOutput
-JupyterBook/_build/.doctrees
-JupyterBook/_build/jupyter_execute
+JupyterBook/_build
