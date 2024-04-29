@@ -8,5 +8,4 @@ emcee
 corner
 numpy
 numba
-mpl_toolkits
 json
