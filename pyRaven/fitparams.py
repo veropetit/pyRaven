@@ -1,22 +1,21 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import pyRaven as rav
 import emcee
 import corner
 from scipy.stats import norm
 import scipy
 from statistics import mode
-import copy
 
-from . import diskint2 as rav_diskint2
 
-def fitdata(param,DataPacket,guess):
+def fitdata(xs,ys,guess,param):
   '''
   This function fits a set of LSD profiles using scipy's curve fit function.
 
   Inputs:
     param - input parameter dictionary
     DataPacket - input DataPacket with real data
-    guess - array of guess values for logkappa, vsini, and vmac. Ex: np.array([1.3,250,30])
+    guess - array of guess values for kappa and vmac. Ex: np.array([1.3,30])
 
    Outputs:
     parameters - array of fit parameters
@@ -24,118 +23,149 @@ def fitdata(param,DataPacket,guess):
     modelout - the best fit model
 
   '''
-  ##################################
-  def model(v,logkappa,vsini,vmac):
+
+  x_data = np.hstack(xs)
+  y_data = np.hstack(ys)
+
+  def star1(v,kappa,vsini,vmac,vrad):
       '''
       This function creates the line profile model that will be fit to the observed profile
 
       Inputs:
-        logkappa - value of logkappa that the walker is on in parameter space
-        vsini - value of vsini that the walker is on in parameter space
-        vmac - value of the vmac that the walker is on in parameter space
-        v - velocity array of the actual data
-
-      Outputs:
-        f - line profile model using the weak field method at the walker's position in parameter space
-      '''
-      # using the param that is passed to the previous funciton as a global
-      # making a deepcopy here as to not modify the original that was passed
-      # to the function. 
-      param_copy = copy.deepcopy(param)
-      # updating the param_copy to the values passed by the curve_fit
-      param_copy['general']['vsini']=vsini
-      param_copy['general']['vmac']=vmac
-      param_copy['general']['logkappa']=logkappa
-
-      #pyRaven's weakfield disk integration function
-      model=rav_diskint2.analytical(param_copy,False)
-
-      #interpolating the model to be size MCMC wants
-      f=np.interp(v,model['vel'],model['flux'])
-      return(f)
-  ##################################
-    
-  x=DataPacket.scaled.lsds[0].vel#+DataPacket.vrad[0]
-  y=DataPacket.scaled.lsds[0].specI
-  sigma = DataPacket.scaled.lsds[0].specSigI
-  if DataPacket.nobs!=1:
-    for i in range(1,DataPacket.nobs):
-      x=np.append(x,DataPacket.scaled.lsds[i].vel)#+DataPacket.vrad[i])
-      y=np.append(y,DataPacket.scaled.lsds[i].specI)
-      sigma=np.append(sigma,DataPacket.scaled.lsds[i].specSigI)
-
-  parameters,covariance = scipy.optimize.curve_fit(model,x,y,p0=guess,sigma=sigma)
-
-  modelout=model(x,parameters[0],parameters[1],parameters[2])
-  modelout=modelout[:DataPacket.scaled.lsds[0].vel.size]
-  param_best = copy.deepcopy(param)
-  param_best['general']['logkappa'] = parameters[0]
-  param_best['general']['vsini'] = parameters[1]
-  param_best['general']['vmac'] = parameters[2]
-  return param_best, covariance, modelout
-
-
-def fitdata_novsini(param,DataPacket,guess):
-  '''
-  This function fits a set of LSD profiles using scipy's curve fit function.
-
-  Inputs:
-    param - input parameter dictionary
-    DataPacket - input DataPacket with real data
-    guess - array of guess values for logkappa and vmac. Ex: np.array([1.3,30])
-
-   Outputs:
-    parameters - array of fit parameters
-    covariance - covariance matrix of the fit
-    modelout - the best fit model
-
-  '''
-  def model(v,logkappa,vmac):
-      '''
-      This function creates the line profile model that will be fit to the observed profile
-
-      Inputs:
-        logkappa - value of logkappa that the walker is on in parameter space
+        kappa - value of kappa that the walker is on in parameter space
         vmac - value of vmac that the walker is on in parameter space
         v - velocity array of the actual data
 
       Outputs:
         f - line profile model using the weak field method at the walker's position in parameter space
       '''
-      # using the param that is passed to the previous funciton as a global
-      # making a deepcopy here as to not modify the original that was passed
-      # to the function. 
-      param_copy = copy.deepcopy(param)
-      param_copy['general']['vmac'] = vmac
-      param_copy['general']['logkappa'] = logkappa
+      param['general']['vsini']=vsini
+      param['general']['vmac']=vmac
+      param['general']['logkappa']=np.log(kappa)
 
       #pyRaven's weakfield disk integration function
-      model=rav_diskint2.analytical(param_copy,False)
+      model=rav.diskint2.analytical(param,False)
 
       #interpolating the model to be size MCMC wants
-      f=np.interp(v,model['vel'],model['flux'])
+      f=np.interp(v,model['vel']+vrad,model['flux'])
       return(f)
+
+  # defines the model used by curvefit
+  def poly(x_, *p):
+    #extracts the constant stellar parameters from the parameter array
+    kappa1=p[0]
+    vsini1=p[1]
+    vmac1=p[2]
+
+    #finds the length of each xs array
+    lens=[0]
+    for i in range(len(xs)):
+        lens.append(lens[i]+len(xs[i]))
     
-  x=DataPacket.scaled.lsds[0].vel#+DataPacket.vrad[0]
-  y=DataPacket.scaled.lsds[0].specI
-  sigma = DataPacket.scaled.lsds[0].specSigI
+    #calculates a model profile for each observation
+    models=[]
+    for i in range(len(lens)-1):
+        models.append(star1(x_[lens[i]:lens[i+1]],kappa1,vsini1,vmac1,p[3+i]))
 
-  if DataPacket.nobs!=1:
-    for i in range(1,DataPacket.nobs):
-      x=np.append(x,DataPacket.scaled.lsds[i].vel)
-      y=np.append(y,DataPacket.scaled.lsds[i].specI)
-      sigma=np.append(sigma,DataPacket.scaled.lsds[i].specSigI)
+    model=np.hstack(models)  
+    return model
+  
+  guess=guess
+  
+  # defines bounds for each parameter. kappa between 0 and infinity, vsini from 0 to 300 km/s, vmac from 0 to 40 vmac, vrads from -infinity to infinity
+  bounds=([0,0,0],[np.inf,300,40])
+  for i in range(len(xs)):
+      bounds[0].append(-np.inf)
+      bounds[1].append(np.inf)
+
+  #performs the fitting
+  pout, pcov = scipy.optimize.curve_fit(poly,x_data,y_data,guess,bounds=bounds)
+  
+  #defining output arrays
+  star1_models=[]
+  for n in range(len(xs)):
+    star1_models.append([star1(xs[n],pout[0],pout[1],pout[2],pout[3+n])])
+
+  return pout,pcov,star1_models
 
 
-  parameters,covariance = scipy.optimize.curve_fit(model,x,y,p0=guess,sigma=sigma)
+def fitdata_novsini(xs,ys,guess,param):
+  '''
+  This function fits a set of LSD profiles using scipy's curve fit function.
 
-  modelout=model(x,parameters[0],parameters[1])
-  modelout=modelout[:DataPacket.scaled.lsds[0].vel.size]
-  param_best = copy.deepcopy(param)
-  param_best['general']['logkappa'] = parameters[0]
-  param_best['general']['vmac'] = parameters[1]
-  return param_best,covariance,modelout
+  Inputs:
+    param - input parameter dictionary
+    DataPacket - input DataPacket with real data
+    guess - array of guess values for kappa and vmac. Ex: np.array([1.3,30])
 
+   Outputs:
+    parameters - array of fit parameters
+    covariance - covariance matrix of the fit
+    modelout - the best fit model
+
+  '''
+
+  x_data = np.hstack(xs)
+  y_data = np.hstack(ys)
+
+  def star1(v,kappa,vmac,vrad):
+      '''
+      This function creates the line profile model that will be fit to the observed profile
+
+      Inputs:
+        kappa - value of kappa that the walker is on in parameter space
+        vmac - value of vmac that the walker is on in parameter space
+        v - velocity array of the actual data
+
+      Outputs:
+        f - line profile model using the weak field method at the walker's position in parameter space
+      '''
+      param['general']['vmac']=vmac
+      param['general']['logkappa']=np.log(kappa)
+
+      #pyRaven's weakfield disk integration function
+      model=rav.diskint2.analytical(param,False)
+
+      #interpolating the model to be size MCMC wants
+      f=np.interp(v,model['vel']+vrad,model['flux'])
+      return(f)
+
+  # defines the model used by curvefit
+  def poly(x_, *p):
+    #extracts the constant stellar parameters from the parameter array
+    kappa1=p[0]
+    vmac1=p[1]
+
+    #finds the length of each xs array
+    lens=[0]
+    for i in range(len(xs)):
+        lens.append(lens[i]+len(xs[i]))
+    
+    #calculates a model profile for each observation
+    models=[]
+    for i in range(len(lens)-1):
+        models.append(star1(x_[lens[i]:lens[i+1]],kappa1,vmac1,p[2+i]))
+
+    model=np.hstack(models)  
+    return model
+  
+  guess=guess
+  
+  # defines bounds for each parameter. kappa between 0 and infinity, vmac from 0 to 40 vmac, vrads from -infinity to infinity
+  bounds=([0,0],[np.inf,40])
+  for i in range(len(xs)):
+      bounds[0].append(-np.inf)
+      bounds[1].append(np.inf)
+
+  #performs the fitting
+  pout, pcov = scipy.optimize.curve_fit(poly,x_data,y_data,guess,bounds=bounds)
+  
+  #defining output arrays
+  star1_models=[]
+  for n in range(len(xs)):
+    star1_models.append([star1(xs[n],pout[0],pout[1],pout[2+n])])
+
+  return pout,pcov,star1_models
 
 
 def binary_fitting(xs,ys,guess, param1, param2):
@@ -181,7 +211,7 @@ def binary_fitting(xs,ys,guess, param1, param2):
     param1['general']['logkappa']=np.log(kappa)
 
     #pyRaven's weakfield disk integration function
-    model=rav_diskint2.analytical(param1,False)
+    model=rav.diskint2.analytical(param1,False)
 
     #interpolating the model to be size MCMC wants
     f=np.interp(v,model['vel']+vrad,model['flux'])
@@ -208,7 +238,7 @@ def binary_fitting(xs,ys,guess, param1, param2):
     param2['general']['logkappa']=np.log(kappa)
 
     #pyRaven's weakfield disk integration function
-    model=rav_diskint2.analytical(param2,False)
+    model=rav.diskint2.analytical(param2,False)
 
     #interpolating the model to be size MCMC wants
     f=np.interp(v,model['vel']+vrad,model['flux'])
@@ -241,8 +271,9 @@ def binary_fitting(xs,ys,guess, param1, param2):
     binary=(f1+f2)-1
     return(binary)
 
-  # the model used by curvefit
+  # defines the model used by curvefit
   def poly(x_, *p):
+    #extracts the constant stellar parameters from the parameter array
     kappa1=p[0]
     kappa2=p[1]
     vsini1=p[2]
@@ -250,10 +281,12 @@ def binary_fitting(xs,ys,guess, param1, param2):
     vmac1=p[4]
     vmac2=p[5]
 
+    #finds the length of each xs array
     lens=[0]
     for i in range(len(xs)):
         lens.append(lens[i]+len(xs[i]))
     
+    #calculates a model profile for each observation
     models=[]
     for i in range(len(lens)-1):
         models.append(binary(x_[lens[i]:lens[i+1]],kappa1,kappa2,vsini1,vsini2,vmac1,vmac2,p[6+2*i],p[7+2*i]))
@@ -264,7 +297,7 @@ def binary_fitting(xs,ys,guess, param1, param2):
 
   guess=guess
   
-  # bounds for each parameter. kappa between 0 and infinity, vsini from 0 to 300 km/s, vmac from 0 to 40 vmac, vrads from -infinity to infinity
+  # defines bounds for each parameter. kappa between 0 and infinity, vsini from 0 to 300 km/s, vmac from 0 to 40 vmac, vrads from -infinity to infinity
   bounds=([0,0,0,0,0,0],[np.inf,np.inf,300,300,40,40])
   for i in range(len(xs)):
       bounds[0].append(-np.inf)
@@ -272,8 +305,10 @@ def binary_fitting(xs,ys,guess, param1, param2):
       bounds[1].append(np.inf)
       bounds[1].append(np.inf)
 
+  #performs the fitting
   pout, pcov = scipy.optimize.curve_fit(poly,x_data,y_data,guess,bounds=bounds)
   
+  #defining output arrays
   binary_models=[]
   star1_models=[]
   star2_models=[]
