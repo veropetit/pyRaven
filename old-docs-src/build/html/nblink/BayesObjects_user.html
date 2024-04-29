@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>User’s manual for the BayesObjects.py classes &mdash; Raven  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/nbsphinx-code-cells.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/template.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Documentation for diskint2" href="diskint2_doc.html" />
+    <link rel="prev" title="Tutorial on how to use the Params Dictionary objects" href="ParamsObject_tutorial.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Raven
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../Installation.html">Installation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">How to run pyRaven tutorial</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="01-DataSetup.html">01 - Data Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02-FitIntensity.html">Fit of the intensity profiles for single stars</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03-ChiSquareCalcLoop.html">03- Calculating the chi2 with the loop code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04-CalculateProbabilities.html">04 - Calculate probabilites from the chi2 files</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Standalone tutorials</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="ParamsObject_tutorial.html">Tutorial on how to use the Params Dictionary objects</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">User’s manual for the BayesObjects.py classes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#0.-Necessary-packages">0. Necessary packages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#1.-Quick-description-of-the-object-classes">1. Quick description of the object classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#2.-The-chi-class">2. The chi class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#The-lnP_PARS-class">The lnP_PARS class</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Underlying physics and statistics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="diskint2_doc.html">Documentation for diskint2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="geometry_doc.html">Geometry documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bayes_doc.html">Documentation for the bayesian calculations</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../API.html">pyRaven Package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Raven</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">User’s manual for the BayesObjects.py classes</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/nblink/BayesObjects_user.nblink.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="User's-manual-for-the-BayesObjects.py-classes">
+<h1>User’s manual for the BayesObjects.py classes<a class="headerlink" href="#User's-manual-for-the-BayesObjects.py-classes" title="Permalink to this heading"></a></h1>
+<p>Most users will not need to access directly the classes defined in BayesObjects.py.</p>
+<p>Instead, a user interested in applying the bayesian analysis to a dataset will most likely use the wrapper functions that perform the analysis in a batch, and create diagnostic graphs. For this, see LINK TO NOTEBOOK</p>
+<p>This notebook serves as a users manual for a more advanced user who wishes to analyze and access specific outputs from the wrapper codes and/or create custom graphs.</p>
+<section id="0.-Necessary-packages">
+<h2>0. Necessary packages<a class="headerlink" href="#0.-Necessary-packages" title="Permalink to this heading"></a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pyRaven</span> <span class="k">as</span> <span class="nn">rav</span>
+
+<span class="kn">from</span> <span class="nn">pprint</span> <span class="kn">import</span> <span class="n">pprint</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+loading specpolFlow package
+</pre></div></div>
+</div>
+</section>
+<section id="1.-Quick-description-of-the-object-classes">
+<h2>1. Quick description of the object classes<a class="headerlink" href="#1.-Quick-description-of-the-object-classes" title="Permalink to this heading"></a></h2>
+<p>BayesObjects.py defines X python objects as classes. Each object are initialized by passing the necessary data, and provide a write method to a h5 file. Function are also provided to read in the saved h5 files.</p>
+<p>All of the objects have a <code class="docutils literal notranslate"><span class="pre">Object.data</span></code>, which contains a multi-D matrix with the actual data (chi2, probability, etc). The object also has additional datasets that contains the grid values for each dimension of the data array (e.g. <code class="docutils literal notranslate"><span class="pre">Object.Bpole_arr</span></code>). The objects may also contain additional metadata, for example a string containing the name of the observation.</p>
+<ul class="simple">
+<li><p>chi object:</p>
+<ul>
+<li><p>a 3D dataset, with dimensions (beta, Bpole, phi)</p></li>
+<li><p>the grid definition (beta_arr, Bpole_arr, phi_arr)</p></li>
+<li><p>the inclination used (float), the ObsID string</p></li>
+</ul>
+</li>
+<li><p>lnP_odds object:</p>
+<ul>
+<li><p>a 4D dataset, with dimensions (beta, Bpole, phi, incl)</p></li>
+<li><p>the grid definition (beta_arr, Bpole_arr, phi_arr, incl_arr)</p></li>
+<li><p>the ObsID string.</p></li>
+</ul>
+</li>
+<li><p>lnP_pars object:</p>
+<ul>
+<li><p>a 5D dataset, with dimensions (beta, Bpole, phi, incl, noise)</p></li>
+<li><p>the grid definition (beta_arr, Bpole_arr, phi_arr, incl_arr, noise_arr)</p></li>
+<li><p>the ObsID string</p></li>
+<li><p>Note: This class in fact is a child class of lnP_odds, with the addition of the scale parameter.</p></li>
+</ul>
+</li>
+<li><p>lnP_mar object:</p>
+<ul>
+<li><p>a 3D dataset, with dimensions (beta, Bpole, incl)</p></li>
+<li><p>the grid definition (beta_arr, Bpole_arr, incl_arr)</p></li>
+<li><p>the ObsID string</p></li>
+<li><p>The main use for this class is to store our probabilities that have been marginalized for the rotational phase (and the noise scale parameter for the parameter estimation – because the latter is also marginalized, there was no need for two separate classes for the odds ratio calculations and the parameter estimation).</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="2.-The-chi-class">
+<h2>2. The chi class<a class="headerlink" href="#2.-The-chi-class" title="Permalink to this heading"></a></h2>
+<p>The usage of this class is mainly to serve as containers in the loop calculation (as can be gleaned from the class function that creates an empty object)</p>
+<p>This said, the class can be used to examine individual chi2 files. As a reminder, to save on RAM usage, the loop code creates one datafile for each of the outer loop on the inclination grid.</p>
+<p>The cell below load in an example chi2 file, and display the content of the object.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">chi2</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">BayesObjects</span><span class="o">.</span><span class="n">read_chi</span><span class="p">(</span><span class="s1">&#39;ExampleData/BayesObject_user/chiV_i5obs0.h5&#39;</span><span class="p">)</span>
+
+<span class="nb">vars</span><span class="p">(</span><span class="n">chi2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{&#39;data&#39;: array([[[ 198.22318866,  198.22318866,  198.22318866, ...,
+           198.22318866,  198.22318866,  198.22318866],
+         [ 201.10054504,  201.1004485 ,  201.10051269, ...,
+           201.10049601,  201.10043842,  201.10054504],
+         [ 206.3923549 ,  206.39194372,  206.39215983, ...,
+           206.39213313,  206.39196855,  206.3923549 ],
+         ...,
+         [ 819.26378252,  819.21127873,  819.23295433, ...,
+           819.23412683,  819.22144904,  819.26378252],
+         [ 875.25911543,  875.20171701,  875.22538664, ...,
+           875.22668908,  875.21286695,  875.25911543],
+         [ 933.6689018 ,  933.60639067,  933.63214205, ...,
+           933.63358109,  933.61856524,  933.6689018 ]],
+
+        [[ 198.22318866,  198.22318866,  198.22318866, ...,
+           198.22318866,  198.22318866,  198.22318866],
+         [ 202.08614529,  202.08681407,  202.05948559, ...,
+           202.00162157,  202.05742032,  202.08614529],
+         [ 209.57930159,  209.56584321,  209.46703159, ...,
+           209.35031098,  209.50658212,  209.57930159],
+         ...,
+         [1121.78435596, 1118.38120819, 1107.58025337, ...,
+          1106.0779635 , 1117.62514829, 1121.78435596],
+         [1205.51170511, 1201.78371555, 1189.98402955, ...,
+          1188.40203934, 1200.98784311, 1205.51170511],
+         [1292.86925391, 1288.80162664, 1275.95905479, ...,
+          1274.29637168, 1287.96546807, 1292.86925391]],
+
+        [[ 198.22318866,  198.22318866,  198.22318866, ...,
+           198.22318866,  198.22318866,  198.22318866],
+         [ 202.98120961,  202.98711243,  202.94618598, ...,
+           202.83230761,  202.92925996,  202.98120961],
+         [ 212.54357915,  212.53549787,  212.39247966, ...,
+           212.16248994,  212.41866489,  212.54357915],
+         ...,
+         [1412.70417312, 1408.240155  , 1393.21058894, ...,
+          1390.18944709, 1406.70682427, 1412.70417312],
+         [1523.15786298, 1518.26223528, 1501.84610618, ...,
+          1498.66196047, 1516.64623528, 1523.15786298],
+         [1638.41590142, 1633.06877721, 1615.20491979, ...,
+          1611.85553724, 1631.36897992, 1638.41590142]],
+
+        ...,
+
+        [[ 198.22318866,  198.22318866,  198.22318866, ...,
+           198.22318866,  198.22318866,  198.22318866],
+         [ 197.71352885,  197.75360558,  197.81497195, ...,
+           197.70264367,  197.69658893,  197.71352885],
+         [ 197.70225416,  197.83091512,  198.0971441 , ...,
+           197.87328006,  197.71730396,  197.70225416],
+         ...,
+         [ 302.13763495,  314.22455649,  348.72224545, ...,
+           346.43409826,  313.06770297,  302.13763495],
+         [ 312.59244772,  325.78661109,  363.50258344, ...,
+           361.11954369,  324.58202785,  312.59244772],
+         [ 323.5456456 ,  337.89555831,  378.97331028, ...,
+           376.49617051,  336.64366748,  323.5456456 ]],
+
+        [[ 198.22318866,  198.22318866,  198.22318866, ...,
+           198.22318866,  198.22318866,  198.22318866],
+         [ 197.64831209,  197.66729315,  197.69479536, ...,
+           197.63778184,  197.63837903,  197.64831209],
+         [ 198.39473882,  198.45457871,  198.57516982, ...,
+           198.46177252,  198.39710811,  198.39473882],
+         ...,
+         [ 490.79696666,  496.26831601,  512.02388877, ...,
+           510.91506257,  495.71481873,  490.79696666],
+         [ 519.29076271,  525.26240418,  542.4883862 , ...,
+           541.33640089,  524.68786071,  519.29076271],
+         [ 549.10586206,  555.59967342,  574.3616514 , ...,
+           573.16713671,  555.00444141,  549.10586206]],
+
+        [[ 198.22318866,  198.22318866,  198.22318866, ...,
+           198.22318866,  198.22318866,  198.22318866],
+         [ 197.76028575,  197.76016421,  197.76018773, ...,
+           197.76021107,  197.76021927,  197.76028575],
+         [ 199.71183633,  199.71137514,  199.7115099 , ...,
+           199.71156326,  199.71153025,  199.71183633],
+         ...,
+         [ 745.77807817,  745.72502434,  745.74580504, ...,
+           745.74785819,  745.73662776,  745.77807817],
+         [ 798.43315178,  798.37517833,  798.39791238, ...,
+           798.4001355 ,  798.38782653,  798.43315178],
+         [ 853.50267887,  853.43956771,  853.46434282, ...,
+           853.46674258,  853.45330567,  853.50267887]]]),
+ &#39;beta_arr&#39;: array([  0.        ,  10.58823529,  21.17647059,  31.76470588,
+         42.35294118,  52.94117647,  63.52941176,  74.11764706,
+         84.70588235,  95.29411765, 105.88235294, 116.47058824,
+        127.05882353, 137.64705882, 148.23529412, 158.82352941,
+        169.41176471, 180.        ]),
+ &#39;Bpole_arr&#39;: array([   0.        ,  208.33333333,  416.66666667,  625.        ,
+         833.33333333, 1041.66666667, 1250.        , 1458.33333333,
+        1666.66666667, 1875.        , 2083.33333333, 2291.66666667,
+        2500.        , 2708.33333333, 2916.66666667, 3125.        ,
+        3333.33333333, 3541.66666667, 3750.        , 3958.33333333,
+        4166.66666667, 4375.        , 4583.33333333, 4791.66666667,
+        5000.        ]),
+ &#39;phi_arr&#39;: array([  0.        ,  10.28571429,  20.57142857,  30.85714286,
+         41.14285714,  51.42857143,  61.71428571,  72.        ,
+         82.28571429,  92.57142857, 102.85714286, 113.14285714,
+        123.42857143, 133.71428571, 144.        , 154.28571429,
+        164.57142857, 174.85714286, 185.14285714, 195.42857143,
+        205.71428571, 216.        , 226.28571429, 236.57142857,
+        246.85714286, 257.14285714, 267.42857143, 277.71428571,
+        288.        , 298.28571429, 308.57142857, 318.85714286,
+        329.14285714, 339.42857143, 349.71428571, 360.        ]),
+ &#39;incl&#39;: 52.94117647058823,
+ &#39;obsID&#39;: &#39;hd13745_21aug12pn.s_Ic_lsd_cln_twk_reg0.2&#39;}
+</pre></div></div>
+</div>
+<p>In the cell below, we use a class method to make a Beta-Bpole chi2 (total, not reduced) map for the i-th phase in the file.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">i_phase</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">chi2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">i_phase</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/nblink_BayesObjects_user_11_0.png" src="../_images/nblink_BayesObjects_user_11_0.png" />
+</div>
+</div>
+<p>The chi2 object did not save the number of data points in the observation (as the likelihood calculation requires the total chi2). But if one wishes to make a graph of the reduced chi2, the number of datapoint can be retrieved from the associated datapacket file/object and one can simply run: ``` chi2.data = chi2.data / npoints i_phase = 1 chi2.plot(i_phase)</p>
+</section>
+<section id="The-lnP_PARS-class">
+<h2>The lnP_PARS class<a class="headerlink" href="#The-lnP_PARS-class" title="Permalink to this heading"></a></h2>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="ParamsObject_tutorial.html" class="btn btn-neutral float-left" title="Tutorial on how to use the Params Dictionary objects" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="diskint2_doc.html" class="btn btn-neutral float-right" title="Documentation for diskint2" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, V. Petit.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

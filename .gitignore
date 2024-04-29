@@ -1,4 +1,3 @@
-docs-src/build
 __pycache__
 __pycache__/__init__.cpython-38.pyc
 __pycache__/diskint.cpython-38.pyc
@@ -6,13 +5,18 @@ __pycache__/localV.cpython-38.pyc
 __pycache__/misc.cpython-38.pyc
 __pycache__/pattern.cpython-38.pyc
 __pycache__/profileI.cpython-38.pyc
-Packet_test.h5
-data copy.py
-__pycache__/diskint2.cpython-39.pyc
-__pycache__/diskint2.cpython-39.pyc
 __pycache__/diskint2.cpython-39.pyc
 *.pyc
-__pycache__/diskint2.cpython-39.pyc
+
 .DS_Store
 ExampleData/.DS_Store
 ExampleData/.DS_Store
+
+Packet_test.h5
+data copy.py
+
+docs-src/build
+
+JupyterBook/SimpleApplication/ExampleOutput
+JupyterBook/_build/.doctrees
+JupyterBook/_build/jupyter_execute

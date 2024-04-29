@@ -1,0 +1,1627 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pyRaven Package &mdash; Raven  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/template.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Documentation for the bayesian calculations" href="nblink/bayes_doc.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Raven
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="Installation.html">Installation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">How to run pyRaven tutorial</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="nblink/01-DataSetup.html">01 - Data Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nblink/02-FitIntensity.html">Fit of the intensity profiles for single stars</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nblink/03-ChiSquareCalcLoop.html">03- Calculating the chi2 with the loop code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nblink/04-CalculateProbabilities.html">04 - Calculate probabilites from the chi2 files</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Standalone tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="nblink/ParamsObject_tutorial.html">Tutorial on how to use the Params Dictionary objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nblink/BayesObjects_user.html">User’s manual for the BayesObjects.py classes</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Underlying physics and statistics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="nblink/diskint2_doc.html">Documentation for diskint2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nblink/geometry_doc.html">Geometry documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nblink/bayes_doc.html">Documentation for the bayesian calculations</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API documentation</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">pyRaven Package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-pyRaven.data">data module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.data.DataPacket"><code class="docutils literal notranslate"><span class="pre">DataPacket</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pyRaven.data.DataPacket.__init__"><code class="docutils literal notranslate"><span class="pre">DataPacket.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRaven.data.DataPacket.write"><code class="docutils literal notranslate"><span class="pre">DataPacket.write()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.data.LSDprofs"><code class="docutils literal notranslate"><span class="pre">LSDprofs</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pyRaven.data.LSDprofs.__init__"><code class="docutils literal notranslate"><span class="pre">LSDprofs.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRaven.data.LSDprofs.write"><code class="docutils literal notranslate"><span class="pre">LSDprofs.write()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.data.create_Packet"><code class="docutils literal notranslate"><span class="pre">create_Packet()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.data.read_lsd"><code class="docutils literal notranslate"><span class="pre">read_lsd()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.data.read_lsds"><code class="docutils literal notranslate"><span class="pre">read_lsds()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.data.read_lsds_from_sfiles"><code class="docutils literal notranslate"><span class="pre">read_lsds_from_sfiles()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.data.read_packet"><code class="docutils literal notranslate"><span class="pre">read_packet()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-pyRaven.params">parameter module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.params.MyJSONEncoder"><code class="docutils literal notranslate"><span class="pre">MyJSONEncoder</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pyRaven.params.MyJSONEncoder.default"><code class="docutils literal notranslate"><span class="pre">MyJSONEncoder.default()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.params.get_def_param_fitI"><code class="docutils literal notranslate"><span class="pre">get_def_param_fitI()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.params.get_def_param_weak"><code class="docutils literal notranslate"><span class="pre">get_def_param_weak()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.params.parameters"><code class="docutils literal notranslate"><span class="pre">parameters</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pyRaven.params.parameters.pprint"><code class="docutils literal notranslate"><span class="pre">parameters.pprint()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRaven.params.parameters.write"><code class="docutils literal notranslate"><span class="pre">parameters.write()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.params.read_parameters"><code class="docutils literal notranslate"><span class="pre">read_parameters()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-pyRaven.pattern">pattern module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-pyRaven.profileI">profileI module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.profileI.voigt_fara"><code class="docutils literal notranslate"><span class="pre">voigt_fara()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-pyRaven.localV">localV module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.localV.unno_local_out_IV"><code class="docutils literal notranslate"><span class="pre">unno_local_out_IV()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-pyRaven.diskint2">diskint2 module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.diskint2.analytical"><code class="docutils literal notranslate"><span class="pre">analytical()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.diskint2.get_B_LOS"><code class="docutils literal notranslate"><span class="pre">get_B_LOS()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.diskint2.get_B_MAG"><code class="docutils literal notranslate"><span class="pre">get_B_MAG()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.diskint2.get_LOS"><code class="docutils literal notranslate"><span class="pre">get_LOS()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.diskint2.get_LOS_values"><code class="docutils literal notranslate"><span class="pre">get_LOS_values()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.diskint2.get_MAG"><code class="docutils literal notranslate"><span class="pre">get_MAG()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.diskint2.get_all_u"><code class="docutils literal notranslate"><span class="pre">get_all_u()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.diskint2.get_empty_model"><code class="docutils literal notranslate"><span class="pre">get_empty_model()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.diskint2.get_local_weak_interp"><code class="docutils literal notranslate"><span class="pre">get_local_weak_interp()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.diskint2.get_local_weak_interp_Vonly_numba"><code class="docutils literal notranslate"><span class="pre">get_local_weak_interp_Vonly_numba()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.diskint2.get_los2rot"><code class="docutils literal notranslate"><span class="pre">get_los2rot()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.diskint2.get_ngrid"><code class="docutils literal notranslate"><span class="pre">get_ngrid()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.diskint2.get_perGaussLorentz"><code class="docutils literal notranslate"><span class="pre">get_perGaussLorentz()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.diskint2.get_resmac_kernel"><code class="docutils literal notranslate"><span class="pre">get_resmac_kernel()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.diskint2.get_rot2mag"><code class="docutils literal notranslate"><span class="pre">get_rot2mag()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.diskint2.get_rotKernel"><code class="docutils literal notranslate"><span class="pre">get_rotKernel()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.diskint2.get_small_u"><code class="docutils literal notranslate"><span class="pre">get_small_u()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.diskint2.get_uconv"><code class="docutils literal notranslate"><span class="pre">get_uconv()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.diskint2.get_unno_angles"><code class="docutils literal notranslate"><span class="pre">get_unno_angles()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.diskint2.get_vel_range_unno"><code class="docutils literal notranslate"><span class="pre">get_vel_range_unno()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.diskint2.get_w_unno"><code class="docutils literal notranslate"><span class="pre">get_w_unno()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.diskint2.get_w_weak"><code class="docutils literal notranslate"><span class="pre">get_w_weak()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.diskint2.grid_ROT"><code class="docutils literal notranslate"><span class="pre">grid_ROT()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.diskint2.model_convolve_resvmac"><code class="docutils literal notranslate"><span class="pre">model_convolve_resvmac()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.diskint2.numerical"><code class="docutils literal notranslate"><span class="pre">numerical()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.diskint2.pad_V"><code class="docutils literal notranslate"><span class="pre">pad_V()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.diskint2.pad_model"><code class="docutils literal notranslate"><span class="pre">pad_model()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-pyRaven.fitparams">fitparams module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.fitparams.fitdata"><code class="docutils literal notranslate"><span class="pre">fitdata()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.fitparams.fitdataMCMC"><code class="docutils literal notranslate"><span class="pre">fitdataMCMC()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.fitparams.fitdata_novsini"><code class="docutils literal notranslate"><span class="pre">fitdata_novsini()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-pyRaven.loop">loop module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.loop.loop"><code class="docutils literal notranslate"><span class="pre">loop()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.loop.loop_wrapper"><code class="docutils literal notranslate"><span class="pre">loop_wrapper()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-pyRaven.loop_speed">loop_speed module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.loop_speed.disk_int_loop_numba"><code class="docutils literal notranslate"><span class="pre">disk_int_loop_numba()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.loop_speed.loop_speed"><code class="docutils literal notranslate"><span class="pre">loop_speed()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.loop_speed.loop_speed_wrapper"><code class="docutils literal notranslate"><span class="pre">loop_speed_wrapper()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-pyRaven.BayesObjects">BayesObjects module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.BayesObjects.chi"><code class="docutils literal notranslate"><span class="pre">chi</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pyRaven.BayesObjects.chi.__init__"><code class="docutils literal notranslate"><span class="pre">chi.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRaven.BayesObjects.chi.write"><code class="docutils literal notranslate"><span class="pre">chi.write()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.BayesObjects.combine_obs"><code class="docutils literal notranslate"><span class="pre">combine_obs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.BayesObjects.create_chi"><code class="docutils literal notranslate"><span class="pre">create_chi()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.BayesObjects.create_empty_lnP_odds"><code class="docutils literal notranslate"><span class="pre">create_empty_lnP_odds()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.BayesObjects.create_empty_lnP_pars"><code class="docutils literal notranslate"><span class="pre">create_empty_lnP_pars()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.BayesObjects.create_lnLH_odds_from_chi"><code class="docutils literal notranslate"><span class="pre">create_lnLH_odds_from_chi()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.BayesObjects.create_lnLH_pars_from_chi"><code class="docutils literal notranslate"><span class="pre">create_lnLH_pars_from_chi()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.BayesObjects.exp_check"><code class="docutils literal notranslate"><span class="pre">exp_check()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.BayesObjects.get_prior_Bpole"><code class="docutils literal notranslate"><span class="pre">get_prior_Bpole()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.BayesObjects.get_prior_beta"><code class="docutils literal notranslate"><span class="pre">get_prior_beta()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.BayesObjects.get_prior_incl"><code class="docutils literal notranslate"><span class="pre">get_prior_incl()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.BayesObjects.get_prior_noise"><code class="docutils literal notranslate"><span class="pre">get_prior_noise()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.BayesObjects.get_prior_phi"><code class="docutils literal notranslate"><span class="pre">get_prior_phi()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.BayesObjects.lnP_mar"><code class="docutils literal notranslate"><span class="pre">lnP_mar</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pyRaven.BayesObjects.lnP_mar.__init__"><code class="docutils literal notranslate"><span class="pre">lnP_mar.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRaven.BayesObjects.lnP_mar.normalize"><code class="docutils literal notranslate"><span class="pre">lnP_mar.normalize()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRaven.BayesObjects.lnP_mar.plot_corner"><code class="docutils literal notranslate"><span class="pre">lnP_mar.plot_corner()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRaven.BayesObjects.lnP_mar.write"><code class="docutils literal notranslate"><span class="pre">lnP_mar.write()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.BayesObjects.lnP_odds"><code class="docutils literal notranslate"><span class="pre">lnP_odds</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pyRaven.BayesObjects.lnP_odds.__init__"><code class="docutils literal notranslate"><span class="pre">lnP_odds.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRaven.BayesObjects.lnP_odds.write"><code class="docutils literal notranslate"><span class="pre">lnP_odds.write()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRaven.BayesObjects.lnP_odds.writef"><code class="docutils literal notranslate"><span class="pre">lnP_odds.writef()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.BayesObjects.lnP_pars"><code class="docutils literal notranslate"><span class="pre">lnP_pars</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pyRaven.BayesObjects.lnP_pars.__init__"><code class="docutils literal notranslate"><span class="pre">lnP_pars.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRaven.BayesObjects.lnP_pars.apply_priors"><code class="docutils literal notranslate"><span class="pre">lnP_pars.apply_priors()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRaven.BayesObjects.lnP_pars.find_best"><code class="docutils literal notranslate"><span class="pre">lnP_pars.find_best()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRaven.BayesObjects.lnP_pars.mar_phase_noise"><code class="docutils literal notranslate"><span class="pre">lnP_pars.mar_phase_noise()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRaven.BayesObjects.lnP_pars.normalize"><code class="docutils literal notranslate"><span class="pre">lnP_pars.normalize()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRaven.BayesObjects.lnP_pars.plot_mar"><code class="docutils literal notranslate"><span class="pre">lnP_pars.plot_mar()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRaven.BayesObjects.lnP_pars.plot_prior"><code class="docutils literal notranslate"><span class="pre">lnP_pars.plot_prior()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRaven.BayesObjects.lnP_pars.write"><code class="docutils literal notranslate"><span class="pre">lnP_pars.write()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.BayesObjects.ln_mar_check"><code class="docutils literal notranslate"><span class="pre">ln_mar_check()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.BayesObjects.overview_plots"><code class="docutils literal notranslate"><span class="pre">overview_plots()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.BayesObjects.read_chi"><code class="docutils literal notranslate"><span class="pre">read_chi()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.BayesObjects.read_lnP_mar"><code class="docutils literal notranslate"><span class="pre">read_lnP_mar()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.BayesObjects.read_lnP_odds"><code class="docutils literal notranslate"><span class="pre">read_lnP_odds()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRaven.BayesObjects.read_lnP_pars"><code class="docutils literal notranslate"><span class="pre">read_lnP_pars()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-pyRaven.misc">misc module</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Raven</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">pyRaven Package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/API.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="pyraven-package">
+<h1>pyRaven Package<a class="headerlink" href="#pyraven-package" title="Permalink to this heading"></a></h1>
+<section id="module-pyRaven.data">
+<span id="data-module"></span><h2>data module<a class="headerlink" href="#module-pyRaven.data" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyRaven.data.DataPacket">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyRaven.data.</span></span><span class="sig-name descname"><span class="pre">DataPacket</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">star_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nobs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vrad</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ic</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wint_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wpol_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wint_rav</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wpol_rav</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fitrange</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vsini</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">original</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scaled</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cutfit</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.data.DataPacket" title="Permalink to this definition"></a></dt>
+<dd><p>Packet of data, convertable back and forth to and h5 file.</p>
+<p>fitrange:
+vsini:
+wint_data:
+wpol_data:
+wint_rav:
+wpol_rav:
+original:
+scaled:
+cutfit:</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyRaven.data.DataPacket.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">star_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nobs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vrad</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ic</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wint_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wpol_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wint_rav</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wpol_rav</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fitrange</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vsini</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">original</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scaled</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cutfit</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.data.DataPacket.__init__" title="Permalink to this definition"></a></dt>
+<dd><p>Initialization method for DataPacket
+:param self: The object being initialized
+:param fitrange: fitrange for the packet
+:param vsini:
+:param wint_rav:
+:param wpol_rav:
+:param original:
+:param scaled:
+:param cutfit:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyRaven.data.DataPacket.write">
+<span class="sig-name descname"><span class="pre">write</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.data.DataPacket.write" title="Permalink to this definition"></a></dt>
+<dd><p>Method that writes a data packet to an h5 file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>packet</strong> – DataPacket object being stored in the file</p></li>
+<li><p><strong>fname</strong> – name of the file to be written</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>none</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyRaven.data.LSDprofs">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyRaven.data.</span></span><span class="sig-name descname"><span class="pre">LSDprofs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lsds</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.data.LSDprofs" title="Permalink to this definition"></a></dt>
+<dd><p>Holds a list of LSD profiles</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>lsds</strong> – List of lsd profiles objects</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyRaven.data.LSDprofs.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lsds</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.data.LSDprofs.__init__" title="Permalink to this definition"></a></dt>
+<dd><p>Initialization method for LSDprofs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>self</strong> – object being initialized</p></li>
+<li><p><strong>lsds</strong> – list of lsd profiles objects</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyRaven.data.LSDprofs.write">
+<span class="sig-name descname"><span class="pre">write</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_names</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.data.LSDprofs.write" title="Permalink to this definition"></a></dt>
+<dd><p>Helper function that writes the contents of an LSDProfs object to an h5 file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>f</strong> – h5 file being written</p></li>
+<li><p><strong>lsds</strong> – LSDprofs object being stored in the file</p></li>
+<li><p><strong>obs_names</strong> – (List of string) the IDs to be used for each observations</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>none</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.data.create_Packet">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.data.</span></span><span class="sig-name descname"><span class="pre">create_Packet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">star_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nobs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vrad</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ic</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wint_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wpol_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wint_rav</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wpol_rav</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fitrange</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vsini</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">original</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.data.create_Packet" title="Permalink to this definition"></a></dt>
+<dd><p>Create a new DataPacket from meta information and a LSDprof object with the original LSD profiles. 
+The creator function will calculate the scaled (radial velocity correction, normalization, LSD weigth scaling) version of the LSD profiles
+based on the meta information provided.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>star_name</strong> – (string) the name (or ID) for the star</p></li>
+<li><p><strong>nobs</strong> – (int) the number of LSD profiles to be analyzed together</p></li>
+<li><p><strong>obs_names</strong> – (list of strings) ID for the observations to be used in e.g. graphs (e.g. filename, obs number, etc)</p></li>
+<li><p><strong>vrad</strong> – (1D array) radial velocity for the LSD profiles to put them in the stellar reference frame (if the LSD profiles are already in the star reference frame, just put an array of zeros)</p></li>
+<li><p><strong>Ic</strong> – (1D array) continuum normalization values for the LSD profiles (if the LSD profiles are already normalized, just input an array of ones)</p></li>
+<li><p><strong>wint_data</strong> – (1D array) the intensity weigth that was used to calculate the LSD profiles</p></li>
+<li><p><strong>wpol_data</strong> – (1D array) the polarization weigth that was used to calculate the LSD profiles</p></li>
+<li><p><strong>wint_rav</strong> – (float) the common LSD intensity weigth that will be used for all of the observations</p></li>
+<li><p><strong>wpol_rav</strong> – (float) the common LSD intensity weigth that will be used for all of the observations</p></li>
+<li><p><strong>fitrange</strong> – (float) the velocity range around the line center that will be use for the fitting</p></li>
+<li><p><strong>vsini</strong> – (float) the vsini of the star (RIGHT NOW, ONLY FOR DISPLAY PURPOSES)</p></li>
+<li><p><strong>original</strong> – (LSDprofs object) the original LSD profiles</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.data.read_lsd">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.data.</span></span><span class="sig-name descname"><span class="pre">read_lsd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.data.read_lsd" title="Permalink to this definition"></a></dt>
+<dd><p>Helper function that reads an lsd_prof from an h5 file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>f</strong> – the h5 file with the data</p></li>
+<li><p><strong>name</strong> – name of the LSDprofs object the data is a part of, with the index in the list</p></li>
+</ul>
+</dd>
+<dt class="field-even">Rtype lsd_prof<span class="colon">:</span></dt>
+<dd class="field-even"><p></p></dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.data.read_lsds">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.data.</span></span><span class="sig-name descname"><span class="pre">read_lsds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_names</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.data.read_lsds" title="Permalink to this definition"></a></dt>
+<dd><p>Helper function that reads an LSDprofs object from an h5 file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>f</strong> – the h5 file with the data</p></li>
+<li><p><strong>name</strong> – name of the LSDprof object (e.g. original, scaled, or cutfit)</p></li>
+<li><p><strong>nobs</strong> – the number of LSD profiles in the LSDprof object.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Rtype LSDprof<span class="colon">:</span></dt>
+<dd class="field-even"><p></p></dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.data.read_lsds_from_sfiles">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.data.</span></span><span class="sig-name descname"><span class="pre">read_lsds_from_sfiles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fnames</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.data.read_lsds_from_sfiles" title="Permalink to this definition"></a></dt>
+<dd><p>Function to create a LSDprof object from a list of filenames for LSD profiles in the .s format</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.data.read_packet">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.data.</span></span><span class="sig-name descname"><span class="pre">read_packet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.data.read_packet" title="Permalink to this definition"></a></dt>
+<dd><p>Function that reads an h5 file and produces a DataPacket object from the data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>fname</strong> – name of the h5 file being read</p>
+</dd>
+<dt class="field-even">Rtype DataPacket<span class="colon">:</span></dt>
+<dd class="field-even"><p></p></dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-pyRaven.params">
+<span id="parameter-module"></span><h2>parameter module<a class="headerlink" href="#module-pyRaven.params" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyRaven.params.MyJSONEncoder">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyRaven.params.</span></span><span class="sig-name descname"><span class="pre">MyJSONEncoder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skipkeys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ensure_ascii</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">check_circular</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_nan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sort_keys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">separators</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.params.MyJSONEncoder" title="Permalink to this definition"></a></dt>
+<dd><p>Utility class to convert numpy arrays to list when using the json encoding</p>
+<p>From <a class="reference external" href="https://python-forum.io/thread-35245.html">https://python-forum.io/thread-35245.html</a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyRaven.params.MyJSONEncoder.default">
+<span class="sig-name descname"><span class="pre">default</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.params.MyJSONEncoder.default" title="Permalink to this definition"></a></dt>
+<dd><p>Implement this method in a subclass such that it returns
+a serializable object for <code class="docutils literal notranslate"><span class="pre">o</span></code>, or calls the base implementation
+(to raise a <code class="docutils literal notranslate"><span class="pre">TypeError</span></code>).</p>
+<p>For example, to support arbitrary iterators, you could
+implement default like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">o</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">iterable</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+        <span class="k">pass</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">iterable</span><span class="p">)</span>
+    <span class="c1"># Let the base class default method raise the TypeError</span>
+    <span class="k">return</span> <span class="n">JSONEncoder</span><span class="o">.</span><span class="n">default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">o</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.params.get_def_param_fitI">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.params.</span></span><span class="sig-name descname"><span class="pre">get_def_param_fitI</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.params.get_def_param_fitI" title="Permalink to this definition"></a></dt>
+<dd><p>Function that returns a <cite>parameters</cite> dictionary with default values 
+for parameters that are necessary for the intensity profile fitting</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.params.get_def_param_weak">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.params.</span></span><span class="sig-name descname"><span class="pre">get_def_param_weak</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.params.get_def_param_weak" title="Permalink to this definition"></a></dt>
+<dd><p>Function that returns a <cite>parameters</cite> dictionary with default values 
+for parameters that are necessary for a typical weak field calculation</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyRaven.params.parameters">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyRaven.params.</span></span><span class="sig-name descname"><span class="pre">parameters</span></span><a class="headerlink" href="#pyRaven.params.parameters" title="Permalink to this definition"></a></dt>
+<dd><p>Class to add functionalities to the <cite>param</cite> dictionaries.</p>
+<p>Usage: to param = parameters(param) to use the <cite>write</cite> and <cite>pprint</cite> functions.</p>
+<p>ADD LINK to info page about the param dictionaries</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyRaven.params.parameters.pprint">
+<span class="sig-name descname"><span class="pre">pprint</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.params.parameters.pprint" title="Permalink to this definition"></a></dt>
+<dd><p>Method to pretty-print a <cite>parameters</cite> dictionary in a readable manner</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyRaven.params.parameters.write">
+<span class="sig-name descname"><span class="pre">write</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.params.parameters.write" title="Permalink to this definition"></a></dt>
+<dd><p>Method to write the parameter dictionary to a json file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>self</strong> – a <cite>parameters</cite> dictionary that can contain numpy arrays (they will be converted to list)</p></li>
+<li><p><strong>fname</strong> – (string) the name of the .json file to write</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.params.read_parameters">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.params.</span></span><span class="sig-name descname"><span class="pre">read_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.params.read_parameters" title="Permalink to this definition"></a></dt>
+<dd><p>Function to read a parameters dictionary that has been written to file
+as a .json file. 
+IMPORTANT NOTE: if some of the keys originally contained a numpy array prior to being written to file,
+they will now be in the form of python lists. It is important to transform them back into numpy array if you want to use them as such.</p>
+<p>TODO: decide if we want to return a plain dictionary or a parameters class dictionary?</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>fname</strong> – the name of the .json file</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-pyRaven.pattern">
+<span id="pattern-module"></span><h2>pattern module<a class="headerlink" href="#module-pyRaven.pattern" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-pyRaven.profileI">
+<span id="profilei-module"></span><h2>profileI module<a class="headerlink" href="#module-pyRaven.profileI" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.profileI.voigt_fara">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.profileI.</span></span><span class="sig-name descname"><span class="pre">voigt_fara</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.profileI.voigt_fara" title="Permalink to this definition"></a></dt>
+<dd><p>Calculation of Voigt and Faraday-Voigt profiles</p>
+<blockquote>
+<div><dl class="field-list simple">
+<dt class="field-odd">param u<span class="colon">:</span></dt>
+<dd class="field-odd"><p>array of frequency in doppler width units.</p>
+</dd>
+<dt class="field-even">param a<span class="colon">:</span></dt>
+<dd class="field-even"><p>damping coefficient</p>
+</dd>
+<dt class="field-odd">return w<span class="colon">:</span></dt>
+<dd class="field-odd"><p>complex array where Voigt is the real component and Voigt-Fara is the imaginary component.</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+</section>
+<section id="module-pyRaven.localV">
+<span id="localv-module"></span><h2>localV module<a class="headerlink" href="#module-pyRaven.localV" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.localV.unno_local_out_IV">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.localV.</span></span><span class="sig-name descname"><span class="pre">unno_local_out_IV</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ub</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ua</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pattern</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">small_u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">all_u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sin_theta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cos_theta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sin_2chi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cos_2chi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kappa</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bnu</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.localV.unno_local_out_IV" title="Permalink to this definition"></a></dt>
+<dd><p>Calculate a local line profile in all Stokes paramters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ub</strong> – the lambda_B in doppler width units.</p></li>
+<li><p><strong>ua</strong> – local radial velocity in doppler width units.</p></li>
+<li><p><strong>pattern</strong> – a zeeman pattern dictionary returned by the zeeman_pattern function</p></li>
+<li><p><strong>small_u</strong> – the uo array for the w array that contains the centered line profile function</p></li>
+<li><p><strong>w</strong> – the line profile function centered at uo=0, calculated over small_u (the profile functions are shifted and interpolated for the addition of all the zeeman components, instead of recalculated, to same computation time).</p></li>
+<li><p><strong>all_u</strong> – the full wavelength array in doppler width units. It need to be larger enough to accomodate the largest zeeman and rotational shifts.</p></li>
+<li><p><strong>sin_theta</strong> – sin of the angle between the local magnetic field and the LOS.</p></li>
+<li><p><strong>cos_theta</strong> – cos of the angle between the local magnetic field and the LOS.</p></li>
+<li><p><strong>sin_2chi</strong> – sin of 2x the angle between the local magnetic field and the reference direction in the plane of the sky</p></li>
+<li><p><strong>cos_2chi</strong> – cos of 2x the angle between the local magnetic field and the reference direction in the plane of the sky</p></li>
+<li><p><strong>kappa</strong> – the line strength parameter</p></li>
+<li><p><strong>bnu</strong> – the slope of the source function with respect to the vertical optical depth</p></li>
+<li><p><strong>mu</strong> – the angle between the normal to the surface and the LOS.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-pyRaven.diskint2">
+<span id="diskint2-module"></span><h2>diskint2 module<a class="headerlink" href="#module-pyRaven.diskint2" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.diskint2.analytical">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.diskint2.</span></span><span class="sig-name descname"><span class="pre">analytical</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.diskint2.analytical" title="Permalink to this definition"></a></dt>
+<dd><p>Function to calculate an intensity line profile using an analytical convolution</p>
+<p>The necessary keys in the parameters dictionary object are:
+- general/vsini
+- general/logkappa
+- general/bnu
+- general/vdop
+- general/ndop
+- general/av
+- general/lambda0</p>
+<p>Note: if the vsini is less then vdop/2, then the function directly returns the non-rotating line profile.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>param</strong> – a parameters dictionary</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.diskint2.get_B_LOS">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.diskint2.</span></span><span class="sig-name descname"><span class="pre">get_B_LOS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">B_MAG</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mag2rot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rot2los</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.diskint2.get_B_LOS" title="Permalink to this definition"></a></dt>
+<dd><p>Function to convert the magnetic field vectors in the MAG coordinate system to the LOS coordinate system</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>B_MAG</strong> – the (3, n_real) matric with Bx, By, Bz of the grid points in the MAG coordinate</p></li>
+<li><p><strong>mag2rot</strong> – the mag to rot rotation matrix</p></li>
+<li><p><strong>rot2los</strong> – the rot to los rotation matrix</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.diskint2.get_B_MAG">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.diskint2.</span></span><span class="sig-name descname"><span class="pre">get_B_MAG</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">MAG</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.diskint2.get_B_MAG" title="Permalink to this definition"></a></dt>
+<dd><p>Function to calculate the field values on the MAG grid in (Bpole/2) units</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>MAG</strong> – the MAG (3, n_real) coordinate grid</p>
+</dd>
+<dt class="field-even">Return B_MAG<span class="colon">:</span></dt>
+<dd class="field-even"><p>a (3, n_real) matric with Bx, By, Bz of the grid points in the MAG coordinate.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.diskint2.get_LOS">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.diskint2.</span></span><span class="sig-name descname"><span class="pre">get_LOS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ROT</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rot2los</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.diskint2.get_LOS" title="Permalink to this definition"></a></dt>
+<dd><p>Function to convert a ROT grid coordinates into LOS coordinates</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ROT</strong> – the (3, n_real) matrix for the x,y,z coordinates of each grid points</p></li>
+<li><p><strong>rot2los</strong> – the rotation matrix</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.diskint2.get_LOS_values">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.diskint2.</span></span><span class="sig-name descname"><span class="pre">get_LOS_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">LOS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vsini</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vdop</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.diskint2.get_LOS_values" title="Permalink to this definition"></a></dt>
+<dd><p>Function to calculate the mu angle, a bolean value for visibility, the projected area and velocity of each grid point, 
+along with the integrated continuum flux for profile normalization</p>
+<p>returns:</p>
+<ul class="simple">
+<li><p>mu_LOS: angle between the surface normal and the line-of-sight</p></li>
+<li><p>vis: boolean array, TRUE is the grid point is visible</p></li>
+<li><p>A_LOS: the projected area of the visible grid points normalized to unity</p></li>
+<li><p>uLOS: the projected rotational velocity of the grid points in uo units.</p></li>
+<li><p>conti_flux: the integrated continuum flux for profile normalization.</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>LOS</strong> – The (3, n_real) grid coordinates in LOS coordinates</p></li>
+<li><p><strong>A</strong> – the area of each grid point</p></li>
+<li><p><strong>S1</strong> – the slope of the source function</p></li>
+<li><p><strong>vsini</strong> – projected rotational equatorial velocity (in km/s)</p></li>
+<li><p><strong>vdop</strong> – the thermal broadening velocity (in km/s)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.diskint2.get_MAG">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.diskint2.</span></span><span class="sig-name descname"><span class="pre">get_MAG</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ROT</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rot2mag</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.diskint2.get_MAG" title="Permalink to this definition"></a></dt>
+<dd><p>Function to convert a ROT grid coordinates into MAG coordinates</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ROT</strong> – the (3, n_real) matrix for the x,y,z coordinates of each grid points</p></li>
+<li><p><strong>rot2mag</strong> – the rotation matrix</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.diskint2.get_all_u">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.diskint2.</span></span><span class="sig-name descname"><span class="pre">get_all_u</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vel_range</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ndop</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.diskint2.get_all_u" title="Permalink to this definition"></a></dt>
+<dd><p>Function to create the larger dispersion array (in uo units) that will accomodate the whole disk-integrated profile.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>vel_range</strong> – the range needed to accomodate the profile in uo units. NOTE: the code with round up to a integer bound</p></li>
+<li><p><strong>ndop</strong> – the number of datapoints per sigma (use the same as for the small dispersion array, please)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.diskint2.get_empty_model">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.diskint2.</span></span><span class="sig-name descname"><span class="pre">get_empty_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">all_u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vdop</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unno</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.diskint2.get_empty_model" title="Permalink to this definition"></a></dt>
+<dd><p>Function to create a structure to save the final model. If unno=True, IQUV, else, just IV.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>all_u</strong> – the total dispersion array in uo units</p></li>
+<li><p><strong>vdop</strong> – the thermal broadening in km/s</p></li>
+<li><p><strong>lambda0</strong> – rest wavelength of transition in AA.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.diskint2.get_local_weak_interp">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.diskint2.</span></span><span class="sig-name descname"><span class="pre">get_local_weak_interp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">small_u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w_weak</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dw_weak</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">all_u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uLOS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu_LOS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bnu</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kappa</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Bz</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.diskint2.get_local_weak_interp" title="Permalink to this definition"></a></dt>
+<dd><p>Function to get the local I and V from the weak field approximation, by using an interpolation of a 
+fixed profile function in the rest frame.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>small_u</strong> – the uo grid on which the profile is defined</p></li>
+<li><p><strong>w_weak</strong> – the voigt profile (already divided by sqrt(2pi))</p></li>
+<li><p><strong>dw_weak</strong> – the derivative of the voigt profile with respect to uo</p></li>
+<li><p><strong>all_u</strong> – the (larger) dispersion grid on which to interpolate (enough to encompase the vsini) in uo units</p></li>
+<li><p><strong>uLOS</strong> – the (rotational) radial velocity of the grid point in uo units</p></li>
+<li><p><strong>mu_LOS</strong> – the mu angle of the grid point (angle between LOS and normal to surface)</p></li>
+<li><p><strong>bnu</strong> – the slope of the source function with respect to tau_z (the vertical optical depth, the change in slope because of the mu angle is coded in)</p></li>
+<li><p><strong>kappa</strong> – the line strenght parameter</p></li>
+<li><p><strong>Bz</strong> – the Bz of that grid point (in Bpole/2 units)</p></li>
+</ul>
+</dd>
+</dl>
+<p>returns: the local_I and local_V profiles, used for disk integration. 
+The local_I and local_V need to be multiplied by the projected area (A_LOS) of the grid point during the integration.
+Furthermore, the local_V needs to be multiplied (can be done after the integration) by geff * Bpole/2 * kappa * perGaussLorentz,
+where perGaussLorentz(lambda0, vdop) is defined in the explanatory notebook.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.diskint2.get_local_weak_interp_Vonly_numba">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.diskint2.</span></span><span class="sig-name descname"><span class="pre">get_local_weak_interp_Vonly_numba</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">small_u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w_weak</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dw_weak</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">all_u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uLOS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu_LOS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kappa</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Bz</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.diskint2.get_local_weak_interp_Vonly_numba" title="Permalink to this definition"></a></dt>
+<dd><p>Function to get the local V only (for the loop) from the weak field approximation, by using an interpolation of a 
+fixed profile function in the rest frame.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>small_u</strong> – the uo grid on which the profile is defined</p></li>
+<li><p><strong>w_weak</strong> – the voigt profile (already divided by sqrt(2pi))</p></li>
+<li><p><strong>dw_weak</strong> – the derivative of the voigt profile with respect to uo</p></li>
+<li><p><strong>all_u</strong> – the (larger) dispersion grid on which to interpolate (enough to encompase the vsini) in uo units</p></li>
+<li><p><strong>uLOS</strong> – the (rotational) radial velocity of the grid point in uo units</p></li>
+<li><p><strong>mu_LOS</strong> – the mu angle of the grid point (angle between LOS and normal to surface)</p></li>
+<li><p><strong>bnu</strong> – the slope of the source function with respect to tau_z (the vertical optical depth, the change in slope because of the mu angle is coded in)</p></li>
+<li><p><strong>kappa</strong> – the line strenght parameter</p></li>
+<li><p><strong>Bz</strong> – the Bz of that grid point (in Bpole/2 units)</p></li>
+</ul>
+</dd>
+</dl>
+<p>returns: local_V profile, used for disk integration. 
+The local_V need to be multiplied by the projected area (A_LOS) of the grid point during the integration.
+Furthermore, the local_V needs to be multiplied (can be done after the integration) by geff * Bpole/2 * kappa * perGaussLorentz,
+where perGaussLorentz(lambda0, vdop) is defined in the explanatory notebook.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.diskint2.get_los2rot">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.diskint2.</span></span><span class="sig-name descname"><span class="pre">get_los2rot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">incl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phase</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.diskint2.get_los2rot" title="Permalink to this definition"></a></dt>
+<dd><p>Function to get the rotation matrix that converts from LOS coordinates to ROT coordinates. 
+NOTE: The angles are passed in degrees.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>incl</strong> – the inclination of the rotational axis to the line of sight</p></li>
+<li><p><strong>phase</strong> – the rotational phase (see documentation notebook for the rotation coordinate system conventions)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.diskint2.get_ngrid">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.diskint2.</span></span><span class="sig-name descname"><span class="pre">get_ngrid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vsini</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.diskint2.get_ngrid" title="Permalink to this definition"></a></dt>
+<dd><p>Function to calculate the number of spatial grid point necessary for a given vsini.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.diskint2.get_perGaussLorentz">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.diskint2.</span></span><span class="sig-name descname"><span class="pre">get_perGaussLorentz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lambda0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vdop</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.diskint2.get_perGaussLorentz" title="Permalink to this definition"></a></dt>
+<dd><p>Function to calculate the perGaussLorentz (in 1/Gauss) constant for a given central wavelength and thermal broadening.</p>
+<ul class="simple">
+<li><p>For the unno calculation: This gets multiplied by B in the disk integration to get uB,i.</p></li>
+<li><p>For the weak-field approximation calculation: This gets multiplied by geff*Bz and the Stokes V shape in the disk integration to get V(uo)</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lambda0</strong> – central wavelength in AA.</p></li>
+<li><p><strong>vdop</strong> – thermal broadening in km/s</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.diskint2.get_resmac_kernel">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.diskint2.</span></span><span class="sig-name descname"><span class="pre">get_resmac_kernel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">all_u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uconv</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.diskint2.get_resmac_kernel" title="Permalink to this definition"></a></dt>
+<dd><p>Function to calculate a combined gaussian kernel for macroturbulence and spectral resolution
+Returns an astropy kernel object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>all_u</strong> – dispersion array in uo units on which the kernel will be calculated</p></li>
+<li><p><strong>uconv</strong> – the sigma of the gaussian kernel in uo units. Should be set to ( u_rot**2 + u_res**2 )**0.5</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.diskint2.get_rot2mag">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.diskint2.</span></span><span class="sig-name descname"><span class="pre">get_rot2mag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">beta</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.diskint2.get_rot2mag" title="Permalink to this definition"></a></dt>
+<dd><p>Function to get the rotation matrix that converts from ROT coordinates to MAG coordinates. 
+NOTE: The angles are passed in degrees.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>beta</strong> – the obliquity of the magnetic axis to the rotational axis</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.diskint2.get_rotKernel">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.diskint2.</span></span><span class="sig-name descname"><span class="pre">get_rotKernel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">uo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">urot</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.diskint2.get_rotKernel" title="Permalink to this definition"></a></dt>
+<dd><p>Helper function to get the rotational covolution profile</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>uo</strong> – (numpy array) the velocity array in u0 units (v/vthermal)</p></li>
+<li><p><strong>S1</strong> – the slope of the source function (see ADD LINK for conversion between the slope of the source function and epsilon)</p></li>
+<li><p><strong>urot</strong> – the vsini in u0 units (vsini / vthermal)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.diskint2.get_small_u">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.diskint2.</span></span><span class="sig-name descname"><span class="pre">get_small_u</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ndop</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.diskint2.get_small_u" title="Permalink to this definition"></a></dt>
+<dd><p>Function to return the small dispersion grid (in uo units) for the Voigt-Fara profile calculations</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sig</strong> – number of sigmas from line center for the range (usually 8-10)</p></li>
+<li><p><strong>ndop</strong> – number of datapoints per sigma (usually 5-10)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.diskint2.get_uconv">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.diskint2.</span></span><span class="sig-name descname"><span class="pre">get_uconv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.diskint2.get_uconv" title="Permalink to this definition"></a></dt>
+<dd><p>Function to calculate and return the combined sigma of the gaussian kernel that will 
+perform the convolution for the macroturbulence and the spectral instrument resolution
+:param param: a parameter dictionary</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.diskint2.get_unno_angles">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.diskint2.</span></span><span class="sig-name descname"><span class="pre">get_unno_angles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">B_LOS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Bpole</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.diskint2.get_unno_angles" title="Permalink to this definition"></a></dt>
+<dd><p>Function to calculate for each grid point:
+1. The angles between the magnetic field vectors and the line of sight (cos(theta), sin(theta), cos(2*chi), sin(2*chi))
+2. The magnitude of the magnetic field</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>B_LOS</strong> – the (3, n_real) matric with Bx, By, Bz of the grid points in the LOS coordinate system</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.diskint2.get_vel_range_unno">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.diskint2.</span></span><span class="sig-name descname"><span class="pre">get_vel_range_unno</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pattern</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Bpole</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">perGaussLorentz</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vsini_over_vdop</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.diskint2.get_vel_range_unno" title="Permalink to this definition"></a></dt>
+<dd><p>Function to figure out the length of vector that we need for the velocity grid, for the Unno solution.
+Takes the max of the Zeeman shift or the vsini, then add the sig*vdop widths.
+to accomodate the whole w(small_u) array shifted to the maximum value possible.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pattern</strong> – the zeeman pattern object</p></li>
+<li><p><strong>Bpole</strong> – the dipolar (or max) field strength</p></li>
+</ul>
+</dd>
+<dt class="field-even">PerGaussLorentz<span class="colon">:</span></dt>
+<dd class="field-even"><p>the perGaussLorentz constant for that specific central wavelenght and thermal broadening.</p>
+</dd>
+<dt class="field-odd">Vsini_over_vdop<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the rotational broadening in uo units.</p>
+</dd>
+<dt class="field-even">Sig<span class="colon">:</span></dt>
+<dd class="field-even"><p>the width in sigma that was used to calculate the small dispersion array (the one used to calculated the Voigt profile)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.diskint2.get_w_unno">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.diskint2.</span></span><span class="sig-name descname"><span class="pre">get_w_unno</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">small_u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">av</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ndop</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.diskint2.get_w_unno" title="Permalink to this definition"></a></dt>
+<dd><p>Function to calculate the Voigt and Voigt-Faraday profiles over the given dispersion grid (in uo units). 
+It will also pad the array at both ends with zeros for one sigma. 
+Note: the result is an array of complex numbers. The real part is the Voigt profile and the imaginary part is the Voigt-Faraday profile.
+Note: Used by the unno solution. The profile is NOT normalized (so not mulitplied by 1/sqrt(pi), because this is done in the local profile function calculation)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>small_u</strong> – the dispersion grid in uo units</p></li>
+<li><p><strong>av</strong> – the damping factor</p></li>
+<li><p><strong>ndop</strong> – the number of datapoint per sigma used in the creation of the dispersion array.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.diskint2.get_w_weak">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.diskint2.</span></span><span class="sig-name descname"><span class="pre">get_w_weak</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">small_u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">av</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ndop</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.diskint2.get_w_weak" title="Permalink to this definition"></a></dt>
+<dd><p>Function to calculate the normalized (so mulitplied by 1/sqrt(pi)) local profile, and the derivative of the local profile, 
+to be used in the the weak-field approximation. 
+It will also pad the array at both ends with zeros for one sigma.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>small_u</strong> – the dispersion grid in uo units</p></li>
+<li><p><strong>av</strong> – the damping factor</p></li>
+<li><p><strong>ndop</strong> – the number of datapoint per sigma used in the creation of the dispersion array.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.diskint2.grid_ROT">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.diskint2.</span></span><span class="sig-name descname"><span class="pre">grid_ROT</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ngrid</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.diskint2.grid_ROT" title="Permalink to this definition"></a></dt>
+<dd><p>Function to set up the grid at the surface of the star,
+in the rotation frame of reference. 
+NOTE: the final number of grid point might be slightly different than the input,
+as the code attempts to have grid points with roughtly the same surface area.
+Returns:
+* a (3, n_real) matrix for the x,y,z coordinates of each grid points
+* a (n_real) array with the surface area of each grid point.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ngrid</strong> – the number of spatial gridpoints on the sphere.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.diskint2.model_convolve_resvmac">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.diskint2.</span></span><span class="sig-name descname"><span class="pre">model_convolve_resvmac</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unno</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.diskint2.model_convolve_resvmac" title="Permalink to this definition"></a></dt>
+<dd><p>Helper function to convolve a model with a kernel. 
+The flux convolution has a fill_value=1.0, and the Stokes convolution have fill_value=0.0. 
+Note – this function does not extend the arrays. The checks on the kernel is performed in the calling function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> – a model object</p></li>
+<li><p><strong>kernel</strong> – an astropy kernel object</p></li>
+<li><p><strong>unno</strong> – (True) flag for a unno calculation. If True, will convolve Q and U.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.diskint2.numerical">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.diskint2.</span></span><span class="sig-name descname"><span class="pre">numerical</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unno</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.diskint2.numerical" title="Permalink to this definition"></a></dt>
+<dd><p>Function to calculated a line profile using a numerical disk integration, 
+either in the weak-field approximation (unno=False, default)
+or with the Unno solution (unno=True).</p>
+<p>The necessary keys in the parameters dictionary object are:
+- general/vsini
+- general/logkappa
+- general/bnu
+- general/vdop
+- general/ndop
+- general/av
+- general/lambda0
+- general/Bpole
+- general/incl
+- general/beta
+- general/phase</p>
+<p>If general/res and general/vmac are not present, the former will be set to infinity and the latter to zero</p>
+<p>For the weak field approximation
+- weak/geff
+For the Unno calculation
+- unno/up
+- unno/down</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.diskint2.pad_V">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.diskint2.</span></span><span class="sig-name descname"><span class="pre">pad_V</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ext_all_u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">all_u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">V</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.diskint2.pad_V" title="Permalink to this definition"></a></dt>
+<dd><p>Helper function for the loop that pads Stokes V to accomodate a convolution</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ext_all_u</strong> – the new uo array</p></li>
+<li><p><strong>all_u</strong> – the existing uo array</p></li>
+<li><p><strong>V</strong> – the Stokes V model defined on all_u</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.diskint2.pad_model">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.diskint2.</span></span><span class="sig-name descname"><span class="pre">pad_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_ext_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unno</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.diskint2.pad_model" title="Permalink to this definition"></a></dt>
+<dd><p>Function to pad a model object with 1.0 (intensity) or 0.0 (Stokes) in order to accomodate a convolution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> – the model to pad</p></li>
+<li><p><strong>input_ext_model</strong> – the extended empty model object</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-pyRaven.fitparams">
+<span id="fitparams-module"></span><h2>fitparams module<a class="headerlink" href="#module-pyRaven.fitparams" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.fitparams.fitdata">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.fitparams.</span></span><span class="sig-name descname"><span class="pre">fitdata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">DataPacket</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">guess</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.fitparams.fitdata" title="Permalink to this definition"></a></dt>
+<dd><p>This function fits a set of LSD profiles using scipy’s curve fit function.</p>
+<dl>
+<dt>Inputs:</dt><dd><blockquote>
+<div><p>param - input parameter dictionary
+DataPacket - input DataPacket with real data
+guess - array of guess values for kappa, vsini, and vmac. Ex: np.array([1.3,250,30])</p>
+</div></blockquote>
+<dl class="simple">
+<dt>Outputs:</dt><dd><p>parameters - array of fit parameters
+covariance - covariance matrix of the fit
+modelout - the best fit model</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.fitparams.fitdataMCMC">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.fitparams.</span></span><span class="sig-name descname"><span class="pre">fitdataMCMC</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">DataPacket</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nsteps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">guess</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.fitparams.fitdataMCMC" title="Permalink to this definition"></a></dt>
+<dd><p>This function fits the LSD profile using MCMC</p>
+<dl class="simple">
+<dt>Inputs:</dt><dd><p>param - input parameter dictionary
+DataPacket - input DataPacket with real data
+nsteps - number of steps to run MCMC
+guess - array of guess values for kappa, vsini, and vmac. Ex: np.array([1.3,250,30])</p>
+</dd>
+<dt>Outputs:</dt><dd><p>kappa - The average fitted value of kappa
+vsini - The average fitted value of vsini
+vmac - The average fitted value of vmac</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.fitparams.fitdata_novsini">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.fitparams.</span></span><span class="sig-name descname"><span class="pre">fitdata_novsini</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">DataPacket</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">guess</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.fitparams.fitdata_novsini" title="Permalink to this definition"></a></dt>
+<dd><p>This function fits a set of LSD profiles using scipy’s curve fit function.</p>
+<dl>
+<dt>Inputs:</dt><dd><blockquote>
+<div><p>param - input parameter dictionary
+DataPacket - input DataPacket with real data
+guess - array of guess values for kappa and vmac. Ex: np.array([1.3,30])</p>
+</div></blockquote>
+<dl class="simple">
+<dt>Outputs:</dt><dd><p>parameters - array of fit parameters
+covariance - covariance matrix of the fit
+modelout - the best fit model</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-pyRaven.loop">
+<span id="loop-module"></span><h2>loop module<a class="headerlink" href="#module-pyRaven.loop" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.loop.loop">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.loop.</span></span><span class="sig-name descname"><span class="pre">loop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datapacket</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.loop.loop" title="Permalink to this definition"></a></dt>
+<dd><p>Function to calculate the chi square between 
+all of the LSD profiles in a pyRaven data packet and 
+the Stokes V profiles for a grid of dipole paramters 
+(inclination, beta, phase, and Bpole)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>param</strong> – For now, see the documentation notebook for the content of the param dictionary.</p></li>
+<li><p><strong>datapacket</strong> – a pyRaven datapacket for a given set of observations</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.loop.loop_wrapper">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.loop.</span></span><span class="sig-name descname"><span class="pre">loop_wrapper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_param</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_datapacket</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.loop.loop_wrapper" title="Permalink to this definition"></a></dt>
+<dd><p>This function is a wrapper to the loop function. 
+It it designed to be run in a directory that contains a parameters json file, and a DataPacket h5 file. 
+The output are written in the same directory by default.</p>
+<p>This wrapper is useful to generate the chi2 data on a remote server.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file_param</strong> – A json file containing the parameter object (see INSERT LINK)</p></li>
+<li><p><strong>file_datapackt</strong> – A h5 file containing the DataPacket structure</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-pyRaven.loop_speed">
+<span id="loop-speed-module"></span><h2>loop_speed module<a class="headerlink" href="#module-pyRaven.loop_speed" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.loop_speed.disk_int_loop_numba">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.loop_speed.</span></span><span class="sig-name descname"><span class="pre">disk_int_loop_numba</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">all_u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vis</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">small_u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w_weak</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dw_weak</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uLOS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu_LOS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kappa</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B_z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">A_LOS</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.loop_speed.disk_int_loop_numba" title="Permalink to this definition"></a></dt>
+<dd><p>Helper function to perform the disk integration, decorated with numba.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.loop_speed.loop_speed">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.loop_speed.</span></span><span class="sig-name descname"><span class="pre">loop_speed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datapacket</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.loop_speed.loop_speed" title="Permalink to this definition"></a></dt>
+<dd><p>Function to calculate the chi square between 
+all of the LSD profiles in a pyRaven data packet and 
+the Stokes V profiles for a grid of dipole paramters 
+(inclination, beta, phase, and Bpole)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>param</strong> – For now, see the documentation notebook for the content of the param dictionary.</p></li>
+<li><p><strong>datapacket</strong> – a pyRaven datapacket for a given set of observations</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.loop_speed.loop_speed_wrapper">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.loop_speed.</span></span><span class="sig-name descname"><span class="pre">loop_speed_wrapper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_param</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_datapacket</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.loop_speed.loop_speed_wrapper" title="Permalink to this definition"></a></dt>
+<dd><p>This function is a wrapper to the loop function. 
+It it designed to be run in a directory that contains a parameters json file, and a DataPacket h5 file. 
+The output are written in the same directory by default.</p>
+<p>This wrapper is useful to generate the chi2 data on a remote server.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file_param</strong> – A json file containing the parameter object (see INSERT LINK)</p></li>
+<li><p><strong>file_datapackt</strong> – A h5 file containing the DataPacket structure</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-pyRaven.BayesObjects">
+<span id="bayesobjects-module"></span><h2>BayesObjects module<a class="headerlink" href="#module-pyRaven.BayesObjects" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyRaven.BayesObjects.chi">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyRaven.BayesObjects.</span></span><span class="sig-name descname"><span class="pre">chi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta_arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Bpole_arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi_arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">incl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obsID</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.BayesObjects.chi" title="Permalink to this definition"></a></dt>
+<dd><p>Class definition for the objects that will store the chi2s</p>
+<p>See __init__ for class content.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyRaven.BayesObjects.chi.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta_arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Bpole_arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi_arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">incl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obsID</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.BayesObjects.chi.__init__" title="Permalink to this definition"></a></dt>
+<dd><p>Initialization of a chi object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> – a (n_beta, n_Bpole, n_phi) array containing the chi2s</p></li>
+<li><p><strong>beta_arr</strong> – a 1D array with the grid values for the beta axis (in degree)</p></li>
+<li><p><strong>Bpole_arr</strong> – a 1D array with the grid values for the Bpole axis (in Gauss)</p></li>
+<li><p><strong>phi_arra</strong> – a 1D array with the grid values for the phase axis (in degree)</p></li>
+<li><p><strong>incl</strong> – (float) the inclination value for this set of chi2s (in degree)</p></li>
+<li><p><strong>obsID</strong> – (string or float) the observation ID for this set of chi2s</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyRaven.BayesObjects.chi.write">
+<span class="sig-name descname"><span class="pre">write</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.BayesObjects.chi.write" title="Permalink to this definition"></a></dt>
+<dd><p>Class function to write the chi object to a h5 file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>fname</strong> – (string) the path/name of the h5 file to be created</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.BayesObjects.combine_obs">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.BayesObjects.</span></span><span class="sig-name descname"><span class="pre">combine_obs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nobs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folder_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.BayesObjects.combine_obs" title="Permalink to this definition"></a></dt>
+<dd><p>Wrapper function to calculate a variety of posterior probabilities and
+combine the probabilities for multiple observtions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nobs</strong> – Number of observations</p></li>
+<li><p><strong>folder_path</strong> – Path of the lnLH and lnpost files. Default is current directory</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.BayesObjects.create_chi">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.BayesObjects.</span></span><span class="sig-name descname"><span class="pre">create_chi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">beta_arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Bpole_arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi_arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">incl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obsID</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.BayesObjects.create_chi" title="Permalink to this definition"></a></dt>
+<dd><p>Function to create an empty chi2 object. This is used in the loop.py
+The chi.data will be a np.zeros array of the approprate size for the beta_arr, Bpole_arr, and phi_arr given</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>beta_arr</strong> – numpy 1D array with grid values for the beta axis (in degree)</p></li>
+<li><p><strong>Bpole_arr</strong> – numpy 1D array with grid values for the Bpole axis (in Gauss)</p></li>
+<li><p><strong>phi_arr</strong> – numpy 1D array with grid values for the phase axis (in degree)</p></li>
+<li><p><strong>incl</strong> – (float) the inclination value for this set of chi2s (in degree)</p></li>
+<li><p><strong>obsID</strong> – (string or float) the observation ID for this set of chi2s</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.BayesObjects.create_empty_lnP_odds">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.BayesObjects.</span></span><span class="sig-name descname"><span class="pre">create_empty_lnP_odds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">beta_arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Bpole_arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi_arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">incl_arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obsID</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.BayesObjects.create_empty_lnP_odds" title="Permalink to this definition"></a></dt>
+<dd><p>Helper function to create an empty lnP_odds object. 
+The lnP_odds.data will be a np.zeros array of the approprate size for the beta_arr, Bpole_arr, and phi_arr given</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>beta_arr</strong> – numpy 1D array with grid values for the beta axis (in degree)</p></li>
+<li><p><strong>Bpole_arr</strong> – numpy 1D array with grid values for the Bpole axis (in Gauss)</p></li>
+<li><p><strong>phi_arr</strong> – numpy 1D array with grid values for the phase axis (in degree)</p></li>
+<li><p><strong>incl_arr</strong> – numpy 1D array with grid values for the inclination axis (in degree)</p></li>
+<li><p><strong>obsID</strong> – (string or float) the observation ID for this set of chi2s</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.BayesObjects.create_empty_lnP_pars">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.BayesObjects.</span></span><span class="sig-name descname"><span class="pre">create_empty_lnP_pars</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">beta_arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Bpole_arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi_arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">incl_arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obsID</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise_arr</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.BayesObjects.create_empty_lnP_pars" title="Permalink to this definition"></a></dt>
+<dd><p>Helper function to create an empty LH_odds object. 
+The lnLH_pars.data will be a np.zeros array of the approprate size for the beta_arr, Bpole_arr, phi_arr, and noise_arr given</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>beta_arr</strong> – numpy 1D array with grid values for the beta axis (in degree)</p></li>
+<li><p><strong>Bpole_arr</strong> – numpy 1D array with grid values for the Bpole axis (in Gauss)</p></li>
+<li><p><strong>phi_arr</strong> – numpy 1D array with grid values for the phase axis (in degree)</p></li>
+<li><p><strong>incl_arr</strong> – numpy 1D array with grid values for the inclination axis (in degree)</p></li>
+<li><p><strong>obsID</strong> – (string or float) the observation ID for this set of chi2s</p></li>
+<li><p><strong>noise_arr</strong> – numpy 1D array with grid values for the scale noise parameter (no units)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.BayesObjects.create_lnLH_odds_from_chi">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.BayesObjects.</span></span><span class="sig-name descname"><span class="pre">create_lnLH_odds_from_chi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datapacket</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.BayesObjects.create_lnLH_odds_from_chi" title="Permalink to this definition"></a></dt>
+<dd><p>Function to calculate the lnLH_odds from a set of already calcualted chi2. (see REF)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>folder_path</strong> – the path of the folder that contains the chi2 files. Default is current directory</p></li>
+<li><p><strong>param</strong> – the parameter object used to calculate the chi2</p></li>
+<li><p><strong>datapacket</strong> – the datapacket used to calculate the chi2 (used to reconstruct the filenames)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Paran output_path<span class="colon">:</span></dt>
+<dd class="field-even"><p>the path fo the folder to output the files to. Default is current directory</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.BayesObjects.create_lnLH_pars_from_chi">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.BayesObjects.</span></span><span class="sig-name descname"><span class="pre">create_lnLH_pars_from_chi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datapacket</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.BayesObjects.create_lnLH_pars_from_chi" title="Permalink to this definition"></a></dt>
+<dd><p>Function to calculate the lnLH_pars from a set of already calcualted chi2. (see REF)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>folder_path</strong> – the path of the folder that contains the chi2 files. Default is current directory</p></li>
+<li><p><strong>param</strong> – the parameter object used to calculate the chi2. Need to include the ‘grid’ information</p></li>
+<li><p><strong>datapacket</strong> – the datapacket used to calculate the chi2 (used to reconstruct the filenames)</p></li>
+<li><p><strong>output_path</strong> – the path of the folder to output the files to. Default is current directory</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.BayesObjects.exp_check">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.BayesObjects.</span></span><span class="sig-name descname"><span class="pre">exp_check</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lnP</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.BayesObjects.exp_check" title="Permalink to this definition"></a></dt>
+<dd><p>Function with an automated check for nans in the expoential</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.BayesObjects.get_prior_Bpole">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.BayesObjects.</span></span><span class="sig-name descname"><span class="pre">get_prior_Bpole</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Bpole_arr</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.BayesObjects.get_prior_Bpole" title="Permalink to this definition"></a></dt>
+<dd><p>Get the modified jeffreys prior for the Bpole.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.BayesObjects.get_prior_beta">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.BayesObjects.</span></span><span class="sig-name descname"><span class="pre">get_prior_beta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">beta_arr</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.BayesObjects.get_prior_beta" title="Permalink to this definition"></a></dt>
+<dd><p>Get the flat prior for beta</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.BayesObjects.get_prior_incl">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.BayesObjects.</span></span><span class="sig-name descname"><span class="pre">get_prior_incl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">incl_arr</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.BayesObjects.get_prior_incl" title="Permalink to this definition"></a></dt>
+<dd><p>Get the sin prior for the inclination. 
+If incl = 0 or 180, the prior is formally zero. This causes problems in ln-format calculations.
+Normally, if the star has a measured vsini, i cannot be zero, and this issue is avoided 
+by the inclination grid not going to 0 and 180.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>incl_arr</strong> – the inclination grid values (in degree)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.BayesObjects.get_prior_noise">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.BayesObjects.</span></span><span class="sig-name descname"><span class="pre">get_prior_noise</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">noise_arr</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.BayesObjects.get_prior_noise" title="Permalink to this definition"></a></dt>
+<dd><p>Get the Jeffreys prior for the scale noise parameter</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.BayesObjects.get_prior_phi">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.BayesObjects.</span></span><span class="sig-name descname"><span class="pre">get_prior_phi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">phi_arr</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.BayesObjects.get_prior_phi" title="Permalink to this definition"></a></dt>
+<dd><p>Get the flat prior for phi</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyRaven.BayesObjects.lnP_mar">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyRaven.BayesObjects.</span></span><span class="sig-name descname"><span class="pre">lnP_mar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta_arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Bpole_arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">incl_arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obsID</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.BayesObjects.lnP_mar" title="Permalink to this definition"></a></dt>
+<dd><p>Class to store (beta, Bpole, incl) probabilities 
+(so usually lnP_odds or lnP_pars marginalized for phase and noise scale parameter)</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyRaven.BayesObjects.lnP_mar.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta_arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Bpole_arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">incl_arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obsID</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.BayesObjects.lnP_mar.__init__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyRaven.BayesObjects.lnP_mar.normalize">
+<span class="sig-name descname"><span class="pre">normalize</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.BayesObjects.lnP_mar.normalize" title="Permalink to this definition"></a></dt>
+<dd><p>Return a normalized version of self</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyRaven.BayesObjects.lnP_mar.plot_corner">
+<span class="sig-name descname"><span class="pre">plot_corner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fig</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">right</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.BayesObjects.lnP_mar.plot_corner" title="Permalink to this definition"></a></dt>
+<dd><p>Function to display the corner plot for the posterior PARS.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fig</strong> – (None) an already created fig object (for two side-by-side graphs). 
+If None and right=False, it will create a single corner plot. 
+If None and right=True, it will create a double corner plot and plot the current to the right side. 
+To get the left corner plot, call plot_corner again, passing the fig and ax and set right</p></li>
+<li><p><strong>ax</strong> – (None) an already created ax object (for two side-by-side graphs)</p></li>
+<li><p><strong>right</strong> – (False) is False, only one corner plot is displayed. If true, it will create a ax for a double corner plot.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyRaven.BayesObjects.lnP_mar.write">
+<span class="sig-name descname"><span class="pre">write</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.BayesObjects.lnP_mar.write" title="Permalink to this definition"></a></dt>
+<dd><p>Function to write a posterior object to a h5 files</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyRaven.BayesObjects.lnP_odds">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyRaven.BayesObjects.</span></span><span class="sig-name descname"><span class="pre">lnP_odds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta_arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Bpole_arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi_arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">incl_arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obsID</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.BayesObjects.lnP_odds" title="Permalink to this definition"></a></dt>
+<dd><p>Class definition for objects that will store the ln likelihood for the odds ratios</p>
+<p>See __init__ for class content.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyRaven.BayesObjects.lnP_odds.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta_arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Bpole_arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi_arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">incl_arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obsID</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.BayesObjects.lnP_odds.__init__" title="Permalink to this definition"></a></dt>
+<dd><p>Initialization of a LH_odd object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> – a (n_beta, n_Bpole, n_phi, n_incl) array containing the lnLH values</p></li>
+<li><p><strong>beta_arr</strong> – a 1D array with the grid values for the beta axis (in degree)</p></li>
+<li><p><strong>Bpole_arr</strong> – a 1D array with the grid values for the Bpole axis (in Gauss)</p></li>
+<li><p><strong>phi_arr</strong> – a 1D array with the grid values for the phase axis (in degree)</p></li>
+<li><p><strong>incl_arr</strong> – a 1D array with the grid values for the inclination axis (in degree)</p></li>
+<li><p><strong>obsID</strong> – (string or float) the observation ID for this set of chi2s</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyRaven.BayesObjects.lnP_odds.write">
+<span class="sig-name descname"><span class="pre">write</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.BayesObjects.lnP_odds.write" title="Permalink to this definition"></a></dt>
+<dd><p>Class function to write the lnLH_odds object to a h5 file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>fname</strong> – (string) the path/name of the h5 file to be created</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyRaven.BayesObjects.lnP_odds.writef">
+<span class="sig-name descname"><span class="pre">writef</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.BayesObjects.lnP_odds.writef" title="Permalink to this definition"></a></dt>
+<dd><p>Helper class function to create datasets in the passed h5 file object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>f</strong> – a h5 file object</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyRaven.BayesObjects.lnP_pars">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyRaven.BayesObjects.</span></span><span class="sig-name descname"><span class="pre">lnP_pars</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta_arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Bpole_arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi_arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">incl_arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obsID</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise_arr</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.BayesObjects.lnP_pars" title="Permalink to this definition"></a></dt>
+<dd><p>Class definition for the lnP_pars. This class inherits from lnP_odds.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyRaven.BayesObjects.lnP_pars.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta_arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Bpole_arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi_arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">incl_arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obsID</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise_arr</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.BayesObjects.lnP_pars.__init__" title="Permalink to this definition"></a></dt>
+<dd><p>Initialization of a LH_odd object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> – a (n_beta, n_Bpole, n_phi, n_incl) array containing the lnLH values</p></li>
+<li><p><strong>beta_arr</strong> – a 1D array with the grid values for the beta axis (in degree)</p></li>
+<li><p><strong>Bpole_arr</strong> – a 1D array with the grid values for the Bpole axis (in Gauss)</p></li>
+<li><p><strong>phi_arr</strong> – a 1D array with the grid values for the phase axis (in degree)</p></li>
+<li><p><strong>incl_arr</strong> – a 1D array with the grid values for the inclination axis (in degree)</p></li>
+<li><p><strong>obsID</strong> – (string or float) the observation ID for this set of chi2s</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyRaven.BayesObjects.lnP_pars.apply_priors">
+<span class="sig-name descname"><span class="pre">apply_priors</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.BayesObjects.lnP_pars.apply_priors" title="Permalink to this definition"></a></dt>
+<dd><p>Function to apply the priors to a LH PARS object. Returns a LH PARS object that is NOT normalized.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyRaven.BayesObjects.lnP_pars.find_best">
+<span class="sig-name descname"><span class="pre">find_best</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.BayesObjects.lnP_pars.find_best" title="Permalink to this definition"></a></dt>
+<dd><p>Function to return dictionary witht the parameters of the max likelihood
+(NEED TO: marginalized for the scale noise parameter)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyRaven.BayesObjects.lnP_pars.mar_phase_noise">
+<span class="sig-name descname"><span class="pre">mar_phase_noise</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.BayesObjects.lnP_pars.mar_phase_noise" title="Permalink to this definition"></a></dt>
+<dd><p>Function to return the a marginalization of a lnLH object over phase and noise scale, 
+in a new ln_post object.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyRaven.BayesObjects.lnP_pars.normalize">
+<span class="sig-name descname"><span class="pre">normalize</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.BayesObjects.lnP_pars.normalize" title="Permalink to this definition"></a></dt>
+<dd><p>Return a normalized version of self</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyRaven.BayesObjects.lnP_pars.plot_mar">
+<span class="sig-name descname"><span class="pre">plot_mar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fig</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">right</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.BayesObjects.lnP_pars.plot_mar" title="Permalink to this definition"></a></dt>
+<dd><p>Function to plot the 1D marginalization for a lnP_pars object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fig</strong> – (None) an already created fig object (for two side-by-side graphs). 
+If None and right=False, it will create a single corner plot. 
+If None and right=True, it will create a double corner plot and plot the current to the right side. 
+To get the left corner plot, call plot_corner again, passing the fig and ax and set right</p></li>
+<li><p><strong>ax</strong> – (None) an already created ax object (for two side-by-side graphs)</p></li>
+<li><p><strong>right</strong> – (False) is False, only one corner plot is displayed. If true, it will create a ax for a double corner plot.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyRaven.BayesObjects.lnP_pars.plot_prior">
+<span class="sig-name descname"><span class="pre">plot_prior</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fig</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">right</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.BayesObjects.lnP_pars.plot_prior" title="Permalink to this definition"></a></dt>
+<dd><p>Function to plot the 1D prior based on the grid definition of a LH PARS object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fig</strong> – (None) an already created fig object (for two side-by-side graphs). 
+If None and right=False, it will create a single corner plot. 
+If None and right=True, it will create a double corner plot and plot the current to the right side. 
+To get the left corner plot, call plot_corner again, passing the fig and ax and set right</p></li>
+<li><p><strong>ax</strong> – (None) an already created ax object (for two side-by-side graphs)</p></li>
+<li><p><strong>right</strong> – (False) is False, only one corner plot is displayed. If true, it will create a ax for a double corner plot.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyRaven.BayesObjects.lnP_pars.write">
+<span class="sig-name descname"><span class="pre">write</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.BayesObjects.lnP_pars.write" title="Permalink to this definition"></a></dt>
+<dd><p>Class function to write the lnLH_pars object to a h5 file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>fname</strong> – (string) the path/name of the h5 file to be created</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.BayesObjects.ln_mar_check">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.BayesObjects.</span></span><span class="sig-name descname"><span class="pre">ln_mar_check</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lnP_array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.BayesObjects.ln_mar_check" title="Permalink to this definition"></a></dt>
+<dd><p>Function to marginalize an array of ln(P) and return a ln(P).
+Note, this function does not know about the grid size. 
+Therefore the multiplication with the binsize should be done by the caller of this function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>array</strong> – the array of logarithmic probabilities to marginalize</p></li>
+<li><p><strong>axis</strong> – (None) the axis information to pass to np.sum</p></li>
+<li><p><strong>verbose</strong> – (True) outputs a warning for overflow/underflow/nans</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.BayesObjects.overview_plots">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.BayesObjects.</span></span><span class="sig-name descname"><span class="pre">overview_plots</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nobs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folder_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.BayesObjects.overview_plots" title="Permalink to this definition"></a></dt>
+<dd><p>Function to create a PDF with overview plots of the probabilities. 
+This function assumed that the files created by the combine_obs function are in the current directory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nobs</strong> – Number of observations</p></li>
+<li><p><strong>folder_path</strong> – Path of the lnLH and lnpost files. Default is current directory</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.BayesObjects.read_chi">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.BayesObjects.</span></span><span class="sig-name descname"><span class="pre">read_chi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.BayesObjects.read_chi" title="Permalink to this definition"></a></dt>
+<dd><p>Function to read in a chi object from an h5 file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>fname</strong> – (string) the name of the h5 file</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.BayesObjects.read_lnP_mar">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.BayesObjects.</span></span><span class="sig-name descname"><span class="pre">read_lnP_mar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.BayesObjects.read_lnP_mar" title="Permalink to this definition"></a></dt>
+<dd><p>Function to read in a lnpost object from an h5 file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>fname</strong> – (string) the name of the h5 file</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.BayesObjects.read_lnP_odds">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.BayesObjects.</span></span><span class="sig-name descname"><span class="pre">read_lnP_odds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.BayesObjects.read_lnP_odds" title="Permalink to this definition"></a></dt>
+<dd><p>Function to read in a lnLH_odds object from an h5 file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>fname</strong> – (string) the name of the h5 file</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRaven.BayesObjects.read_lnP_pars">
+<span class="sig-prename descclassname"><span class="pre">pyRaven.BayesObjects.</span></span><span class="sig-name descname"><span class="pre">read_lnP_pars</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyRaven.BayesObjects.read_lnP_pars" title="Permalink to this definition"></a></dt>
+<dd><p>Function to read in a lnLH_pars object from an h5 file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>fname</strong> – (string) the name of the h5 file</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-pyRaven.misc">
+<span id="misc-module"></span><h2>misc module<a class="headerlink" href="#module-pyRaven.misc" title="Permalink to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="nblink/bayes_doc.html" class="btn btn-neutral float-left" title="Documentation for the bayesian calculations" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, V. Petit.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

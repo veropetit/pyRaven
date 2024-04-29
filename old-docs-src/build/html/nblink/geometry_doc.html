@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Geometry documentation &mdash; Raven  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/nbsphinx-code-cells.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/template.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Documentation for the bayesian calculations" href="bayes_doc.html" />
+    <link rel="prev" title="Documentation for diskint2" href="diskint2_doc.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Raven
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../Installation.html">Installation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">How to run pyRaven tutorial</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="01-DataSetup.html">01 - Data Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02-FitIntensity.html">Fit of the intensity profiles for single stars</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03-ChiSquareCalcLoop.html">03- Calculating the chi2 with the loop code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04-CalculateProbabilities.html">04 - Calculate probabilites from the chi2 files</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Standalone tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="ParamsObject_tutorial.html">Tutorial on how to use the Params Dictionary objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="BayesObjects_user.html">User’s manual for the BayesObjects.py classes</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Underlying physics and statistics</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="diskint2_doc.html">Documentation for diskint2</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Geometry documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#0.-Loading-packages">0. Loading packages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#1.-grid">1. grid</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="bayes_doc.html">Documentation for the bayesian calculations</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../API.html">pyRaven Package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Raven</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Geometry documentation</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/nblink/geometry_doc.nblink.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="Geometry-documentation">
+<h1>Geometry documentation<a class="headerlink" href="#Geometry-documentation" title="Permalink to this heading"></a></h1>
+<p>This notebook illustrates the geometry of the system</p>
+<section id="0.-Loading-packages">
+<h2>0. Loading packages<a class="headerlink" href="#0.-Loading-packages" title="Permalink to this heading"></a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">astropy.units</span> <span class="k">as</span> <span class="nn">u</span>
+<span class="kn">import</span> <span class="nn">astropy.constants</span> <span class="k">as</span> <span class="nn">const</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">plotly.express</span> <span class="k">as</span> <span class="nn">px</span>
+
+<span class="kn">import</span> <span class="nn">pyRaven</span> <span class="k">as</span> <span class="nn">rav</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+loading specpolFlow package
+</pre></div></div>
+</div>
+<p>Functions for visualization</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">viz_plotly</span><span class="p">(</span> <span class="n">ROT</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="o">**</span><span class="n">kwarg</span> <span class="p">):</span>
+
+  <span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">scatter_3d</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">ROT</span><span class="p">[</span><span class="mi">0</span><span class="p">,:],</span> <span class="n">y</span><span class="o">=</span><span class="n">ROT</span><span class="p">[</span><span class="mi">1</span><span class="p">,:],</span> <span class="n">z</span><span class="o">=</span><span class="n">ROT</span><span class="p">[</span><span class="mi">2</span><span class="p">,:],</span>
+                    <span class="n">color</span><span class="o">=</span><span class="n">c</span><span class="p">,</span> <span class="o">**</span><span class="n">kwarg</span><span class="p">)</span>
+  <span class="c1">#fig.show()</span>
+  <span class="k">return</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="1.-grid">
+<h2>1. grid<a class="headerlink" href="#1.-grid" title="Permalink to this heading"></a></h2>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">genparam</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;lambda0&#39;</span><span class="p">:</span><span class="mi">5000</span><span class="p">,</span>    <span class="c1"># the central wavelength of the transition</span>
+    <span class="s1">&#39;vsini&#39;</span><span class="p">:</span><span class="mf">10.0</span><span class="p">,</span>         <span class="c1"># the projected rotational velocity</span>
+    <span class="s1">&#39;vdop&#39;</span><span class="p">:</span><span class="mf">10.0</span><span class="p">,</span>          <span class="c1"># the thermal broadening</span>
+    <span class="s1">&#39;av&#39;</span><span class="p">:</span><span class="mf">0.05</span><span class="p">,</span>             <span class="c1"># the damping coefficient of the Voigt profile</span>
+    <span class="s1">&#39;bnu&#39;</span><span class="p">:</span><span class="mf">1.5</span><span class="p">,</span>             <span class="c1"># the slope of the source function with respect to vertical optical depth</span>
+    <span class="s1">&#39;logkappa&#39;</span><span class="p">:</span><span class="mf">0.5</span><span class="p">,</span>          <span class="c1"># the line strength parameter</span>
+    <span class="s1">&#39;ndop&#39;</span><span class="p">:</span><span class="nb">int</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span>       <span class="c1"># the number of sample point per doppler width for the wavelength array</span>
+    <span class="s1">&#39;Bpole&#39;</span><span class="p">:</span><span class="mi">1000</span><span class="p">,</span>
+    <span class="s1">&#39;incl&#39;</span><span class="p">:</span><span class="mi">90</span><span class="p">,</span> <span class="c1">#not necessary for loop</span>
+    <span class="s1">&#39;beta&#39;</span><span class="p">:</span><span class="mi">90</span><span class="p">,</span> <span class="c1">#not necessary for loop</span>
+    <span class="s1">&#39;phase&#39;</span><span class="p">:</span><span class="mi">0</span> <span class="c1">#not necessary for loop</span>
+  <span class="p">}</span>
+
+<span class="n">unnoparam</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;down&#39;</span><span class="p">:[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>   <span class="c1"># the s, j, l of the lower level</span>
+    <span class="s1">&#39;up&#39;</span><span class="p">:[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>    <span class="c1"># the s, j, l of the upper level</span>
+    <span class="p">}</span>
+
+<span class="n">param</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;general&#39;</span> <span class="p">:</span> <span class="n">genparam</span><span class="p">,</span>
+       <span class="s1">&#39;unno&#39;</span><span class="p">:</span> <span class="n">unnoparam</span>
+       <span class="p">}</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ngrid</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">diskint2</span><span class="o">.</span><span class="n">get_ngrid</span><span class="p">(</span><span class="n">param</span><span class="p">[</span><span class="s1">&#39;general&#39;</span><span class="p">][</span><span class="s1">&#39;vsini&#39;</span><span class="p">],</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">ROT</span><span class="p">,</span> <span class="n">A</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">diskint2</span><span class="o">.</span><span class="n">grid_ROT</span><span class="p">(</span><span class="n">ngrid</span><span class="p">)</span>
+<span class="n">los2rot</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">diskint2</span><span class="o">.</span><span class="n">get_los2rot</span><span class="p">(</span><span class="n">param</span><span class="p">[</span><span class="s1">&#39;general&#39;</span><span class="p">][</span><span class="s1">&#39;incl&#39;</span><span class="p">],</span> <span class="n">param</span><span class="p">[</span><span class="s1">&#39;general&#39;</span><span class="p">][</span><span class="s1">&#39;phase&#39;</span><span class="p">])</span>
+<span class="n">rot2los</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">los2rot</span><span class="p">)</span>
+<span class="n">LOS</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">diskint2</span><span class="o">.</span><span class="n">get_LOS</span><span class="p">(</span><span class="n">ROT</span><span class="p">,</span> <span class="n">rot2los</span><span class="p">)</span>
+<span class="n">mu_LOS</span><span class="p">,</span> <span class="n">vis</span><span class="p">,</span> <span class="n">A_LOS</span><span class="p">,</span> <span class="n">uLOS</span><span class="p">,</span> <span class="n">conti_flux</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">diskint2</span><span class="o">.</span><span class="n">get_LOS_values</span><span class="p">(</span><span class="n">LOS</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">param</span><span class="p">[</span><span class="s1">&#39;general&#39;</span><span class="p">][</span><span class="s1">&#39;bnu&#39;</span><span class="p">],</span> <span class="n">param</span><span class="p">[</span><span class="s1">&#39;general&#39;</span><span class="p">][</span><span class="s1">&#39;vsini&#39;</span><span class="p">],</span> <span class="n">param</span><span class="p">[</span><span class="s1">&#39;general&#39;</span><span class="p">][</span><span class="s1">&#39;vdop&#39;</span><span class="p">])</span>
+
+<span class="n">rot2mag</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">diskint2</span><span class="o">.</span><span class="n">get_rot2mag</span><span class="p">(</span><span class="n">param</span><span class="p">[</span><span class="s1">&#39;general&#39;</span><span class="p">][</span><span class="s1">&#39;beta&#39;</span><span class="p">])</span>
+<span class="n">mag2rot</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">rot2mag</span><span class="p">)</span>
+<span class="n">MAG</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">diskint2</span><span class="o">.</span><span class="n">get_MAG</span><span class="p">(</span><span class="n">ROT</span><span class="p">,</span> <span class="n">rot2mag</span><span class="p">)</span>
+<span class="n">B_MAG</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">diskint2</span><span class="o">.</span><span class="n">get_B_MAG</span><span class="p">(</span><span class="n">MAG</span><span class="p">)</span>
+<span class="n">B_LOS</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">diskint2</span><span class="o">.</span><span class="n">get_B_LOS</span><span class="p">(</span><span class="n">B_MAG</span><span class="p">,</span> <span class="n">mag2rot</span><span class="p">,</span> <span class="n">rot2los</span><span class="p">)</span>
+
+<span class="n">B</span><span class="p">,</span> <span class="n">costheta_temp</span><span class="p">,</span> <span class="n">sintheta_temp</span><span class="p">,</span> <span class="n">cos2chi_temp</span><span class="p">,</span> <span class="n">sin2chi_temp</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">diskint2</span><span class="o">.</span><span class="n">get_unno_angles</span><span class="p">(</span><span class="n">B_LOS</span><span class="p">,</span> <span class="n">param</span><span class="p">[</span><span class="s1">&#39;general&#39;</span><span class="p">][</span><span class="s1">&#39;Bpole&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Using 1400.0 grid point on the surface
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">viz_plotly</span><span class="p">(</span> <span class="n">LOS</span><span class="p">,</span> <span class="n">sintheta_temp</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">sin2chi_temp</span><span class="p">,</span>
+        <span class="c1">#range_color=[-1,1],</span>
+        <span class="n">title</span><span class="o">=</span><span class="s1">&#39;B Z MAG&#39;</span><span class="p">,</span>
+        <span class="n">color_continuous_scale</span><span class="o">=</span><span class="s1">&#39;Picnic&#39;</span> <span class="p">)</span>
+<span class="n">camera</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+    <span class="n">up</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+    <span class="n">eye</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="mf">2.5</span><span class="p">)</span>
+<span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span><span class="n">scene_camera</span><span class="o">=</span><span class="n">camera</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="admonition warning">
+<p>Data type cannot be displayed: application/vnd.plotly.v1+json</p>
+</div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="diskint2_doc.html" class="btn btn-neutral float-left" title="Documentation for diskint2" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="bayes_doc.html" class="btn btn-neutral float-right" title="Documentation for the bayesian calculations" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, V. Petit.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

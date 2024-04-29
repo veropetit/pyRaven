@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fit of the intensity profiles for single stars &mdash; Raven  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/nbsphinx-code-cells.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/template.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="03- Calculating the chi2 with the loop code" href="03-ChiSquareCalcLoop.html" />
+    <link rel="prev" title="01 - Data Setup" href="01-DataSetup.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Raven
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../Installation.html">Installation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">How to run pyRaven tutorial</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="01-DataSetup.html">01 - Data Setup</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Fit of the intensity profiles for single stars</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#0.-Importing-the-necessary-packages">0. Importing the necessary packages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#1.-Opening-the-information-spreadsheets,-and-loading-the-DataPacked-created-in-the-previous-tutorial">1. Opening the information spreadsheets, and loading the DataPacked created in the previous tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#2.-Creating-a-parameter-dictionary-for-the-intensity-profile-fitting">2. Creating a parameter dictionary for the intensity profile fitting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#3.-Fitting-kappa,-vsini,-and-vmac">3. Fitting kappa, vsini, and vmac</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Below,-dev-still">Below, dev still</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="03-ChiSquareCalcLoop.html">03- Calculating the chi2 with the loop code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04-CalculateProbabilities.html">04 - Calculate probabilites from the chi2 files</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Standalone tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="ParamsObject_tutorial.html">Tutorial on how to use the Params Dictionary objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="BayesObjects_user.html">User’s manual for the BayesObjects.py classes</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Underlying physics and statistics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="diskint2_doc.html">Documentation for diskint2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="geometry_doc.html">Geometry documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bayes_doc.html">Documentation for the bayesian calculations</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../API.html">pyRaven Package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Raven</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Fit of the intensity profiles for single stars</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/nblink/02-FitIntensity.nblink.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="Fit-of-the-intensity-profiles-for-single-stars">
+<h1>Fit of the intensity profiles for single stars<a class="headerlink" href="#Fit-of-the-intensity-profiles-for-single-stars" title="Permalink to this heading"></a></h1>
+<p>In this notebook, we demonstrate how to determine the line profile paramters that will be use to generate the synthetic Stokes V profile, base on a modelling of the Stokes I profiles.</p>
+<p>TODO: binary processing</p>
+<section id="0.-Importing-the-necessary-packages">
+<h2>0. Importing the necessary packages<a class="headerlink" href="#0.-Importing-the-necessary-packages" title="Permalink to this heading"></a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="c1">#import itertools</span>
+<span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">display</span>
+<span class="kn">import</span> <span class="nn">pyRaven</span> <span class="k">as</span> <span class="nn">rav</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">h5py</span> <span class="k">as</span> <span class="nn">h5</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+loading specpolFlow package
+</pre></div></div>
+</div>
+</section>
+<section id="1.-Opening-the-information-spreadsheets,-and-loading-the-DataPacked-created-in-the-previous-tutorial">
+<h2>1. Opening the information spreadsheets, and loading the DataPacked created in the previous tutorial<a class="headerlink" href="#1.-Opening-the-information-spreadsheets,-and-loading-the-DataPacked-created-in-the-previous-tutorial" title="Permalink to this heading"></a></h2>
+<p>For this example, we will again use the spreadsheets from the data_example notebook, that contains some informations about the stars in the sample, as well as the observations for eachs stars.</p>
+<p>In the cell below, we open the spreadsheets, and select the rows containing the information for the star HD 13745. (see the previous tutorials for some tips on how to used to functionality of Pandas to automate your processing with loops).</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sheet_id</span> <span class="o">=</span> <span class="s2">&quot;1fHcSEr-hUV-VQ1bH9DjDppJQvZ-K9PzX5DRjnpKPbUk&quot;</span>
+<span class="n">sheet_name</span> <span class="o">=</span> <span class="s2">&quot;Stars&quot;</span>
+<span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;https://docs.google.com/spreadsheets/d/</span><span class="si">{</span><span class="n">sheet_id</span><span class="si">}</span><span class="s2">/gviz/tq?tqx=out:csv&amp;sheet=</span><span class="si">{</span><span class="n">sheet_name</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="n">df_stars</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+
+<span class="n">sheet_name</span> <span class="o">=</span> <span class="s2">&quot;Observations&quot;</span>
+<span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;https://docs.google.com/spreadsheets/d/</span><span class="si">{</span><span class="n">sheet_id</span><span class="si">}</span><span class="s2">/gviz/tq?tqx=out:csv&amp;sheet=</span><span class="si">{</span><span class="n">sheet_name</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="n">df_obs</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+
+<span class="c1"># Star contains the row for HD 13745</span>
+<span class="n">star</span> <span class="o">=</span> <span class="n">df_stars</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df_stars</span><span class="p">[</span><span class="s2">&quot;StarName&quot;</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;hd13745&#39;</span><span class="p">]</span>
+
+<span class="c1"># selecting the rows in the observation dataframe where the star name matches</span>
+<span class="n">obs</span> <span class="o">=</span> <span class="n">df_obs</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df_obs</span><span class="p">[</span><span class="s2">&quot;StarName&quot;</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;hd13745&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<p>In the cell below, we load the DataPacket that we created in the previous tutorial</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">DataPacket</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">read_packet</span><span class="p">(</span><span class="s1">&#39;ExampleData/ExamplePacket.h5&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="2.-Creating-a-parameter-dictionary-for-the-intensity-profile-fitting">
+<h2>2. Creating a parameter dictionary for the intensity profile fitting<a class="headerlink" href="#2.-Creating-a-parameter-dictionary-for-the-intensity-profile-fitting" title="Permalink to this heading"></a></h2>
+<p>A lot of the main codes in pyRaven rely on a dictionary to pass the necessary parameters necessary for computations (see LINK for details).</p>
+<p>As a simple introduction here, we demonstrate two ways of creating these dictionaries (default parameter function, and direct dictionary creation), as well as how to write to file (and read back)in .json format.</p>
+<p>In the cell below, we use the <code class="docutils literal notranslate"><span class="pre">params.get_def_param_fitI()</span></code> function to return a typical dictionary suitable for a calculation of the intensity profile. We use the <code class="docutils literal notranslate"><span class="pre">pprint</span></code> method to do a pretty-print of the dictionary. We also illustrate quickly how to edit the value of a key in a dictionary.</p>
+<p>As you can see, <code class="docutils literal notranslate"><span class="pre">param</span></code> is a dictionary of sub-dictionaries (as explained ADD LINK). For the calculation of intensity profiles with the ADD FUNCTION function, we only need some elements in the <code class="docutils literal notranslate"><span class="pre">&quot;general&quot;</span></code> sub-dictionary (we would need additional sub-dictionaries if we were making Stokes V calculations, for example).</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">param</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get_def_param_fitI</span><span class="p">()</span>
+
+<span class="n">param</span><span class="o">.</span><span class="n">pprint</span><span class="p">()</span>
+
+<span class="n">param</span><span class="p">[</span><span class="s2">&quot;general&quot;</span><span class="p">][</span><span class="s2">&quot;vsini&quot;</span><span class="p">]</span><span class="o">=</span><span class="mf">40.0</span>
+
+<span class="n">param</span><span class="o">.</span><span class="n">pprint</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{
+  &#34;general&#34;: {
+    &#34;lambda0&#34;: 5000,
+    &#34;vsini&#34;: 50.0,
+    &#34;vdop&#34;: 10.0,
+    &#34;av&#34;: 0.05,
+    &#34;bnu&#34;: 1.5,
+    &#34;logkappa&#34;: 0.98,
+    &#34;ndop&#34;: 10
+  }
+}
+{
+  &#34;general&#34;: {
+    &#34;lambda0&#34;: 5000,
+    &#34;vsini&#34;: 40.0,
+    &#34;vdop&#34;: 10.0,
+    &#34;av&#34;: 0.05,
+    &#34;bnu&#34;: 1.5,
+    &#34;logkappa&#34;: 0.98,
+    &#34;ndop&#34;: 10
+  }
+}
+</pre></div></div>
+</div>
+<p>In the cell below, we provide an alternative method to create a <code class="docutils literal notranslate"><span class="pre">parameter</span></code> dictionary object. We first create the dictionary that contains the necessary keywords in the <code class="docutils literal notranslate"><span class="pre">&quot;general&quot;</span></code> sub-dictionary. As we only need this sub-dictionary for the intensity profile calculations below, we then create the main dictionary with only the ‘general’ sub-dictionary. We use the <code class="docutils literal notranslate"><span class="pre">params.parameters(dict)</span></code> class to create a <code class="docutils literal notranslate"><span class="pre">parameters</span></code> object (which is simply a regular dictionary with a few add-ons) so
+that we can use the <code class="docutils literal notranslate"><span class="pre">pprint()</span></code> method afterwards (but this is not strickly necessary to use the pyRaven calculation codes)</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">genparam</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;lambda0&#39;</span><span class="p">:</span><span class="mi">5000</span><span class="p">,</span>    <span class="c1"># the central wavelength of the transition</span>
+    <span class="s1">&#39;vsini&#39;</span><span class="p">:</span><span class="mf">50.0</span><span class="p">,</span>         <span class="c1"># the projected rotational velocity</span>
+    <span class="s1">&#39;vdop&#39;</span><span class="p">:</span><span class="mf">10.0</span><span class="p">,</span>          <span class="c1"># the thermal broadening</span>
+    <span class="s1">&#39;av&#39;</span><span class="p">:</span><span class="mf">0.05</span><span class="p">,</span>             <span class="c1"># the damping coefficient of the Voigt profile</span>
+    <span class="s1">&#39;bnu&#39;</span><span class="p">:</span><span class="mf">1.5</span><span class="p">,</span>             <span class="c1"># the slope of the source function with respect to vertical optical depth</span>
+    <span class="s1">&#39;logkappa&#39;</span><span class="p">:</span><span class="mf">0.98</span><span class="p">,</span>          <span class="c1"># the line strength parameter</span>
+    <span class="s1">&#39;ndop&#39;</span><span class="p">:</span><span class="nb">int</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>      <span class="c1"># the number of sample point per doppler width for the wavelength array</span>
+  <span class="p">}</span>
+
+<span class="n">param</span><span class="o">=</span><span class="n">rav</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">parameters</span><span class="p">({</span><span class="s1">&#39;general&#39;</span> <span class="p">:</span> <span class="n">genparam</span><span class="p">})</span>
+
+<span class="n">param</span><span class="o">.</span><span class="n">pprint</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{
+  &#34;general&#34;: {
+    &#34;lambda0&#34;: 5000,
+    &#34;vsini&#34;: 50.0,
+    &#34;vdop&#34;: 10.0,
+    &#34;av&#34;: 0.05,
+    &#34;bnu&#34;: 1.5,
+    &#34;logkappa&#34;: 0.98,
+    &#34;ndop&#34;: 10
+  }
+}
+</pre></div></div>
+</div>
+<p>In the cell below, we illustrate how to use the <code class="docutils literal notranslate"><span class="pre">write</span></code> method of the <code class="docutils literal notranslate"><span class="pre">parameters</span></code> dictionary class to write the information to a .json file for safe-keeping.</p>
+<p>We chose to use the json format because they are human-readable.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">param</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;ExampleData/FitI_param.json&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>In the cell below, we show how to read back these .json files back into a <code class="docutils literal notranslate"><span class="pre">parameters</span></code> dictionary object.</p>
+<p>As the json format is easily human-readable, it is also possible to use these files as input files to create your parameters dictionaries. (However, please note the subtleties with python lists versus numpy arrays described in ADD LINK, especially for the parameters related to the unno zeeman parameters and the loop grid parameters).</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">param</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">read_parameters</span><span class="p">(</span><span class="s1">&#39;ExampleData/FitI_param.json&#39;</span><span class="p">)</span>
+
+<span class="n">param</span><span class="o">.</span><span class="n">pprint</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{
+  &#34;general&#34;: {
+    &#34;av&#34;: 0.05,
+    &#34;bnu&#34;: 1.5,
+    &#34;lambda0&#34;: 5000,
+    &#34;logkappa&#34;: 0.98,
+    &#34;ndop&#34;: 10,
+    &#34;vdop&#34;: 10.0,
+    &#34;vsini&#34;: 50.0
+  }
+}
+</pre></div></div>
+</div>
+</section>
+<section id="3.-Fitting-kappa,-vsini,-and-vmac">
+<h2>3. Fitting kappa, vsini, and vmac<a class="headerlink" href="#3.-Fitting-kappa,-vsini,-and-vmac" title="Permalink to this heading"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">fitparams.py</span></code> module contains two functions that can fit kappa, vsini, and vmac. We must first set up our param dictionary and DataPacket. The param set up works exactly the same as above. You can create one by hand, load one from a <code class="docutils literal notranslate"><span class="pre">.json</span></code> file, or change one of the defualt param dictionaries. In this example, we will use the latter.</p>
+<p>We also need to read in a DataPacket as was done above.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">param</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get_def_param_fitI</span><span class="p">()</span>
+<span class="n">param</span><span class="p">[</span><span class="s1">&#39;general&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;res&#39;</span><span class="p">:</span> <span class="mf">65000.</span><span class="p">})</span>
+<span class="n">param</span><span class="p">[</span><span class="s1">&#39;general&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;vmac&#39;</span><span class="p">:</span> <span class="mf">10.</span><span class="p">})</span>
+<span class="n">param</span><span class="o">.</span><span class="n">pprint</span><span class="p">()</span>
+
+<span class="n">DataPacket</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">read_packet</span><span class="p">(</span><span class="s1">&#39;ExampleData/ExamplePacket.h5&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{
+  &#34;general&#34;: {
+    &#34;lambda0&#34;: 5000,
+    &#34;vsini&#34;: 50.0,
+    &#34;vdop&#34;: 10.0,
+    &#34;av&#34;: 0.05,
+    &#34;bnu&#34;: 1.5,
+    &#34;logkappa&#34;: 0.98,
+    &#34;ndop&#34;: 10,
+    &#34;res&#34;: 65000.0,
+    &#34;vmac&#34;: 10.0
+  }
+}
+</pre></div></div>
+</div>
+<p>The first method for fitting the three values is using scipy’s <code class="docutils literal notranslate"><span class="pre">curve_fit</span></code> function. We can pass the param dictionary, DataPacket, and an arry containing guess values of kappa, vsini, and vmac to <code class="docutils literal notranslate"><span class="pre">rav.fitparams.fitdata</span></code>. This will output an array with the three values (saved as <code class="docutils literal notranslate"><span class="pre">parameters</span></code> below), the covariance matrix (<code class="docutils literal notranslate"><span class="pre">covariance</span></code>), and the model output from <code class="docutils literal notranslate"><span class="pre">rav.diskint2.analytical</span></code> (<code class="docutils literal notranslate"><span class="pre">modelout</span></code>).</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><br/><span></span><span class="n">guess</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.3</span><span class="p">,</span><span class="n">DataPacket</span><span class="o">.</span><span class="n">vsini</span><span class="p">,</span><span class="mi">30</span><span class="p">])</span>
+
+<span class="n">parameters</span><span class="p">,</span><span class="n">covariance</span><span class="p">,</span><span class="n">modelout</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">fitparams</span><span class="o">.</span><span class="n">fitdata</span><span class="p">(</span><span class="n">param</span><span class="p">,</span><span class="n">DataPacket</span><span class="p">,</span><span class="n">guess</span><span class="p">)</span>
+<br/><br/></pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">x1</span><span class="o">=</span><span class="n">DataPacket</span><span class="o">.</span><span class="n">original</span><span class="o">.</span><span class="n">lsds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">vel</span><span class="o">-</span><span class="n">DataPacket</span><span class="o">.</span><span class="n">vrad</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">y1</span><span class="o">=</span><span class="n">DataPacket</span><span class="o">.</span><span class="n">original</span><span class="o">.</span><span class="n">lsds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">specI</span>
+<span class="n">x2</span><span class="o">=</span><span class="n">DataPacket</span><span class="o">.</span><span class="n">original</span><span class="o">.</span><span class="n">lsds</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">vel</span><span class="o">-</span><span class="n">DataPacket</span><span class="o">.</span><span class="n">vrad</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">y2</span><span class="o">=</span><span class="n">DataPacket</span><span class="o">.</span><span class="n">original</span><span class="o">.</span><span class="n">lsds</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">specI</span>
+<span class="n">x3</span><span class="o">=</span><span class="n">DataPacket</span><span class="o">.</span><span class="n">original</span><span class="o">.</span><span class="n">lsds</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">vel</span><span class="o">-</span><span class="n">DataPacket</span><span class="o">.</span><span class="n">vrad</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+<span class="n">y3</span><span class="o">=</span><span class="n">DataPacket</span><span class="o">.</span><span class="n">original</span><span class="o">.</span><span class="n">lsds</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">specI</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span><span class="n">y1</span><span class="p">,</span><span class="n">c</span><span class="o">=</span><span class="s1">&#39;C0&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x2</span><span class="p">,</span><span class="n">y2</span><span class="p">,</span><span class="n">c</span><span class="o">=</span><span class="s1">&#39;C0&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x3</span><span class="p">,</span><span class="n">y3</span><span class="p">,</span><span class="n">c</span><span class="o">=</span><span class="s1">&#39;C0&#39;</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;Data&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span><span class="n">modelout</span><span class="p">,</span><span class="n">c</span><span class="o">=</span><span class="s1">&#39;C1&#39;</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;Fit Model&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;matplotlib.legend.Legend at 0x1eac9afd890&gt;
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/nblink_02-FitIntensity_24_1.png" src="../_images/nblink_02-FitIntensity_24_1.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">kappa</span><span class="p">,</span><span class="n">vsini</span><span class="p">,</span><span class="n">vmac</span><span class="p">,</span><span class="n">out</span><span class="o">=</span><span class="n">rav</span><span class="o">.</span><span class="n">fitparams</span><span class="o">.</span><span class="n">fitdataMCMC</span><span class="p">(</span><span class="n">param</span><span class="p">,</span><span class="n">DataPacket</span><span class="p">,</span><span class="mi">100</span><span class="p">,</span><span class="n">guess</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+  0%|          | 0/100 [00:00&lt;?, ?it/s]c:\Users\pjsta\anaconda3\Lib\site-packages\emcee\moves\red_blue.py:99: RuntimeWarning: invalid value encountered in scalar subtract
+  lnpdiff = f + nlp - state.log_prob[j]
+100%|██████████| 100/100 [00:31&lt;00:00,  3.21it/s]
+C:\MyPythonPackages\pyRaven\fitparams.py:207: RuntimeWarning: invalid value encountered in divide
+  bin_means = (np.histogram(kappa, bins, weights=kappa)[0]/np.histogram(kappa, bins)[0])
+C:\MyPythonPackages\pyRaven\fitparams.py:210: RuntimeWarning: invalid value encountered in divide
+  bin_means = (np.histogram(vsini, bins, weights=vsini)[0]/np.histogram(vsini, bins)[0])
+C:\MyPythonPackages\pyRaven\fitparams.py:213: RuntimeWarning: invalid value encountered in divide
+  bin_means = (np.histogram(vmac, bins, weights=vmac)[0]/np.histogram(vmac, bins)[0])
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+kappa: 1.259218729326427 | vsini: 97.37207023619489 | vmac: 84.73514804504917
+Too few points to create valid contours
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/nblink_02-FitIntensity_26_2.png" src="../_images/nblink_02-FitIntensity_26_2.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/nblink_02-FitIntensity_26_3.png" src="../_images/nblink_02-FitIntensity_26_3.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/nblink_02-FitIntensity_26_4.png" src="../_images/nblink_02-FitIntensity_26_4.png" />
+</div>
+</div>
+<p>Additionally, we can also perform a fit of kappa and vmac while keeping vsini fixed. This is done by using the <code class="docutils literal notranslate"><span class="pre">fitdata_novsini</span></code> function as done below.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><br/><span></span><span class="n">guess</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.3</span><span class="p">,</span><span class="mi">30</span><span class="p">])</span>
+
+<span class="n">parameters</span><span class="p">,</span><span class="n">covariance</span><span class="p">,</span><span class="n">modelout</span> <span class="o">=</span> <span class="n">rav</span><span class="o">.</span><span class="n">fitparams</span><span class="o">.</span><span class="n">fitdata_novsini</span><span class="p">(</span><span class="n">param</span><span class="p">,</span><span class="n">DataPacket</span><span class="p">,</span><span class="n">guess</span><span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">x1</span><span class="o">=</span><span class="n">DataPacket</span><span class="o">.</span><span class="n">original</span><span class="o">.</span><span class="n">lsds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">vel</span><span class="o">-</span><span class="n">DataPacket</span><span class="o">.</span><span class="n">vrad</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">y1</span><span class="o">=</span><span class="n">DataPacket</span><span class="o">.</span><span class="n">original</span><span class="o">.</span><span class="n">lsds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">specI</span>
+<span class="n">x2</span><span class="o">=</span><span class="n">DataPacket</span><span class="o">.</span><span class="n">original</span><span class="o">.</span><span class="n">lsds</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">vel</span><span class="o">-</span><span class="n">DataPacket</span><span class="o">.</span><span class="n">vrad</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">y2</span><span class="o">=</span><span class="n">DataPacket</span><span class="o">.</span><span class="n">original</span><span class="o">.</span><span class="n">lsds</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">specI</span>
+<span class="n">x3</span><span class="o">=</span><span class="n">DataPacket</span><span class="o">.</span><span class="n">original</span><span class="o">.</span><span class="n">lsds</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">vel</span><span class="o">-</span><span class="n">DataPacket</span><span class="o">.</span><span class="n">vrad</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+<span class="n">y3</span><span class="o">=</span><span class="n">DataPacket</span><span class="o">.</span><span class="n">original</span><span class="o">.</span><span class="n">lsds</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">specI</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span><span class="n">y1</span><span class="p">,</span><span class="n">c</span><span class="o">=</span><span class="s1">&#39;C0&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x2</span><span class="p">,</span><span class="n">y2</span><span class="p">,</span><span class="n">c</span><span class="o">=</span><span class="s1">&#39;C0&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x3</span><span class="p">,</span><span class="n">y3</span><span class="p">,</span><span class="n">c</span><span class="o">=</span><span class="s1">&#39;C0&#39;</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;Data&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span><span class="n">modelout</span><span class="p">,</span><span class="n">c</span><span class="o">=</span><span class="s1">&#39;C1&#39;</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;Fit Model&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;matplotlib.legend.Legend at 0x1eacb0b8d50&gt;
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/nblink_02-FitIntensity_29_1.png" src="../_images/nblink_02-FitIntensity_29_1.png" />
+</div>
+</div>
+</section>
+<section id="Below,-dev-still">
+<h2>Below, dev still<a class="headerlink" href="#Below,-dev-still" title="Permalink to this heading"></a></h2>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">genparam</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;lambda0&#39;</span><span class="p">:</span><span class="mi">5000</span><span class="p">,</span>    <span class="c1"># the central wavelength of the transition</span>
+    <span class="s1">&#39;vsini&#39;</span><span class="p">:</span><span class="mf">50.0</span><span class="p">,</span>         <span class="c1"># the projected rotational velocity</span>
+    <span class="s1">&#39;vdop&#39;</span><span class="p">:</span><span class="mf">10.0</span><span class="p">,</span>          <span class="c1"># the thermal broadening</span>
+    <span class="s1">&#39;av&#39;</span><span class="p">:</span><span class="mf">0.05</span><span class="p">,</span>             <span class="c1"># the damping coefficient of the Voigt profile</span>
+    <span class="s1">&#39;bnu&#39;</span><span class="p">:</span><span class="mf">1.5</span><span class="p">,</span>             <span class="c1"># the slope of the source function with respect to vertical optical depth</span>
+    <span class="s1">&#39;logkappa&#39;</span><span class="p">:</span><span class="mf">0.98</span><span class="p">,</span>          <span class="c1"># the line strength parameter</span>
+    <span class="s1">&#39;ndop&#39;</span><span class="p">:</span><span class="nb">int</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span>       <span class="c1"># the number of sample point per doppler width for the wavelength array</span>
+    <span class="s1">&#39;Bpole&#39;</span><span class="p">:</span><span class="mi">1000</span><span class="p">,</span> <span class="c1">#not necessary for loop</span>
+    <span class="s1">&#39;incl&#39;</span><span class="p">:</span><span class="mf">30.</span><span class="p">,</span> <span class="c1">#not necessary for loop</span>
+    <span class="s1">&#39;beta&#39;</span><span class="p">:</span><span class="mi">30</span><span class="p">,</span> <span class="c1">#not necessary for loop</span>
+    <span class="s1">&#39;phase&#39;</span><span class="p">:</span><span class="mf">90.</span> <span class="c1">#not necessary for loop</span>
+  <span class="p">}</span>
+
+<span class="n">unnoparam</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;down&#39;</span><span class="p">:[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>   <span class="c1"># the s, j, l of the lower level</span>
+    <span class="s1">&#39;up&#39;</span><span class="p">:[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>    <span class="c1"># the s, j, l of the upper level</span>
+    <span class="p">}</span>
+
+<span class="n">weakparam</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;geff&#39;</span><span class="p">:</span><span class="mf">1.0</span>
+    <span class="p">}</span>
+
+<span class="n">gridparam</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;Bgrid&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">2000</span><span class="p">]),</span>
+        <span class="s1">&#39;igrid&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">30</span><span class="p">,</span><span class="mi">60</span><span class="p">]),</span>
+        <span class="s1">&#39;betagrid&#39;</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">30</span><span class="p">]),</span>
+        <span class="s1">&#39;phasegrid&#39;</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">90</span><span class="p">])</span>
+        <span class="p">}</span>
+
+<span class="n">param</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;general&#39;</span> <span class="p">:</span> <span class="n">genparam</span><span class="p">,</span>
+       <span class="s1">&#39;weak&#39;</span> <span class="p">:</span> <span class="n">weakparam</span><span class="p">,</span>
+       <span class="s1">&#39;grid&#39;</span> <span class="p">:</span> <span class="n">gridparam</span><span class="p">,</span>
+       <span class="s1">&#39;unno&#39;</span><span class="p">:</span> <span class="n">unnoparam</span> <span class="c1"># no necessary for loop</span>
+       <span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="01-DataSetup.html" class="btn btn-neutral float-left" title="01 - Data Setup" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="03-ChiSquareCalcLoop.html" class="btn btn-neutral float-right" title="03- Calculating the chi2 with the loop code" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, V. Petit.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
