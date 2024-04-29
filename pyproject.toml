@@ -13,7 +13,7 @@ build-backend = "setuptools.build_meta"
 include = ["pyRaven*"]  # ["*"] by default
 
 [project]
-name = "spyRaven"
+name = "pyRaven"
 version = "0.0.1"
 authors = [ {name="pyRaven Team", email="vpetit@udel.edu"},
 ]
@@ -35,13 +35,9 @@ dependencies = [
     "specpolFlow",
     "h5py",
     "numba",
-    "copy",
     "emcee",
     "corner",
     "statistics",
-    "mpl_toolkits",
-    "sys",
-    "json",
 ]
 
 [project.urls]

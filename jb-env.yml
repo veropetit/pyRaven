@@ -1,10 +1,1 @@
 jupyter-book
-astropy
-h5py
-pandas
-matplotlib
-scipy
-emcee
-corner
-numpy
-numba
