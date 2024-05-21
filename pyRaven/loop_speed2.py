@@ -10,6 +10,7 @@ from numba.typed import List
 from . import diskint2 as disk
 from . import misc as rav_misc
 from . import localV as rav_localV
+from . import profileI as rav_profileI
 from . import BayesObjects as rav_BayesObjects
 from . import params as rav_params
 from . import data as rav_data
@@ -282,12 +283,12 @@ def loop_speed2(param, datapacket, path='', ax=None):
                 ## The the weak field, all we need is Bz, so B_LOS[z]*Bpole/2
 
                 # Now multiplying the local V profiles by the Bz/Bpole values. 
-                local_V_mat = local_V_mat * np.broadcast_to(B_LOS[2,vis], (all_u.size,nvis)).T
+                local_V_mat_beta = local_V_mat * np.broadcast_to(B_LOS[2,vis], (all_u.size,nvis)).T
 
                 ### Disk integration and convolution with macroturb
                 ####################################################
 
-                modelV = np.sum(local_V_mat, axis=0)
+                modelV = np.sum(local_V_mat_beta, axis=0)
                 # has yet to be multiplied by Bpole in Bpole loop
 
                 # convolve the model over the instrumental resolution
@@ -311,6 +312,7 @@ def loop_speed2(param, datapacket, path='', ax=None):
                 for o in range(0, datapacket.nobs):
                     interpol_modelV[o,0:list_npix[o]]= rav_localV.interpol_lin_numba(modelV,  model_vel, spec_vel[o,0:list_npix[o]])
                 
+
                 #########################################
                 #########################################
                 # Loop on the Bpole values
@@ -319,7 +321,9 @@ def loop_speed2(param, datapacket, path='', ax=None):
                 
                 ### this block is just for debbuging!!
                 #for ind_bp, bpole in enumerate(param['grid']['Bpole_grid']):
-                #    ax[1].plot(model_vel, modelV*bpole, c='k')
+                #    import matplotlib.pyplot as plt
+                #    plt.plot(model_vel, modelV*bpole, c='k')
+                #plt.show()
                 ########################################
 
 
@@ -329,7 +333,7 @@ def loop_speed2(param, datapacket, path='', ax=None):
                 #chi2V_data, chi2N1_data = B_loop_numba(
                 #                            chi2V_data, chi2N1_data, 
                 #                            param['grid']['Bpole_grid'], 
-                #                            typed_specV, typed_specSigV, typed_specN1, typed_specSigN1, datapacket.nobs,
+                #                            specV, specSigV, specN1, specSigN1, datapacket.nobs,
                 #                            interpol_modelV, 
                 #                            ind_beta, ind_p)
                 ####
