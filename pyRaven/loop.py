@@ -85,7 +85,7 @@ def B_loop_numba2(chi2V_data, chi2N1_data, Bpole_grid,
 
 
 
-def loop_speed2(param, datapacket, path='', ax=None):
+def loop(param, datapacket, path='', ax=None):
     '''
     Function to calculate the chi square between 
     all of the LSD profiles in a pyRaven data packet and 
@@ -380,7 +380,7 @@ def loop_speed2(param, datapacket, path='', ax=None):
 
     return
 
-def loop_speed2_wrapper(file_param, file_datapacket, path=''):
+def loop_wrapper(file_param, file_datapacket, path=''):
     '''
     This function is a wrapper to the loop function. 
     It it designed to be run in a directory that contains a parameters json file, and a DataPacket h5 file. 
@@ -395,6 +395,6 @@ def loop_speed2_wrapper(file_param, file_datapacket, path=''):
     param = rav_params.read_parameters(file_param)
     packet = rav_data.read_packet(file_datapacket)
 
-    loop_speed2(param, packet)
+    loop(param, packet)
 
     return
