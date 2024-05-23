@@ -1,6 +1,6 @@
-diskint2 module
+diskint module
 ####################
 
-.. automodule:: pyRaven.diskint2
+.. automodule:: pyRaven.diskint
     :members:
     :special-members: __init__

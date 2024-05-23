@@ -7,8 +7,9 @@ parts:
   - caption: Simple application
     chapters:
     - file: SimpleApplication
-    - file: SimpleApplication/01-DataSetup
-    - file: SimpleApplication/02-FitIntensity  
+    - file: SimpleApplication/01-DataSetup.ipynb
+    - file: SimpleApplication/02-FitIntensity.ipynb 
+    - file: SimpleApplication/03-ChiSquareCalcLoop.ipynb 
   - caption: API
     chapters:
     - file: API/data.rst
@@ -18,8 +19,6 @@ parts:
     - file: API/pattern.rst
     - file: API/profileI.rst
     - file: API/localV.rst
-    - file: API/diskint2.rst
+    - file: API/diskint.rst
     - file: API/loop.rst
-    #- file: API/loop_speed.rst
-    - file: API/loop_speed2.rst
     - file: API/misc.rst

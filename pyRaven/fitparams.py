@@ -44,7 +44,7 @@ def fitdata(xs,ys,guess,param):
       param['general']['logkappa']=np.log(kappa)
 
       #pyRaven's weakfield disk integration function
-      model=rav.diskint2.analytical(param,False)
+      model=rav.diskint.analytical(param,False)
 
       #interpolating the model to be size MCMC wants
       f=np.interp(v,model['vel']+vrad,model['flux'])
@@ -124,7 +124,7 @@ def fitdata_novsini(xs,ys,guess,param):
       param['general']['logkappa']=np.log(kappa)
 
       #pyRaven's weakfield disk integration function
-      model=rav.diskint2.analytical(param,False)
+      model=rav.diskint.analytical(param,False)
 
       #interpolating the model to be size MCMC wants
       f=np.interp(v,model['vel']+vrad,model['flux'])
@@ -211,7 +211,7 @@ def binary_fitting(xs,ys,guess, param1, param2):
     param1['general']['logkappa']=np.log(kappa)
 
     #pyRaven's weakfield disk integration function
-    model=rav.diskint2.analytical(param1,False)
+    model=rav.diskint.analytical(param1,False)
 
     #interpolating the model to be size MCMC wants
     f=np.interp(v,model['vel']+vrad,model['flux'])
@@ -238,7 +238,7 @@ def binary_fitting(xs,ys,guess, param1, param2):
     param2['general']['logkappa']=np.log(kappa)
 
     #pyRaven's weakfield disk integration function
-    model=rav.diskint2.analytical(param2,False)
+    model=rav.diskint.analytical(param2,False)
 
     #interpolating the model to be size MCMC wants
     f=np.interp(v,model['vel']+vrad,model['flux'])
