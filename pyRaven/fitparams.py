@@ -32,7 +32,7 @@ def param_to_model(parameters,DataPacket):
     fitmodels=[]
     fys=[]
     for j in range(len(parameters)):
-        model=rav.diskint2.analytical(parameters[j],False)
+        model=rav.diskint.analytical(parameters[j],False)
         for o in range(DataPacket.nobs):
             fys.append(np.interp(DataPacket.scaled.lsds[o].vel,model['vel']+parameters[j]['general']['vrad'][o],model['flux']))
     
