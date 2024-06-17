@@ -4,6 +4,21 @@ import copy
 import pyRaven as rav
 
 def fun(theta_,*p):
+    '''
+    This function makes a copy of the param object and updates it based on the input parameters.
+    Inputs:
+    :theta_: a list of lists containing parameters to update the param object with. The structure is as follows: [[star1 parameters],[star2 parameters],...]
+    :*p: is a set of additional input parameters, listed below.
+        :fitparam: list of lists of strings indicating which parameters to fit for which stars 
+        :param: list of param objects for each star to fit
+        :DataPacket: the datapacket for the object
+        :guess: a list of lists containing the original guess parameters in the same order and format as theta_
+
+    Outputs:
+    :star: a list of param objects containing the new parameters (in the same format as param)
+    
+    '''
+
     fitparam=p[0]
     param=p[1]
     DataPacket=p[2]
@@ -29,6 +44,18 @@ def fun(theta_,*p):
     return(star)
 
 def param_to_model(parameters,DataPacket):
+    '''
+    This function models the multi-star LSD profile given the input list of param objects
+
+    Inputs:
+    :parameters: a list of param objects to model
+    :DataPacket: the datapacket for the object
+
+    Outputs:
+    :fitmodels: list of stokes I values for the fit model per observation
+    '''
+
+
     fitmodels=[]
     fys=[]
     for j in range(len(parameters)):
@@ -44,6 +71,23 @@ def param_to_model(parameters,DataPacket):
     return(fitmodels)
 
 def chi2(theta_,*p):
+    '''
+    Helper function that calculates the chi2 used by scipy.optimize.minimize
+
+    Inputs:
+    :theta_: list of lists containing the parameters to test
+    :*p: is a set of additional input parameters, listed below.
+        :fitparam: list of lists of strings indicating which parameters to fit for which stars 
+        :param: list of param objects for each star to fit
+        :DataPacket: the datapacket for the object
+        :guess: a list of lists containing the original guess parameters in the same order and format as theta_
+
+    Outputs:
+    :chi2: the chi2 value 
+
+    '''
+
+
     ys=[]
     ys_err=[]
     DataPacket=p[2]
@@ -59,6 +103,23 @@ def chi2(theta_,*p):
     return(chi2)
 
 def fitting(param_to_fit,parameters,DataPacket,guess,bounds):
+    '''
+    The actual fitting routine
+
+    Inputs:
+    :param_to_fit: list of list of strings stating which parameters should be fit for each star
+    :parameters: list of param objects for each star
+    :DataPacket: datapacket for the object
+    :guess: list of lists containing the initial guess values for each parameter to fit and each star
+    :bounds: list of lists of tuples containing the bounds to use for each parameter to fit
+
+    Outputs:
+    :res: the output from scipy.optimize.minimize
+    :star: list of param objects for each star containing the final fit values
+
+    '''
+
+
     bound=[]
     guesses=np.array([])
     for j in range(len(param_to_fit)):
