@@ -209,7 +209,7 @@ def create_empty_lnP_odds(beta_arr, Bpole_arr, phi_arr, incl_arr, obsID):
     data = np.zeros((beta_arr.size, Bpole_arr.size, phi_arr.size, incl_arr.size))
     return(lnP_odds(data, beta_arr, Bpole_arr, phi_arr, incl_arr, obsID))
 
-def create_lnLH_odds_from_chi(folder_path, param, datapacket, output_path):
+def create_lnLH_odds_from_chi(folder_path, param, datapacket, output_path=None):
     '''
     Function to calculate the lnLH_odds from a set of already calcualted chi2. (see REF)
 
@@ -222,7 +222,7 @@ def create_lnLH_odds_from_chi(folder_path, param, datapacket, output_path):
         folder_path='.'
 
     if output_path==None:
-        output_path=','
+        output_path='.'
 
     # one LH file per observation for the odds ratio. 
 
@@ -514,7 +514,7 @@ def create_lnLH_pars_from_chi(folder_path, param, datapacket, output_path):
         folder_path='.'
 
     if output_path==None:
-        output_path=','
+        output_path='.'
 
     # one lnLH file per observation for the parameter estimation. 
 
