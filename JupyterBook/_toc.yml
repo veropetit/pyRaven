@@ -10,6 +10,7 @@ parts:
     - file: SimpleApplication/01-DataSetup.ipynb
     - file: SimpleApplication/02-FitIntensity.ipynb 
     - file: SimpleApplication/03-ChiSquareCalcLoop.ipynb 
+    - file: SimpleApplication/04-CalculateProbabilities.ipynb
   - caption: API
     chapters:
     - file: API/data.rst
