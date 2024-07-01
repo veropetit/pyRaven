@@ -6,25 +6,23 @@ import pyRaven as rav
 def update_params(theta_,param_to_fit,parameters,nobs,guess):
     '''
     This function makes a copy of the param object and updates it based on the input parameters.
-    Inputs:
-    :theta_: list of parameter values to update the param objects with
-        :format: [[guess for star 1 parameter to fit,guess for star 1 parameter to fit,...],[guess for star 2 parameter to fit,...]]
-        :Note: MUST BE IN THE SAME ORDER AS param_to_fit. 
-        :Note: If vrad is specified in param_to_fit, the corresponding guess input must be a list with one value per observation, i.e. [vrad1,vrad2,...]
-    :param_to_fit: list of strings stating which parameters should be fit for each star
-        :format: [[star 1 parameter to fit,star 1 parameter to fit,...],[star 2 parameter to fit,...],...]
-        :Note: Order of parameters in arrays doesn't matter, you can fit different parameters for each star. 
-        :Note: Any parameter not stated here will not be fit and will be taken to be its value in the param object 
-    :parameters: list of param objects for each star
-        :format: [param object 1,param object 2,...]
-    :nobs: number of observations
-    :guess: list containing the initial guess values for each parameter to fit and each star. 
-        :format: [[guess for star 1 parameter to fit,guess for star 1 parameter to fit,...],[guess for star 2 parameter to fit,...]]
-        :Note: MUST BE IN THE SAME ORDER AS param_to_fit. 
-        :Note: If vrad is specified in param_to_fit, the corresponding guess input must be a list with one value per observation, i.e. [vrad1,vrad2,...]
 
-    Outputs:
-    :star: a list of param objects containing the new parameters (in the same format as param)
+    :param theta_: list of parameter values to update the param objects with. 
+        The format is [[guess for star 1 parameter to fit,guess for star 1 parameter to fit,...],[guess for star 2 parameter to fit,...]].
+        Note - MUST BE IN THE SAME ORDER AS param_to_fit. 
+        Note - If vrad is specified in param_to_fit, the corresponding guess input must be a list with one value per observation, i.e. [vrad1,vrad2,...]
+    :param param_to_fit: list of strings stating which parameters should be fit for each star.
+        format - [[star 1 parameter to fit,star 1 parameter to fit,...],[star 2 parameter to fit,...],...].
+        Note - Order of parameters in arrays doesn't matter, you can fit different parameters for each star. 
+        Note - Any parameter not stated here will not be fit and will be taken to be its value in the param object. 
+    :param parameters: list of param objects for each star.
+        format - [param object 1,param object 2,...].
+    :param nobs: number of observations.
+    :param guess: list containing the initial guess values for each parameter to fit and each star. 
+        format - [[guess for star 1 parameter to fit,guess for star 1 parameter to fit,...],[guess for star 2 parameter to fit,...]].
+        Note - MUST BE IN THE SAME ORDER AS param_to_fit. 
+        Note - If vrad is specified in param_to_fit, the corresponding guess input must be a list with one value per observation, i.e. [vrad1,vrad2,...].
+    :return: a list of param objects containing the new parameters (in the same format as param)
     
     '''
 
@@ -51,15 +49,11 @@ def param_to_model(parameters,lsds):
     '''
     This function models the multi-star LSD profile given the input list of param objects
 
-    Inputs:
-        :parameters: list of param objects for each star
-            :format: [param object 1,param object 2,...]
-        :lsds: a list containing the arrays of velocity,specI,and specSigI values for the lsd profiles to fit
-            :format: [[velocity array for ob1, '' for ob2, ...],[specI array for ob1, '' for ob2, ...],[specSigI array for ob1, '' for ob2, ...]]
-        
-
-    Outputs: 
-    :fitmodels: list of stokes I values for the fit model per observation
+    :param parameters: list of param objects for each star.
+        format - [param object 1,param object 2,...].
+    :param lsds: a list containing the arrays of velocity,specI,and specSigI values for the lsd profiles to fit.
+        format - [[velocity array for ob1, '' for ob2, ...],[specI array for ob1, '' for ob2, ...],[specSigI array for ob1, '' for ob2, ...]]
+    :return: list of stokes I values for the fit model per observation
     '''
     vel=lsds[0]
     specI=lsds[1]
@@ -84,24 +78,23 @@ def chi2(theta_,*p):
     '''
     Helper function that calculates the chi2 used by scipy.optimize.minimize
 
-    Inputs:
-    :theta_: list of lists containing the parameters to test
-    :*p: is a set of additional input parameters, listed below.
-        :param_to_fit: list of strings stating which parameters should be fit for each star
-            :format: [[star 1 parameter to fit,star 1 parameter to fit,...],[star 2 parameter to fit,...],...]
-            :Note: Order of parameters in arrays doesn't matter, you can fit different parameters for each star. 
-            :Note: Any parameter not stated here will not be fit and will be taken to be its value in the param object 
-        :parameters: list of param objects for each star
-            :format: [param object 1,param object 2,...]
-        :lsds: a list containing the arrays of velocity,specI,and specSigI values for the lsd profiles to fit
-            :format: [[velocity array for ob1, '' for ob2, ...],[specI array for ob1, '' for ob2, ...],[specSigI array for ob1, '' for ob2, ...]]
-        :guess: list containing the initial guess values for each parameter to fit and each star. 
-            :format: [[guess for star 1 parameter to fit,guess for star 1 parameter to fit,...],[guess for star 2 parameter to fit,...]]
-            :Note: MUST BE IN THE SAME ORDER AS param_to_fit. 
-            :Note: If vrad is specified in param_to_fit, the corresponding guess input must be a list with one value per observation, i.e. [vrad1,vrad2,...]
-    
-    Outputs:
-    :chi2: the chi2 value 
+    :param theta_: list of parameter values to update the param objects with.
+        format - [[guess for star 1 parameter to fit,guess for star 1 parameter to fit,...],[guess for star 2 parameter to fit,...]].
+        Note - MUST BE IN THE SAME ORDER AS param_to_fit. 
+        Note - If vrad is specified in param_to_fit, the corresponding guess input must be a list with one value per observation, i.e. [vrad1,vrad2,...]
+    :param param_to_fit: list of strings stating which parameters should be fit for each star.
+        format - [[star 1 parameter to fit,star 1 parameter to fit,...],[star 2 parameter to fit,...],...].
+        Note - Order of parameters in arrays doesn't matter, you can fit different parameters for each star. 
+        Note - Any parameter not stated here will not be fit and will be taken to be its value in the param object. 
+    :param parameters: list of param objects for each star.
+        format - [param object 1,param object 2,...].
+    :param lsds: a list containing the arrays of velocity,specI,and specSigI values for the lsd profiles to fit.
+        format - [[velocity array for ob1, '' for ob2, ...],[specI array for ob1, '' for ob2, ...],[specSigI array for ob1, '' for ob2, ...]].
+    :param guess: list containing the initial guess values for each parameter to fit and each star. 
+        format - [[guess for star 1 parameter to fit,guess for star 1 parameter to fit,...],[guess for star 2 parameter to fit,...]].
+        Note - MUST BE IN THE SAME ORDER AS param_to_fit. 
+        Note - If vrad is specified in param_to_fit, the corresponding guess input must be a list with one value per observation, i.e. [vrad1,vrad2,...].
+    :return: the chi2 value 
 
     '''
 
@@ -129,27 +122,23 @@ def fitting(param_to_fit,parameters,lsds,guess,bounds):
     '''
     The actual fitting routine
 
-    Inputs:
-    :param_to_fit: list of strings stating which parameters should be fit for each star
-        :format: [[star 1 parameter to fit,star 1 parameter to fit,...],[star 2 parameter to fit,...],...]
-        :Note: Order of parameters in arrays doesn't matter, you can fit different parameters for each star. 
-        :Note: Any parameter not stated here will not be fit and will be taken to be its value in the param object
-    :parameters: list of param objects for each star
-        :format: [param object 1,param object 2,...]
-    :lsds: a list containing the arrays of velocity,specI,and specSigI values for the lsd profiles to fit
-        :format: [[velocity array for ob1, '' for ob2, ...],[specI array for ob1, '' for ob2, ...],[specSigI array for ob1, '' for ob2, ...]]
-    :guess: list containing the initial guess values for each parameter to fit and each star. 
-        :format: [[guess for star 1 parameter to fit,guess for star 1 parameter to fit,...],[guess for star 2 parameter to fit,...]]
-        :Note: MUST BE IN THE SAME ORDER AS param_to_fit. 
-        :Note: If vrad is specified in param_to_fit, the corresponding guess input must be a list with one value per observation, i.e. [vrad1,vrad2,...]
-    :bounds: list of tuples containing the bounds to use for each parameter to fit
-        :format: [[(lower bound for star 1 guess,upper bound for star 1 guess),...],[(lower bound for star 2 guess,upper bound for star 2 guess)]]
-        :Note: MUST BE IN THE SAME ORDER AS param_to_fit
-        :Note: If vrad is specified in param_to_fit, the corresponding bounds must be a list with one tuple per observation, i.e. [(lower 1,upper 1),(lower 2, upper 2),...]
- 
-    Outputs:
-    :res: the output from scipy.optimize.minimize
-    :star: list of param objects for each star containing the final fit values
+    :param param_to_fit: list of strings stating which parameters should be fit for each star.
+        format - [[star 1 parameter to fit,star 1 parameter to fit,...],[star 2 parameter to fit,...],...].
+        Note - Order of parameters in arrays doesn't matter, you can fit different parameters for each star. 
+        Note - Any parameter not stated here will not be fit and will be taken to be its value in the param object. 
+    :param parameters: list of param objects for each star.
+        format - [param object 1,param object 2,...].
+    :param lsds: a list containing the arrays of velocity,specI,and specSigI values for the lsd profiles to fit.
+        format - [[velocity array for ob1, '' for ob2, ...],[specI array for ob1, '' for ob2, ...],[specSigI array for ob1, '' for ob2, ...]].
+    :param guess: list containing the initial guess values for each parameter to fit and each star. 
+        format - [[guess for star 1 parameter to fit,guess for star 1 parameter to fit,...],[guess for star 2 parameter to fit,...]].
+        Note - MUST BE IN THE SAME ORDER AS param_to_fit. 
+        Note - If vrad is specified in param_to_fit, the corresponding guess input must be a list with one value per observation, i.e. [vrad1,vrad2,...].
+    :param bounds: list of tuples containing the bounds to use for each parameter to fit.
+        format - [[(lower bound for star 1 guess,upper bound for star 1 guess),...],[(lower bound for star 2 guess,upper bound for star 2 guess)]].
+        Note - MUST BE IN THE SAME ORDER AS param_to_fit.
+        Note - If vrad is specified in param_to_fit, the corresponding bounds must be a list with one tuple per observation, i.e. [(lower 1,upper 1),(lower 2, upper 2),...].
+    :return: the output from scipy.optimize.minimize and a list of param objects for each star containing the final fit values
 
     '''
 
