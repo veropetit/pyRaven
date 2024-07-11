@@ -19,3 +19,4 @@ docs-src/build
 
 JupyterBook/SimpleApplication/ExampleOutput
 JupyterBook/_build
+.DS_Store
