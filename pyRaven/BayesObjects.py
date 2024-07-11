@@ -179,6 +179,68 @@ class lnP_odds:
         with h5py.File(fname, 'w') as f:
             self.writef(f)
 
+    def get_deltas(self, ln=False):
+        if ln == False:
+            return(
+                self.beta_arr[1]-self.beta_arr[0],
+                self.Bpole_arr[1]-self.Bpole_arr[0],
+                self.phi_arr[1]-self.phi_arr[0],
+                self.incl_arr[1]-self.incl_arr[0],
+            )
+        else:
+            return(
+                np.log(self.beta_arr[1]-self.beta_arr[0]),
+                np.log(self.Bpole_arr[1]-self.Bpole_arr[0]),
+                np.log(self.phi_arr[1]-self.phi_arr[0]),
+                np.log(self.incl_arr[1]-self.incl_arr[0]),
+            )
+
+    def normalize(self):
+        '''
+        Return a normalized version of self
+        '''
+        lnd_beta, lnd_Bpole, lnd_phi, lnd_incl = self.get_deltas(ln=True)
+
+        ln_norm = ln_mar_check(self.data) + lnd_beta+lnd_Bpole+lnd_incl+lnd_phi 
+        
+        return(lnP_odds(self.data-ln_norm, self.beta_arr,self.Bpole_arr,self.phi_arr, self.incl_arr,self.obsID))
+
+    def mar_phase(self):
+        '''
+        Function to return the a marginalization of a lnLH object over phase, 
+        in a new ln_odds object. 
+        '''
+
+        lnd_beta, lnd_Bpole, lnd_phi, lnd_incl = self.get_deltas(ln=True)
+
+        ln_post_mar = ln_mar_check(self.data, axis=(2))+ lnd_phi
+
+        #create a ln_odds object to return
+        ln_post = lnP_mar(ln_post_mar,self.beta_arr,self.Bpole_arr,self.incl_arr, self.obsID)
+        return(ln_post)
+
+    def apply_priors(self, flat=False):
+        '''
+        Function to apply the priors to a LH ODDS object. Returns a LH ODDS object that is NOT normalized. 
+
+        :param flat: (False) If set to true, a flat prior will be used for Bpole and incl. 
+        '''
+        # I could use numpy broadcasting in numpy for that, 
+        # but considering that we are only doing this operation a few times
+        # using a loop does not add that much more time
+        # and it makes the code more readable. 
+        lnpost = copy.deepcopy(self)
+        ln_prior_beta= np.log(get_prior_beta(self.beta_arr))
+        ln_prior_Bpole = np.log(get_prior_Bpole(self.Bpole_arr, flat=flat))
+        ln_prior_phi = np.log(get_prior_phi(self.phi_arr))
+        ln_prior_incl = np.log(get_prior_incl(self.incl_arr, flat=flat))
+        for beta, lnp_beta in enumerate(ln_prior_beta):
+            for Bpole, lnp_Bpole in enumerate(ln_prior_Bpole):
+                for phi, lnp_phi in enumerate(ln_prior_phi):
+                    for incl, lnp_incl in enumerate(ln_prior_incl):
+                        lnpost.data[beta, Bpole, phi, incl] += (lnp_beta+lnp_Bpole+lnp_phi+lnp_incl)
+        return(lnpost)
+
 def read_lnP_odds(fname):
     '''
     Function to read in a lnLH_odds object from an h5 file
@@ -224,7 +286,7 @@ def create_lnLH_odds_from_chi(folder_path, param, datapacket, output_path=None):
     if output_path==None:
         output_path='.'
 
-    # one LH file per observation for the odds ratio. 
+    # one lnLH file per observation for the odds ratio. 
 
     Stokes = ['V', 'N1']
 
@@ -562,26 +624,33 @@ def create_lnLH_pars_from_chi(folder_path, param, datapacket, output_path):
 #####################
 #####################
 
-def get_prior_Bpole(Bpole_arr):
+def get_prior_Bpole(Bpole_arr, flat=False):
     '''
-    Get the modified jeffreys prior for the Bpole. 
+    Get the modified jeffreys or flat prior for the Bpole. 
     '''
-    Jeff_B = 100 #gauss
-    prior_B = 1.0 / ( (Bpole_arr+ Jeff_B) * np.log(  (Jeff_B+Bpole_arr[-1])/Jeff_B ) )
-    return(prior_B)
+    if flat == False:
+        Jeff_B = 100 #gauss
+        prior_B = 1.0 / ( (Bpole_arr+ Jeff_B) * np.log(  (Jeff_B+Bpole_arr[-1])/Jeff_B ) )
+        return(prior_B)
+    else:
+        prior_B = np.array( [ 1.0 / (Bpole_arr[-1] - Bpole_arr[0]) ] * Bpole_arr.size )
+        return(prior_B)
 
-def get_prior_incl(incl_arr):
+def get_prior_incl(incl_arr, flat=False):
     '''
-    Get the sin prior for the inclination. 
+    Get the sin prior or flat prior for the inclination. 
     If incl = 0 or 180, the prior is formally zero. This causes problems in ln-format calculations.
     Normally, if the star has a measured vsini, i cannot be zero, and this issue is avoided 
     by the inclination grid not going to 0 and 180. 
     
     :param incl_arr: the inclination grid values (in degree)
     '''
-    prior_incl = np.sin(incl_arr*np.pi/180) /2	# p(incl)dincl = sin(incl)dincl (P(i<io) = 1-cos(io))
-    
-    return(prior_incl)
+    if flat == False:
+        prior_incl = np.sin(incl_arr*np.pi/180) /2	# p(incl)dincl = sin(incl)dincl (P(i<io) = 1-cos(io))
+        return(prior_incl)
+    else:
+        prior_incl = np.array( [ 1.0 / (incl_arr[-1] - incl_arr[0]) ] * incl_arr.size )
+        return(prior_incl)
 
 def get_prior_beta(beta_arr):
     '''
@@ -756,7 +825,12 @@ def combine_obs(nobs,folder_path):
 
     for S in Stokes: 
 
+        ###############################################
         ### Dealing with the parameter estimation first
+        ###############################################
+        # Note: for parameter estimation, we normalize the posterior probability densities
+        # Therefore applying a flat prior is the same as simply not applying the priors
+        # as all, because the normalization process will just get rid of the constant flat priors
         # 1. read in the first observation
         ln_LH = read_lnP_pars('{}/lnLH_PARS_{}_obs0.h5'.format(folder_path,S))
 
@@ -781,7 +855,7 @@ def combine_obs(nobs,folder_path):
         # 8. Write to disk the normalize marginalized posterior for this observation. 
         ln_post_mar0.normalize().write('{}/lnpost_PARS_mar_wprior_{}_obs0.h5'.format(folder_path,S))
         
-        # 8. Keeping track of the obsID used
+        # 9. Keeping track of the obsID used
         obsID = [ln_LH.obsID]
         # if there are more than one observation:
         if nobs > 1:
@@ -814,8 +888,79 @@ def combine_obs(nobs,folder_path):
         #write to combined normalized posterior to disk
         ln_post_mar0.normalize().write('{}/lnpost_PARS_mar_wprior_{}.h5'.format(folder_path,S))  
         ln_post_mar_noprior0.normalize().write('{}/lnpost_PARS_mar_noprior_{}.h5'.format(folder_path,S))        
-      
+
+        ###############################################
+        ### Now dealing with the odds ratio calculation
+        ###############################################
+        # Note: for odds ratio calculations, we need to need the exact value of the 
+        # Global likelihood (so the un-normalized marginalzation of prior*likelihood)
+        # Therefore we need to directly apply the flat priors 
+        # unlike for the parameters estimations where we simply saved the normalized likelihood
+        # to get the posterior with flat priors. 
+        # 1. read in the first observation
+        ln_LH = read_lnP_odds('{}/lnLH_ODDS_{}_obs0.h5'.format(folder_path,S))
+
+        # 2. Apply flat prior and write the un-normalized LH to disk
+        ln_post_noprior0 = ln_LH.apply_priors(flat=True)
+        ln_post_noprior0.write('{}/lnpost_ODDS_flatprior_{}_obs0.h5'.format(folder_path,S))
+
+        # 3. Marginalize for the phase and noise scale (with flat priors), 
+        ln_post_mar_noprior0 = ln_post_noprior0.mar_phase()
+        
+        # 4. Write to disk the un-normalized verison
+        ln_post_mar_noprior0.write('{}/lnpost_ODDS_mar_flatprior_{}_obs0.h5'.format(folder_path,S))
+
+        # 5. multiply LH by the prior (non-flat version)
+        ln_post = ln_LH.apply_priors()
+        
+        # 6. write to disk the un-normalized version of the posterior for the observation
+        ln_post.write('{}/lnpost_ODDS_wprior_{}_obs0.h5'.format(folder_path,S))
+
+        # 7. marginalize the observation for phi
+        ln_post_mar0 = ln_post.mar_phase()
+        
+        # 8. Write to disk the un-normalize marginalized posterior for this observation. 
+        ln_post_mar0.write('{}/lnpost_ODDS_mar_wprior_{}_obs0.h5'.format(folder_path,S))
+        
+        # 9. Keeping track of the obsID used
+        obsID = [ln_LH.obsID]
+        # if there are more than one observation:
+        if nobs > 1:
+            for i in range(1,nobs):
+                # steps 1-3 from above
+                ln_LH = read_lnP_odds('{}/lnLH_ODDS_{}_obs{}.h5'.format(folder_path,S,i))
+                ln_post_noprior = ln_LH.apply_priors(flat=True)
+                ln_post_noprior.write('{}/lnpost_ODDS_flatprior_{}_obs{}.h5'.format(folder_path,S,i))
+                ln_post_mar_noprior = ln_post_noprior.mar_phase()
+                ln_post_mar_noprior.write('{}/lnpost_ODDS_mar_flatprior_{}_obs{}.h5'.format(folder_path,S,i))
+                
+                # combine the probabilities into the first observation data structure
+                ln_post_mar_noprior0.data = ln_post_mar_noprior0.data + ln_post_mar_noprior.data
+                
+                # steps 5-8 from above
+                ln_post = ln_LH.apply_priors()
+                ln_post.write('{}/lnpost_ODDS_wprior_{}_obs{}.h5'.format(folder_path,S,i))
+                ln_post_mar = ln_post.mar_phase()
+                ln_post_mar.normalize().write('{}/lnpost_ODDS_mar_wprior_{}_obs{}.h5'.format(folder_path,S,i))
+
+                # combine the probabilities into the first observation data structure
+                ln_post_mar0.data = ln_post_mar0.data + ln_post_mar.data
+                
+                # keep track of the obsID combined
+                obsID.append(ln_LH.obsID)
+
+        # replace the obsID in the object in which the combination was done
+        ln_post_mar0.obsID = obsID
+        ln_post_mar_noprior0.obsID = obsID
+
+        #write to combined normalized posterior to disk
+        ln_post_mar0.write('{}/lnpost_ODDS_mar_wprior_{}.h5'.format(folder_path,S))  
+        ln_post_mar_noprior0.normalize().write('{}/lnpost_ODDS_mar_flatprior_{}.h5'.format(folder_path,S))        
+
+
     return()
+
+
 
 def overview_plots(nobs, folder_path):
     '''
