@@ -11,6 +11,12 @@ parts:
     - file: SimpleApplication/02-FitIntensity.ipynb 
     - file: SimpleApplication/03-ChiSquareCalcLoop.ipynb 
     - file: SimpleApplication/04-CalculateProbabilities.ipynb
+  - caption: Tutorials
+    chapters:
+    - file: Tutorials/ParamsObject_tutorial.ipynb
+  - caption: User manuals
+    chapters:
+    - file: UserManual/BayesObjects_user.ipynb
   - caption: API
     chapters:
     - file: API/data.rst
