@@ -241,6 +241,56 @@ class lnP_odds:
                         lnpost.data[beta, Bpole, phi, incl] += (lnp_beta+lnp_Bpole+lnp_phi+lnp_incl)
         return(lnpost)
 
+    def plot_mar(self, fig=None, ax=None, right=False, **kwargs):
+        '''
+        Function to plot the normalized 1D marginalization for a lnP_odds object. 
+
+        :param fig: (None) an already created fig object (for two side-by-side graphs). 
+            If None and right=False, it will create a single corner plot. 
+            If None and right=True, it will create a double corner plot and plot the current to the right side. 
+            To get the left corner plot, call plot_corner again, passing the fig and ax and set right 
+        :param ax: (None) an already created ax object (for two side-by-side graphs)
+        :param right: (False) is False, only one corner plot is displayed. If true, it will create a ax for a double corner plot.  
+        '''
+
+        if right == True:
+            k = 2
+        else:
+            k=0
+
+        if fig == None and right == False:
+            fig, ax = plt.subplots(3,2, figsize=(6,6))
+            ax[2,1+k].set_axis_off()
+            ax[2,0+k].set_axis_off()
+
+
+        if fig == None and right == True:
+            fig, ax = plt.subplots(3,4, figsize=(12,6))
+            ax[2,1].set_axis_off()
+            ax[2,0].set_axis_off()
+
+        lnd_beta, lnd_Bpole, lnd_phi, lnd_incl = self.get_deltas(ln=True)
+
+        lnmar = ln_mar_check(self.normalize().data, axis=(1,2,3)) + lnd_Bpole + lnd_phi + lnd_incl
+        ax[0,0+k].plot(self.beta_arr, exp_check(lnmar), **kwargs)
+        ax[0,0+k].set_xlabel('beta')
+
+        lnmar = ln_mar_check(self.normalize().data,axis=(0,2,3)) + lnd_beta + lnd_phi + lnd_incl
+        ax[0,1+k].plot(self.Bpole_arr, exp_check(lnmar), **kwargs)
+        ax[0,1+k].set_xlabel('Bpole')
+
+        lnmar = ln_mar_check(self.normalize().data,axis=(0,1,3)) + lnd_beta + lnd_Bpole + lnd_incl
+        ax[1,0+k].plot(self.phi_arr, exp_check(lnmar), **kwargs)
+        ax[1,0+k].set_xlabel('phi')
+
+        lnmar = ln_mar_check(self.normalize().data,axis=(0,1,2)) + lnd_beta + lnd_Bpole + lnd_phi
+        ax[1,1+k].plot(self.incl_arr, exp_check(lnmar), **kwargs)
+        ax[1,1+k].set_xlabel('incl')
+
+
+        plt.tight_layout()
+        return(fig, ax)
+
 def read_lnP_odds(fname):
     '''
     Function to read in a lnLH_odds object from an h5 file
@@ -393,21 +443,26 @@ class lnP_pars(lnP_odds):
         :param ax: (None) an already created ax object (for two side-by-side graphs)
         :param right: (False) is False, only one corner plot is displayed. If true, it will create a ax for a double corner plot.  
         '''
-        if fig == None and right == False:
-            fig, ax = plt.subplots(3,2, figsize=(6,6))
 
-        if fig == None and right == True:
-            fig, ax = plt.subplots(3,4, figsize=(12,6))
         if right == True:
             k = 2
         else:
             k=0
+
+        if fig == None and right == False:
+            fig, ax = plt.subplots(3,2, figsize=(6,6))
+            ax[2,1+k].set_axis_off()
+
+        if fig == None and right == True:
+            fig, ax = plt.subplots(3,4, figsize=(12,6))
+            ax[2,1+k].set_axis_off()
 
         lnd_beta, lnd_Bpole, lnd_phi, lnd_incl, lnd_noise = self.get_deltas(ln=True)
 
         lnmar = ln_mar_check(self.data, axis=(1,2,3,4)) + lnd_Bpole + lnd_phi + lnd_incl + lnd_noise
         ax[0,0+k].plot(self.beta_arr, exp_check(lnmar), **kwargs)
         ax[0,0+k].set_xlabel('beta')
+        ax[0,0+k].set_xlim(0,180)
 
         lnmar = ln_mar_check(self.data,axis=(0,2,3,4)) + lnd_beta + lnd_phi + lnd_incl + lnd_noise
         ax[0,1+k].plot(self.Bpole_arr, exp_check(lnmar), **kwargs)
@@ -416,16 +471,19 @@ class lnP_pars(lnP_odds):
         lnmar = ln_mar_check(self.data,axis=(0,1,3,4)) + lnd_beta + lnd_Bpole + lnd_incl + lnd_noise
         ax[1,0+k].plot(self.phi_arr, exp_check(lnmar), **kwargs)
         ax[1,0+k].set_xlabel('phi')
+        ax[1,0+k].set_xlim(0,360)
+
 
         lnmar = ln_mar_check(self.data,axis=(0,1,2,4)) + lnd_beta + lnd_Bpole + lnd_phi + lnd_noise
         ax[1,1+k].plot(self.incl_arr, exp_check(lnmar), **kwargs)
         ax[1,1+k].set_xlabel('incl')
+        ax[1,1+k].set_xlim(0,180)
+
 
         lnmar = ln_mar_check(self.data,axis=(0,1,2,3)) + lnd_beta + lnd_Bpole + lnd_phi + lnd_incl
         ax[2,0+k].plot(self.noise_arr, exp_check(lnmar), **kwargs)
         ax[2,0+k].set_xlabel('scale noise')
 
-        ax[2,1+k].set_axis_off()
 
         plt.tight_layout()
         return(fig, ax)
@@ -763,26 +821,32 @@ class lnP_mar():
         #beta
         lnmar = ln_mar_check(self.data, axis=(1,2)) + lnd_Bpole+lnd_incl
         ax[2,2+k].set_axis_on()
+        ax[2,2+k].set_xlim(0,180)
         ax[2,2+k].plot(self.beta_arr, exp_check(lnmar))
 
         #incl
         lnmar = ln_mar_check(self.data, axis=(0,1)) + lnd_beta+lnd_Bpole
         ax[1,1+k].set_axis_on()
+        ax[1,1+k].set_xlim(0,180)
         ax[1,1+k].plot(self.incl_arr, exp_check(lnmar))
 
         # Bpole - beta
         lnmar = ln_mar_check(self.data, axis=2) + lnd_incl
         ax[2,0+k].set_axis_on()
+        ax[2,0+k].set_ylim(0,180)
         ax[2,0+k].pcolormesh(self.Bpole_arr,self.beta_arr, exp_check(lnmar), shading='auto', cmap=cmap, vmin=0, vmax=exp_check(lnmar).max())
 
         # Bpole - incl
         lnmar = ln_mar_check(self.data, axis=0) + lnd_beta
         ax[1,0+k].set_axis_on()
+        ax[1,0+k].set_ylim(0,180)
         ax[1,0+k].pcolormesh(self.Bpole_arr,self.incl_arr, exp_check(lnmar).T, shading='auto', cmap=cmap, vmin=0, vmax=exp_check(lnmar).max())
 
         # beta - incl
         lnmar = ln_mar_check(self.data, axis=1) + lnd_Bpole
         ax[2,1+k].set_axis_on()
+        ax[2,1+k].set_ylim(0,180)
+        ax[2,1+k].set_xlim(0,180)
         ax[2,1+k].pcolormesh(self.incl_arr,self.beta_arr, exp_check(lnmar), shading='auto', cmap=cmap, vmin=0, vmax=exp_check(lnmar).max())
 
         ax[2,2+k].set_xlabel('beta (deg)')
@@ -974,64 +1038,128 @@ def overview_plots(nobs, folder_path):
     if folder_path==None:
         folder_path='.'
 
-    # during the 'combine_obs' stage, all of the probabilities have been appropriately normalized. 
+    # during the 'combine_obs' stage, all of the PARS probabilities have been appropriately normalized. 
     # so this is not necessary to perform here. Just read in the data and plot. 
+    # However for the ODDS probabilities, these have not been normalized. 
 
     with PdfPages('{}/post_summary.pdf'.format(folder_path)) as pdf:
 
         # For each observation, the full parameter 1D marginalization
         for i in range(0,nobs):
-            # The posterior with flat prior (aka no prior, with scale noise)
-            lnP = read_lnP_pars('{}/lnpost_PARS_noprior_N1_obs{}.h5'.format(folder_path,i))
-            fig, ax = lnP.plot_mar(right=True, c='k',ls='--')
-            lnP = read_lnP_pars('{}/lnpost_PARS_noprior_V_obs{}.h5'.format(folder_path,i))
-            fig, ax = lnP.plot_mar(fig=fig, ax=ax, right=False, c='k',ls='--')            
-            # The posterior (aka with prior and scale noise)
-            lnP = read_lnP_pars('{}/lnpost_PARS_wprior_N1_obs{}.h5'.format(folder_path,i))
-            fig, ax = lnP.plot_mar(fig=fig, ax=ax, right=True, c='k')
+
+            #1. Plot the priors 
             lnP = read_lnP_pars('{}/lnpost_PARS_wprior_V_obs{}.h5'.format(folder_path,i))
-            fig, ax = lnP.plot_mar(fig=fig, ax=ax, right=False, c='k')
-            # over plot the priors
-            fig, ax = lnP.plot_prior(fig=fig, ax=ax, right=True, c='orchid', alpha=0.5, lw=3 )
-            fig, ax = lnP.plot_prior(fig=fig, ax=ax, right=False, c='orchid', alpha=0.5, lw=3 )
+            fig, ax = lnP.plot_prior(right=True, c='orchid', alpha=0.5, lw=5 )
+            fig, ax = lnP.plot_prior(fig=fig, ax=ax, right=False, c='orchid', alpha=0.5, lw=5, label='Normalized Prior' )
+
+            # 2. The posterior with flat prior (aka no prior, with scale noise)
+            lnP = read_lnP_pars('{}/lnpost_PARS_noprior_N1_obs{}.h5'.format(folder_path,i))
+            fig, ax = lnP.plot_mar(fig=fig, ax=ax, right=True, c='k',ls='dotted', lw=4)
+            lnP = read_lnP_pars('{}/lnpost_PARS_noprior_V_obs{}.h5'.format(folder_path,i))
+            fig, ax = lnP.plot_mar(fig=fig, ax=ax, right=False, c='k',ls='dotted', lw=4, label='Post, Flat prior, \nwith scale noise')            
+            # 2. The posterior (aka with prior and scale noise)
+            lnP = read_lnP_pars('{}/lnpost_PARS_wprior_N1_obs{}.h5'.format(folder_path,i))
+            fig, ax = lnP.plot_mar(fig=fig, ax=ax, right=True, c='k', lw=4)
+            lnP = read_lnP_pars('{}/lnpost_PARS_wprior_V_obs{}.h5'.format(folder_path,i))
+            fig, ax = lnP.plot_mar(fig=fig, ax=ax, right=False, c='k', lw=4, label='Post, With prior, \nwith scale noise')
+
+            # 3. The posterior with flat prior without scale noise
+            lnP = read_lnP_odds('{}/lnpost_ODDS_flatprior_N1_obs{}.h5'.format(folder_path,i))
+            fig, ax = lnP.normalize().plot_mar(fig=fig, ax=ax, right=True, c='0.75',ls='dotted') 
+            lnP = read_lnP_odds('{}/lnpost_ODDS_flatprior_V_obs{}.h5'.format(folder_path,i))
+            fig, ax = lnP.normalize().plot_mar(fig=fig, ax=ax, right=False, c='0.75',ls='dotted', label='Post, Flat prior,\n no scale noise')                    
+            # 4. The posterior with prior without scale noise
+            lnP = read_lnP_odds('{}/lnpost_ODDS_wprior_N1_obs{}.h5'.format(folder_path,i))
+            fig, ax = lnP.normalize().plot_mar(fig=fig, ax=ax, right=True, c='0.75') 
+            lnP = read_lnP_odds('{}/lnpost_ODDS_wprior_V_obs{}.h5'.format(folder_path,i))
+            fig, ax = lnP.normalize().plot_mar(fig=fig, ax=ax, right=False, c='0.75', label='Post, With prior,\n no scale noise')                    
+
+            
+            h, l = ax[0,0].get_legend_handles_labels()
+            ax[2,1].legend(h, l, borderaxespad=0)
+            ax[2,1].axis("off")
+
             # add labels and titles
             ax[0,0].set_title('Stokes V')
             ax[0,2].set_title('Null')
             for item in ax.flatten():
                 item.set_ylim(bottom=0.0)
-            fig.suptitle("Observation {}, scale noise, no prior (--) and with prior (solid)".format(i), fontsize=16)
+            fig.suptitle("Observation {}".format(i), fontsize=16)
             fig.tight_layout()
             fig.subplots_adjust(top=0.88)
             pdf.savefig()
 
         # For each observation, the corner plot of beta, Bpole, incl. 
         for i in range(0,nobs):
-            # No prior, with scale noise
+
+            # 1. Flat prior, without scale noise
+            lnP = read_lnP_mar('{}/lnpost_ODDS_mar_flatprior_N1_obs{}.h5'.format(folder_path,i))
+            fig, ax = lnP.normalize().plot_corner(right=True)
+            lnP = read_lnP_mar('{}/lnpost_ODDS_mar_flatprior_V_obs{}.h5'.format(folder_path,i))
+            fig, ax = lnP.normalize().plot_corner(fig=fig, ax=ax, right=False)
+            ax[0,0].set_title('Stokes V')
+            ax[0,3].set_title('Null')
+            fig.suptitle("Observation {}, no scale noise, flat prior".format(i), fontsize=16)
+            for item in ax.flatten():
+                item.set_ylim(bottom=0)
+            fig.tight_layout()
+            fig.subplots_adjust(top=0.88)
+            pdf.savefig()            
+
+            # 2. Flat prior, with scale noise
             lnP = read_lnP_mar('{}/lnpost_PARS_mar_noprior_N1_obs{}.h5'.format(folder_path,i))
             fig, ax = lnP.plot_corner(right=True)
             lnP = read_lnP_mar('{}/lnpost_PARS_mar_noprior_V_obs{}.h5'.format(folder_path,i))
             fig, ax = lnP.plot_corner(fig=fig, ax=ax, right=False)
             ax[0,0].set_title('Stokes V')
             ax[0,3].set_title('Null')
-            fig.suptitle("Observation {}, scale noise, no prior".format(i), fontsize=16)
+            fig.suptitle("Observation {}, with scale noise, flat prior".format(i), fontsize=16)
             for item in ax.flatten():
                 item.set_ylim(bottom=0)
             fig.tight_layout()
             fig.subplots_adjust(top=0.88)
             pdf.savefig()
-            # With prior, with scale noise
+
+            # 3. With prior, without scale noise
+            lnP = read_lnP_mar('{}/lnpost_ODDS_mar_wprior_N1_obs{}.h5'.format(folder_path,i))
+            fig, ax = lnP.normalize().plot_corner(right=True)
+            lnP = read_lnP_mar('{}/lnpost_ODDS_mar_wprior_V_obs{}.h5'.format(folder_path,i))
+            fig, ax = lnP.normalize().plot_corner(fig=fig, ax=ax, right=False)
+            ax[0,0].set_title('Stokes V')
+            ax[0,3].set_title('Null')
+            fig.suptitle("Observation {}, no scale noise, with prior".format(i), fontsize=16)
+            for item in ax.flatten():
+                item.set_ylim(bottom=0)
+            fig.tight_layout()
+            fig.subplots_adjust(top=0.88)
+            pdf.savefig()
+
+            # 4. With prior, with scale noise
             lnP = read_lnP_mar('{}/lnpost_PARS_mar_wprior_N1_obs{}.h5'.format(folder_path,i))
             fig, ax = lnP.plot_corner(right=True)
             lnP = read_lnP_mar('{}/lnpost_PARS_mar_wprior_V_obs{}.h5'.format(folder_path,i))
             fig, ax = lnP.plot_corner(fig=fig, ax=ax, right=False)
             ax[0,0].set_title('Stokes V')
             ax[0,3].set_title('Null')
-            fig.suptitle("Observation {}, scale noise, with prior".format(i), fontsize=16)
+            fig.suptitle("Observation {}, with scale noise, with prior".format(i), fontsize=16)
             for item in ax.flatten():
                 item.set_ylim(bottom=0)
             fig.tight_layout()
             fig.subplots_adjust(top=0.88)
             pdf.savefig()
+
+        lnP = read_lnP_mar('{}/lnpost_ODDS_mar_flatprior_N1.h5'.format(folder_path))
+        fig, ax = lnP.normalize().plot_corner(right=True)
+        lnP = read_lnP_mar('{}/lnpost_ODDS_mar_flatprior_V.h5'.format(folder_path))
+        fig, ax = lnP.normalize().plot_corner(fig=fig, ax=ax, right=False)
+        ax[0,0].set_title('Stokes V')
+        ax[0,3].set_title('Null')
+        for item in ax.flatten():
+            item.set_ylim(bottom=0)
+        fig.suptitle("Combined observations, without scale noise, flat prior".format(i), fontsize=16)
+        fig.tight_layout()
+        fig.subplots_adjust(top=0.88)
+        pdf.savefig()
 
         lnP = read_lnP_mar('{}/lnpost_PARS_mar_noprior_N1.h5'.format(folder_path))
         fig, ax = lnP.plot_corner(right=True)
@@ -1041,7 +1169,20 @@ def overview_plots(nobs, folder_path):
         ax[0,3].set_title('Null')
         for item in ax.flatten():
             item.set_ylim(bottom=0)
-        fig.suptitle("Combined observations, scale noise, no prior".format(i), fontsize=16)
+        fig.suptitle("Combined observations, with scale noise, flat prior".format(i), fontsize=16)
+        fig.tight_layout()
+        fig.subplots_adjust(top=0.88)
+        pdf.savefig()
+
+        lnP = read_lnP_mar('{}/lnpost_ODDS_mar_wprior_N1.h5'.format(folder_path))
+        fig, ax = lnP.normalize().plot_corner(right=True)
+        lnP = read_lnP_mar('{}/lnpost_ODDS_mar_wprior_V.h5'.format(folder_path))
+        fig, ax = lnP.normalize().plot_corner(fig=fig, ax=ax, right=False)
+        ax[0,0].set_title('Stokes V')
+        ax[0,3].set_title('Null')
+        for item in ax.flatten():
+            item.set_ylim(bottom=0)
+        fig.suptitle("Combined observations, without scale noise, with prior".format(i), fontsize=16)
         fig.tight_layout()
         fig.subplots_adjust(top=0.88)
         pdf.savefig()
@@ -1054,7 +1195,7 @@ def overview_plots(nobs, folder_path):
         ax[0,3].set_title('Null')
         for item in ax.flatten():
             item.set_ylim(bottom=0)
-        fig.suptitle("Combined observations, scale noise, with prior".format(i), fontsize=16)
+        fig.suptitle("Combined observations, with scale noise, with prior".format(i), fontsize=16)
         fig.tight_layout()
         fig.subplots_adjust(top=0.88)
         pdf.savefig()
