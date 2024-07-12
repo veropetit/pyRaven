@@ -18,7 +18,7 @@ jobs:
 
     # Install dependencies
     - name: Set up Python 3.9
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: 3.9
 
@@ -51,7 +51,7 @@ jobs:
     # Push the book's HTML to github-pages
     # Upload the book's HTML as an artifact
     - name: Upload artifact
-      uses: actions/upload-pages-artifact@v4
+      uses: actions/upload-pages-artifact@v3
       with:
         path: "JupyterBook/_build/html"
 
