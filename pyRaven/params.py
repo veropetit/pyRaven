@@ -79,6 +79,7 @@ def get_def_param_fitI():
     'logkappa':0.98,          # the line strength parameter
     'ndop':int(10),       # the number of sample point per doppler width for the wavelength array
     'res':65000,       # the spectral resolution lambda0 / gaussian FWHM.
+    'vrad':[0]       # list of radial velocities (1 for every observation)
     }
     return(parameters({'general' : genparam}))
 
@@ -101,7 +102,8 @@ def get_def_param_weak():
     'Bpole':1000,      # dipolar field strength in Gauss
     'incl':90,         # inclination of the rotation axis to the LOS
     'beta':90,         # obliquity of the field to the rotation axis
-    'phase':0          # rotational phase
+    'phase':0,          # rotational phase
+    'vrad':[0]       # list of radial velocities (1 for every observation)
     }
     weakparam = {
         'geff':1.0

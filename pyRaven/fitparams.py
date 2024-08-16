@@ -31,15 +31,15 @@ def update_params(theta_,param_to_fit,parameters,nobs,guess):
     for j in range(len(param_to_fit)): #loop over stars
         k=0
         star.append(copy.deepcopy(parameters[j])) 
-        for i,n in enumerate(param_to_fit[j]): #loop over parameters that are being fit (skipping vrad for now)
+        for i,n in enumerate(param_to_fit[j]): #loop over parameters that are being fit
             if n != 'vrad':
-                star[j]['general'][n]=theta_[prev+i+k]
+                star[j]['general'][n]=theta_[prev+i+k] #this updates the param value for non-vrad entries
             if n == 'vrad':
                 k=nobs-1
                 vrads=[]
                 for o in range(nobs):
-                    vrads.append(theta_[i+prev+o])
-                star[j]['general']['vrad']=vrads
+                    vrads.append(theta_[i+prev+o]) #this appends the fit vrad entries to the vrad array
+                star[j]['general']['vrad']=vrads #this updates the param value for vrad
          
         prev+=len(np.hstack(guess[j]))
 
@@ -60,16 +60,18 @@ def param_to_model(parameters,lsds):
     specSigI=lsds[2]
     nobs=int(len(lsds[0]))
 
+    #this creates a model for each star
     fitmodels=[]
     fys=[]
     for j in range(len(parameters)):
-        model=rav.diskint.analytical(parameters[j],False)
+        model=rav.diskint.analytical(parameters[j],False) #creates the model lsd profile
         for o in range(nobs):
-            fys.append(np.interp(vel[o],model['vel']+parameters[j]['general']['vrad'][o],model['flux']))
+            fys.append(np.interp(vel[o],model['vel']+parameters[j]['general']['vrad'][o],model['flux'])) #for each observation, this interpolates the model to be the same size as the input lsd arrays
     
-    for o in range(nobs):
-        obs=np.zeros(len(fys[0]))
-        for j in range(len(parameters)):
+    #this combines the models in the case of spectroscopic binaries to get a single LSD profile
+    for o in range(nobs): #loop over observations
+        obs=np.zeros(len(fys[o]))
+        for j in range(len(parameters)): #loop of number of stars being fit
             obs+=fys[o+(nobs)*j]
         fitmodels.append(obs-j)
     return(fitmodels)
