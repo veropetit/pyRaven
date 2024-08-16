@@ -3,7 +3,7 @@ import h5py
 import matplotlib.pyplot as plt
 import copy
 from matplotlib.backends.backend_pdf import PdfPages
-
+from . import data as rav_data
 
 ## Develop by Robin Moore and Veronique Petit
 
@@ -24,7 +24,7 @@ def exp_check(lnP):
             print('WARNING: nan or inf in the exp(P)') 
     return(P)
 
-def ln_mar_check(lnP_array, axis=None, verbose=True):
+def ln_mar_check(lnP_array, axis=None, verbose=False):
     '''
     Function to marginalize an array of ln(P) and return a ln(P).
     Note, this function does not know about the grid size. 
@@ -36,6 +36,8 @@ def ln_mar_check(lnP_array, axis=None, verbose=True):
     '''
     # normalizing the array by its maximum value.
     norm = lnP_array.max()
+    if verbose:
+        print('Max of lnP is: {}'.format(norm))
     P_array = np.exp(lnP_array - norm)
     ln_mar = np.log( np.sum(P_array, axis=axis) ) + norm
 
@@ -858,6 +860,20 @@ class lnP_mar():
         plt.tight_layout()
         return(fig, ax)
 
+    def get_globalLH(self):
+        '''
+        Function to calculate the global LH associated with this marginalized 
+        probability density. Important: the probability needs to be un-normalized
+        (of the 'ODDS' type).
+
+        :param self: a lnP_mar object with unormalized probability density
+        :returns: 
+        '''
+
+        return ln_mar_check(self.data, axis=None, verbose=True)
+
+
+
 def read_lnP_mar(fname):
     '''
     Function to read in a lnpost object from an h5 file
@@ -1005,7 +1021,7 @@ def combine_obs(nobs,folder_path):
                 ln_post = ln_LH.apply_priors()
                 ln_post.write('{}/lnpost_ODDS_wprior_{}_obs{}.h5'.format(folder_path,S,i))
                 ln_post_mar = ln_post.mar_phase()
-                ln_post_mar.normalize().write('{}/lnpost_ODDS_mar_wprior_{}_obs{}.h5'.format(folder_path,S,i))
+                ln_post_mar.write('{}/lnpost_ODDS_mar_wprior_{}_obs{}.h5'.format(folder_path,S,i))
 
                 # combine the probabilities into the first observation data structure
                 ln_post_mar0.data = ln_post_mar0.data + ln_post_mar.data
@@ -1019,10 +1035,99 @@ def combine_obs(nobs,folder_path):
 
         #write to combined normalized posterior to disk
         ln_post_mar0.write('{}/lnpost_ODDS_mar_wprior_{}.h5'.format(folder_path,S))  
-        ln_post_mar_noprior0.normalize().write('{}/lnpost_ODDS_mar_flatprior_{}.h5'.format(folder_path,S))        
+        ln_post_mar_noprior0.write('{}/lnpost_ODDS_mar_flatprior_{}.h5'.format(folder_path,S))        
 
 
     return()
+
+
+def get_odds_dict(nobs):
+    '''
+    Helper function that creates a list of dictionaries to store the odds ratio results. 
+    '''
+    d = {'Obs':'',
+         'V ln(GLH_M0)':'',
+         'N1 ln(GLH_M0)':'',
+         'V ln(GLH_M1)':'',
+         'N1 ln(GLH_M1)':'',
+         'log10 Odds V':'',
+         'log10 Odds N1':''}
+    d_list = []
+    # A deep copy was needed overwise doing
+    # return [d]*(nobs+1) was linking all the values together. 
+    for i in range(0,nobs+1):
+        d_list.append(copy.deepcopy(d))
+    return d_list
+
+def get_all_odds(LSDprof, folder_path=None):
+    '''
+    Function to use the standard data products to get the odds ratios
+    '''
+    if folder_path==None:
+        folder_path='.'
+
+    nobs = len(LSDprof.lsds)
+    print(nobs)
+    odds_dict = get_odds_dict(nobs)
+    odds_dict_flat = get_odds_dict(nobs)
+    global_LH = LSDprof.get_globalLH_M0()
+
+    Stokes = ['V', 'N1']
+
+    print()
+    print()
+
+    for i in range(0,nobs):
+        print()
+        print(i)
+        print()
+        odds_dict[i]['Obs']='Observation {}'.format(i)
+        odds_dict_flat[i]['Obs']='Observation {}'.format(i)
+
+        for s,S in enumerate(Stokes):
+
+            odds_dict[i]['{} ln(GLH_M0)'.format(S)] = global_LH[s][i]
+            odds_dict_flat[i]['{} ln(GLH_M0)'.format(S)] = global_LH[s][i]
+
+            print('{}/lnpost_ODDS_mar_wprior_{}_obs{}.h5'.format(folder_path,S,i))
+            lnP = read_lnP_mar('{}/lnpost_ODDS_mar_wprior_{}_obs{}.h5'.format(folder_path,S,i))
+            GLH = lnP.get_globalLH()
+            print(GLH)
+            odds_dict[i]['{} ln(GLH_M1)'.format(S)] = GLH
+            odds_dict[i]['log10 Odds {}'.format(S)] = (global_LH[s][i] - GLH)*np.log10(np.exp(1.0))
+
+
+            print('{}/lnpost_ODDS_mar_flatprior_{}_obs{}.h5'.format(folder_path,S,i))
+            lnP = read_lnP_mar('{}/lnpost_ODDS_mar_flatprior_{}_obs{}.h5'.format(folder_path,S,i))
+            GLH = lnP.get_globalLH()
+            print(GLH)
+            odds_dict_flat[i]['{} ln(GLH_M1)'.format(S)] = GLH
+            odds_dict_flat[i]['log10 Odds {}'.format(S)] = (global_LH[s][i] - GLH)*np.log10(np.exp(1.0))
+
+    print()
+    print()
+
+    # The last row in the list is for the combined obs info
+    odds_dict[nobs]['Obs']='Combined'
+    odds_dict_flat[nobs]['Obs']='Combined'
+
+    for s,S in enumerate(Stokes):
+    
+        lnP = read_lnP_mar('{}/lnpost_ODDS_mar_wprior_{}.h5'.format(folder_path,S))
+        GLH = lnP.get_globalLH()
+        odds_dict[nobs]['{} ln(GLH_M1)'.format(S)] = GLH
+        GLH_M0 = np.sum(global_LH[s]) # getting the joint GLH for M0
+        odds_dict[nobs]['{} ln(GLH_M0)'.format(S)] = GLH_M0
+        odds_dict[nobs]['log10 Odds {}'.format(S)] = (GLH_M0 - GLH)*np.log10(np.exp(1.0))
+
+        lnP = read_lnP_mar('{}/lnpost_ODDS_mar_flatprior_{}.h5'.format(folder_path,S))
+        GLH = lnP.get_globalLH()
+        odds_dict_flat[nobs]['{} ln(GLH_M1)'.format(S)] = GLH
+        GLH_M0 = np.sum(global_LH[s]) # getting the joint GLH for M0
+        odds_dict_flat[nobs]['{} ln(GLH_M0)'.format(S)] = GLH_M0
+        odds_dict_flat[nobs]['log10 Odds {}'.format(S)] = (GLH_M0 - GLH)*np.log10(np.exp(1.0))
+
+    return(odds_dict, odds_dict_flat)
 
 
 

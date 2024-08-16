@@ -128,6 +128,36 @@ class LSDprofs:
       
       return(fig, ax)
 
+  def get_chi2_M0(self):
+    '''
+    Function to return the chi2 for the no-magnetic-field model M0 for each observation
+    (Stokes V = 0)
+    '''
+    chi2V=np.array([])
+    chi2N=np.array([])
+    for lsd in self.lsds:
+      chi2V = np.append(chi2V, np.sum((lsd.specV/lsd.specSigV)**2))
+      chi2N = np.append(chi2N, np.sum((lsd.specN1/lsd.specSigN1)**2))
+
+    return(chi2V, chi2N) 
+
+  def get_globalLH_M0(self):
+    '''
+    Function to return the global likelihood for the no-magnetic-field model M0
+    (Stokes V = 0)
+    '''
+    chi2V, chi2N = self.get_chi2_M0()
+
+    logLH_global_V = np.array([])
+    logLH_global_N = np.array([])
+    for i, lsd in enumerate(self.lsds):
+      # Stokes V
+      constant_term = -lsd.npix/2*np.log(2*np.pi)+np.sum(np.log(1/lsd.specSigV))
+      logLH_global_V = np.append(logLH_global_V, -0.5*chi2V[i] + constant_term)
+      # Null profile
+      constant_term = -lsd.npix/2*np.log(2*np.pi)+np.sum(np.log(1/lsd.specSigN1))
+      logLH_global_N = np.append(logLH_global_N, -0.5*chi2N[i] + constant_term)
+    return(logLH_global_V,logLH_global_N)
 
 # class for a 'DataPacket'
 ## meta information
