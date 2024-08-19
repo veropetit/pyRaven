@@ -141,7 +141,7 @@ class lnP_odds:
     See __init__ for class content. 
     '''
 
-    def __init__(self, data, beta_arr, Bpole_arr, phi_arr, incl_arr, obsID):
+    def __init__(self, data, beta_arr, Bpole_arr, phi_arr, incl_arr, obsID, bestChi):
         '''
         Initialization of a LH_odd object
 
@@ -158,6 +158,7 @@ class lnP_odds:
         self.phi_arr = phi_arr
         self.incl_arr = incl_arr
         self.obsID = obsID
+        self.bestChi = bestChi
 
     def writef(self, f):
         '''
@@ -170,7 +171,8 @@ class lnP_odds:
         f.create_dataset('Bpole_arr',data=self.Bpole_arr)
         f.create_dataset('phi_arr',data=self.phi_arr)
         f.create_dataset('incl_arr',data=self.incl_arr)
-        f.attrs['obsID'] = self.obsID        
+        f.attrs['obsID'] = self.obsID
+        f.attrs['bestChi'] = self.bestChi        
 
     def write(self, fname):
         '''
@@ -205,7 +207,7 @@ class lnP_odds:
 
         ln_norm = ln_mar_check(self.data) + lnd_beta+lnd_Bpole+lnd_incl+lnd_phi 
         
-        return(lnP_odds(self.data-ln_norm, self.beta_arr,self.Bpole_arr,self.phi_arr, self.incl_arr,self.obsID))
+        return(lnP_odds(self.data-ln_norm, self.beta_arr,self.Bpole_arr,self.phi_arr, self.incl_arr,self.obsID,self.bestChi))
 
     def mar_phase(self):
         '''
@@ -306,8 +308,9 @@ def read_lnP_odds(fname):
         phi_arr = np.array(f['phi_arr'])
         incl_arr = np.array(f['incl_arr'])
         obsID = f.attrs.get('obsID')
+        bestChi = f.attrs.get('bestChi')
 
-    return(lnP_odds(data, beta_arr, Bpole_arr, phi_arr, incl_arr, obsID))
+    return(lnP_odds(data, beta_arr, Bpole_arr, phi_arr, incl_arr, obsID, bestChi))
 
 def create_empty_lnP_odds(beta_arr, Bpole_arr, phi_arr, incl_arr, obsID):
     '''
@@ -321,7 +324,7 @@ def create_empty_lnP_odds(beta_arr, Bpole_arr, phi_arr, incl_arr, obsID):
     :param obsID: (string or float) the observation ID for this set of chi2s
     '''
     data = np.zeros((beta_arr.size, Bpole_arr.size, phi_arr.size, incl_arr.size))
-    return(lnP_odds(data, beta_arr, Bpole_arr, phi_arr, incl_arr, obsID))
+    return(lnP_odds(data, beta_arr, Bpole_arr, phi_arr, incl_arr, obsID, bestChi=0.0))
 
 def create_lnLH_odds_from_chi(folder_path, param, datapacket, output_path=None):
     '''
@@ -369,6 +372,10 @@ def create_lnLH_odds_from_chi(folder_path, param, datapacket, output_path=None):
                 chi = read_chi(filename)
                 
                 lnLH.data[:,:,:,i] = -0.5*chi.data
+
+
+            loc=np.where(lnLH.data/-.5==np.min(lnLH.data/-.5)) #finds the minimum chi value
+            lnLH.bestChi=lnLH.data[loc[0],loc[1],loc[2],loc[3]][0]/-.5
 
             lnLH.data = lnLH.data+constant_term
 
