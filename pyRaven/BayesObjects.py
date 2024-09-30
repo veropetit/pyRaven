@@ -395,7 +395,7 @@ class lnP_pars(lnP_odds):
 
     def __init__(self, data, beta_arr, Bpole_arr, phi_arr, incl_arr, obsID, noise_arr):
         ## calling the constructor of the parent class
-        super().__init__(data, beta_arr, Bpole_arr, phi_arr, incl_arr, obsID)
+        super().__init__(data, beta_arr, Bpole_arr, phi_arr, incl_arr, obsID,bestChi=0.0)
         # adding the noise_arr
         self.noise_arr = noise_arr
 
@@ -610,6 +610,7 @@ def read_lnP_pars(fname):
         incl_arr = np.array(f['incl_arr'])
         obsID = f.attrs.get('obsID')
         noise_arr = np.array(f['noise_arr'])
+        
 
 
     return(lnP_pars(data, beta_arr, Bpole_arr, phi_arr, incl_arr, obsID, noise_arr))
