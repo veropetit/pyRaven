@@ -189,7 +189,7 @@ def loop(param, datapacket, path='', ax=None):
         flag_conv = False
         
     # create an array in kms unit, for the chi2 calculations
-    model_vel = ext_all_u*param['general']['ndop']
+    model_vel = ext_all_u*param['general']['vdop']
 
     # Surface Grid Setup
     # cartesian coordinates of each grid points in ROT
@@ -312,6 +312,11 @@ def loop(param, datapacket, path='', ax=None):
                 for o in range(0, datapacket.nobs):
                     interpol_modelV[o,0:list_npix[o]]= rav_localV.interpol_lin_numba(modelV,  model_vel, spec_vel[o,0:list_npix[o]])
                 
+                # For debugging:
+                # saving the first model
+                if (ind_beta) == 0 and (ind_i == 0) and (ind_p == 0):
+                    print('Saving first model')
+                    np.save('interp_model.npy', interpol_modelV)
 
                 #########################################
                 #########################################

@@ -223,9 +223,9 @@ class lnP_odds:
         ln_post = lnP_mar(ln_post_mar,self.beta_arr,self.Bpole_arr,self.incl_arr, self.obsID)
         return(ln_post)
 
-    def apply_priors(self, flat=False):
+    def apply_all_priors(self, flat=False, Jeff_B=None):
         '''
-        Function to apply the priors to a LH ODDS object. Returns a LH ODDS object that is NOT normalized. 
+        Function to apply the all priors to a LH ODDS object. Returns a LH ODDS object that is NOT normalized. 
 
         :param flat: (False) If set to true, a flat prior will be used for Bpole and incl. 
         '''
@@ -235,7 +235,7 @@ class lnP_odds:
         # and it makes the code more readable. 
         lnpost = copy.deepcopy(self)
         ln_prior_beta= np.log(get_prior_beta(self.beta_arr))
-        ln_prior_Bpole = np.log(get_prior_Bpole(self.Bpole_arr, flat=flat))
+        ln_prior_Bpole = np.log(get_prior_Bpole(self.Bpole_arr, flat=flat, Jeff_B=Jeff_B))
         ln_prior_phi = np.log(get_prior_phi(self.phi_arr))
         ln_prior_incl = np.log(get_prior_incl(self.incl_arr, flat=flat))
         for beta, lnp_beta in enumerate(ln_prior_beta):
@@ -243,6 +243,21 @@ class lnP_odds:
                 for phi, lnp_phi in enumerate(ln_prior_phi):
                     for incl, lnp_incl in enumerate(ln_prior_incl):
                         lnpost.data[beta, Bpole, phi, incl] += (lnp_beta+lnp_Bpole+lnp_phi+lnp_incl)
+        return(lnpost)
+    
+    def apply_phase_priors(self):
+        '''
+        Function to apply the phi prior (only) to a LH ODDS object. Returns a LH ODDS object that is NOT normalized. 
+        This is used to apply the phi prior to the LH ODDS prior to marginalizing the LH over the phases. 
+        '''
+        # I could use numpy broadcasting in numpy for that, 
+        # but considering that we are only doing this operation a few times
+        # using a loop does not add that much more time
+        # and it makes the code more readable. 
+        lnpost = copy.deepcopy(self)
+        ln_prior_phi = np.log(get_prior_phi(self.phi_arr))
+        for phi, lnp_phi in enumerate(ln_prior_phi):
+            lnpost.data[:, :, phi, :] += (lnp_phi)
         return(lnpost)
 
     def plot_mar(self, fig=None, ax=None, right=False, **kwargs):
@@ -497,7 +512,7 @@ class lnP_pars(lnP_odds):
         plt.tight_layout()
         return(fig, ax)
 
-    def plot_prior(self, fig=None, ax=None, right=False, **kwargs):
+    def plot_prior(self, fig=None, ax=None, right=False, Jeff_B=None, **kwargs):
         '''
         Function to plot the 1D prior based on the grid definition of a LH PARS object. 
 
@@ -528,7 +543,7 @@ class lnP_pars(lnP_odds):
         ax[0,0+k].plot(self.beta_arr, prior/(np.sum(prior)*d_beta) , **kwargs)
         if overplot == False: ax[0,0+k].set_xlabel('beta')
 
-        prior = get_prior_Bpole(self.Bpole_arr)
+        prior = get_prior_Bpole(self.Bpole_arr, Jeff_B=Jeff_B)
         ax[0,1+k].plot(self.Bpole_arr, prior/(np.sum(prior)*d_Bpole), **kwargs)
         if overplot == False: ax[0,1+k].set_xlabel('Bpole')
 
@@ -549,9 +564,9 @@ class lnP_pars(lnP_odds):
         plt.tight_layout()
         return(fig, ax) 
 
-    def apply_priors(self):
+    def apply_all_priors(self, Jeff_B=None):
         '''
-        Function to apply the priors to a LH PARS object. Returns a LH PARS object that is NOT normalized. 
+        Function to apply all the priors to a LH PARS object. Returns a LH PARS object that is NOT normalized. 
         '''
         # I could use numpy broadcasting in numpy for that, 
         # but considering that we are only doing this operation a few times
@@ -559,7 +574,7 @@ class lnP_pars(lnP_odds):
         # and it makes the code more readable. 
         lnpost = copy.deepcopy(self)
         ln_prior_beta= np.log(get_prior_beta(self.beta_arr))
-        ln_prior_Bpole = np.log(get_prior_Bpole(self.Bpole_arr))
+        ln_prior_Bpole = np.log(get_prior_Bpole(self.Bpole_arr, Jeff_B=Jeff_B))
         ln_prior_phi = np.log(get_prior_phi(self.phi_arr))
         ln_prior_incl = np.log(get_prior_incl(self.incl_arr))
         ln_prior_noise = np.log(get_prior_noise(self.noise_arr))
@@ -569,6 +584,24 @@ class lnP_pars(lnP_odds):
                     for incl, lnp_incl in enumerate(ln_prior_incl):
                         for noise, lnp_noise in enumerate(ln_prior_noise):
                             lnpost.data[beta, Bpole, phi, incl, noise] += (lnp_beta+lnp_Bpole+lnp_phi+lnp_incl+lnp_noise)
+        return(lnpost)
+    
+    def apply_phase_noise_priors(self):
+        '''
+        Function to apply the phi and noise priors to a LH PARS object. Returns a LH PARS object that is NOT normalized. 
+
+        This is used to apply the phi and noise prior to the likelihood prior to marginalizing the LH. 
+        '''
+        # I could use numpy broadcasting in numpy for that, 
+        # but considering that we are only doing this operation a few times
+        # using a loop does not add that much more time
+        # and it makes the code more readable. 
+        lnpost = copy.deepcopy(self)
+        ln_prior_phi = np.log(get_prior_phi(self.phi_arr))
+        ln_prior_noise = np.log(get_prior_noise(self.noise_arr))
+        for phi, lnp_phi in enumerate(ln_prior_phi):
+            for noise, lnp_noise in enumerate(ln_prior_noise):
+                lnpost.data[:, :, phi, :, noise] += (lnp_phi+lnp_noise)
         return(lnpost)
 
     def mar_phase_noise(self):
@@ -692,12 +725,12 @@ def create_lnLH_pars_from_chi(folder_path, param, datapacket, output_path):
 #####################
 #####################
 
-def get_prior_Bpole(Bpole_arr, flat=False):
+def get_prior_Bpole(Bpole_arr, flat=False, Jeff_B=100):
     '''
     Get the modified jeffreys or flat prior for the Bpole. 
     '''
     if flat == False:
-        Jeff_B = 100 #gauss
+        #Jeff_B = 100 #gauss
         prior_B = 1.0 / ( (Bpole_arr+ Jeff_B) * np.log(  (Jeff_B+Bpole_arr[-1])/Jeff_B ) )
         return(prior_B)
     else:
@@ -715,6 +748,7 @@ def get_prior_incl(incl_arr, flat=False):
     '''
     if flat == False:
         prior_incl = np.sin(incl_arr*np.pi/180) /2	# p(incl)dincl = sin(incl)dincl (P(i<io) = 1-cos(io))
+        prior_incl = prior_incl * np.pi / 180 # This is because our grid is set in degrees (so we need prob per degree)
         return(prior_incl)
     else:
         prior_incl = np.array( [ 1.0 / (incl_arr[-1] - incl_arr[0]) ] * incl_arr.size )
@@ -790,6 +824,26 @@ class lnP_mar():
         ln_norm = ln_mar_check(self.data) + lnd_beta+lnd_Bpole+lnd_incl 
         
         return(lnP_mar(self.data-ln_norm, self.beta_arr,self.Bpole_arr,self.incl_arr,self.obsID))
+
+    def apply_priors(self, flat=False, Jeff_B=None):
+        '''
+        Function to apply the all priors to a lnP_mar object. Returns a lnP_mar object that is NOT normalized. 
+
+        :param flat: (False) If set to true, a flat prior will be used for Bpole and incl. 
+        '''
+        # I could use numpy broadcasting in numpy for that, 
+        # but considering that we are only doing this operation a few times
+        # using a loop does not add that much more time
+        # and it makes the code more readable. 
+        lnpost = copy.deepcopy(self)
+        ln_prior_beta= np.log(get_prior_beta(self.beta_arr))
+        ln_prior_Bpole = np.log(get_prior_Bpole(self.Bpole_arr, flat=flat, Jeff_B=Jeff_B))
+        ln_prior_incl = np.log(get_prior_incl(self.incl_arr, flat=flat))
+        for beta, lnp_beta in enumerate(ln_prior_beta):
+            for Bpole, lnp_Bpole in enumerate(ln_prior_Bpole):
+                for incl, lnp_incl in enumerate(ln_prior_incl):
+                    lnpost.data[beta, Bpole, incl] += (lnp_beta+lnp_Bpole+lnp_incl)
+        return(lnpost)
 
     def plot_corner(self, fig=None, ax=None, right=False):
         '''
@@ -877,8 +931,9 @@ class lnP_mar():
         :param self: a lnP_mar object with unormalized probability density
         :returns: 
         '''
+        lnd_beta, lnd_Bpole, lnd_incl = self.get_deltas(ln=True)
 
-        return ln_mar_check(self.data, axis=None, verbose=True)
+        return ln_mar_check(self.data, axis=None) + lnd_beta + lnd_Bpole + lnd_incl
 
 
 
@@ -897,7 +952,88 @@ def read_lnP_mar(fname):
 
     return(lnP_mar(data, beta_arr, Bpole_arr, incl_arr, obsID))    
 
-def combine_obs(nobs,folder_path):
+
+def calc_all_LHs(param, datapacket, chi_folder, output_path='.'):
+    '''
+    Wrapper function to calculate the most used probability products
+    '''
+
+    # 1. use the function to create the LH objects and files for each observations. 
+    create_lnLH_odds_from_chi(chi_folder, param, datapacket, output_path)
+    create_lnLH_pars_from_chi(chi_folder, param, datapacket, output_path)
+
+    Stokes = ['V', 'N1']
+    for S in Stokes:
+
+        ###############################################
+        ### Dealing with the odds first
+        ###############################################            
+
+        # 1. read in the first observation
+        ln_P0 = read_lnP_odds('{}/lnLH_ODDS_{}_obs0.h5'.format(output_path,S))
+        # 2. apply the phase prior (it's already flat)
+        ln_P0 = ln_P0.apply_phase_priors()
+        # 3. marginalize the LH over phase
+        ln_P0 = ln_P0.mar_phase()
+
+        # Keeping track of the obsID used
+        obsID = [ln_P0.obsID]
+        # if there are more than one observation:
+        if datapacket.nobs > 1:
+            for i in range(1,datapacket.nobs):  
+                ln_P = read_lnP_odds('{}/lnLH_ODDS_{}_obs{}.h5'.format(output_path,S,i))
+                obsID.append(ln_P.obsID)
+                ln_P = ln_P.apply_phase_priors()
+                ln_P = ln_P.mar_phase()
+                # Multiply the marginalized LH
+                ln_P0.data = ln_P0.data + ln_P.data
+
+        # replace the obsID in the object in which the combination was done
+        ln_P0.obsID = obsID
+        # Write to disk
+        ln_P0.write('{}/lnLH_ODDS_{}_mar_combined.h5'.format(output_path,S))
+
+        ###############################################
+        ### Dealing with the pars next
+        ###############################################            
+
+        # 1. read in the first observation
+        ln_P0_flat = read_lnP_pars('{}/lnLH_PARS_{}_obs0.h5'.format(output_path,S))
+        # 2. apply the phase and noise priors ()
+        ln_P0_withprior = ln_P0_flat.apply_phase_noise_priors()
+        # 3. marginalize the LH over phase
+        ln_P0_flat = ln_P0_flat.mar_phase_noise()
+        ln_P0_withprior = ln_P0_withprior.mar_phase_noise()
+        # Keeping track of the obsID used
+        obsID = [ln_P0_flat.obsID]
+        # if there are more than one observation:
+        if datapacket.nobs > 1:
+            for i in range(1,datapacket.nobs):  
+                # Read in next observation
+                ln_P_flat = read_lnP_pars('{}/lnLH_PARS_{}_obs{}.h5'.format(output_path,S,i))
+                obsID.append(ln_P_flat.obsID)
+                # Apply the prior to phase and noise
+                ln_P_withprior = ln_P_flat.apply_phase_noise_priors()
+                # mar over phase and noise
+                ln_P_flat = ln_P_flat.mar_phase_noise()
+                ln_P_withprior = ln_P_withprior.mar_phase_noise()
+                # Multiply the marginalized LH
+                ln_P0_flat.data = ln_P0_flat.data + ln_P_flat.data
+                ln_P0_withprior.data = ln_P0_withprior.data + ln_P_withprior.data
+
+        print()
+
+        # replace the obsID in the object in which the combination was done
+        ln_P0_flat.obsID = obsID
+        ln_P0_withprior.obsID = obsID
+        # Write to disk
+        ln_P0_flat.normalize().write('{}/lnLH_PARS_{}_mar_combined_flatprior.h5'.format(output_path,S))
+        ln_P0_withprior.normalize().write('{}/lnLH_PARS_{}_mar_combined_withprior.h5'.format(output_path,S))
+    
+
+
+
+def combine_obs(nobs,folder_path, Jeff_B=100):
     '''
     Wrapper function to calculate a variety of posterior probabilities and
     combine the probabilities for multiple observtions. 
@@ -908,6 +1044,8 @@ def combine_obs(nobs,folder_path):
 
     if folder_path==None:
         folder_path='.'
+
+    ## Eventually, pass the param structure, and stick Jeff_B in it, instead of passing it. 
 
     Stokes = ['V', 'N1']
 
@@ -932,7 +1070,7 @@ def combine_obs(nobs,folder_path):
         ln_post_mar_noprior0.normalize().write('{}/lnpost_PARS_mar_noprior_{}_obs0.h5'.format(folder_path,S))
 
         # 5. multiply LH by the prior
-        ln_post = ln_LH.apply_priors()
+        ln_post = ln_LH.apply_priors(Jeff_B=Jeff_B)
         
         # 6. write to disk the normalize version of the posterior for the observation
         ln_post.normalize().write('{}/lnpost_PARS_wprior_{}_obs0.h5'.format(folder_path,S))
@@ -958,7 +1096,7 @@ def combine_obs(nobs,folder_path):
                 ln_post_mar_noprior0.data = ln_post_mar_noprior0.data + ln_post_mar_noprior.data
                 
                 # steps 5-8 from above
-                ln_post = ln_LH.apply_priors()
+                ln_post = ln_LH.apply_priors(Jeff_B=Jeff_B)
                 ln_post.normalize().write('{}/lnpost_PARS_wprior_{}_obs{}.h5'.format(folder_path,S,i))
                 ln_post_mar = ln_post.mar_phase_noise()
                 ln_post_mar.normalize().write('{}/lnpost_PARS_mar_wprior_{}_obs{}.h5'.format(folder_path,S,i))
@@ -999,7 +1137,7 @@ def combine_obs(nobs,folder_path):
         ln_post_mar_noprior0.write('{}/lnpost_ODDS_mar_flatprior_{}_obs0.h5'.format(folder_path,S))
 
         # 5. multiply LH by the prior (non-flat version)
-        ln_post = ln_LH.apply_priors()
+        ln_post = ln_LH.apply_priors(Jeff_B=Jeff_B)
         
         # 6. write to disk the un-normalized version of the posterior for the observation
         ln_post.write('{}/lnpost_ODDS_wprior_{}_obs0.h5'.format(folder_path,S))
@@ -1026,7 +1164,7 @@ def combine_obs(nobs,folder_path):
                 ln_post_mar_noprior0.data = ln_post_mar_noprior0.data + ln_post_mar_noprior.data
                 
                 # steps 5-8 from above
-                ln_post = ln_LH.apply_priors()
+                ln_post = ln_LH.apply_priors(Jeff_B=Jeff_B)
                 ln_post.write('{}/lnpost_ODDS_wprior_{}_obs{}.h5'.format(folder_path,S,i))
                 ln_post_mar = ln_post.mar_phase()
                 ln_post_mar.write('{}/lnpost_ODDS_mar_wprior_{}_obs{}.h5'.format(folder_path,S,i))
@@ -1049,7 +1187,7 @@ def combine_obs(nobs,folder_path):
     return()
 
 
-def get_odds_dict(nobs):
+def create_odds_dict(nobs):
     '''
     Helper function that creates a list of dictionaries to store the odds ratio results. 
     '''
@@ -1067,28 +1205,22 @@ def get_odds_dict(nobs):
         d_list.append(copy.deepcopy(d))
     return d_list
 
-def get_all_odds(LSDprof, folder_path=None):
+def get_all_odds(datapacket, param, folder_path=None):
     '''
     Function to use the standard data products to get the odds ratios
     '''
     if folder_path==None:
         folder_path='.'
 
-    nobs = len(LSDprof.lsds)
-    print(nobs)
-    odds_dict = get_odds_dict(nobs)
-    odds_dict_flat = get_odds_dict(nobs)
-    global_LH = LSDprof.get_globalLH_M0()
+    nobs = datapacket.nobs
+    odds_dict = create_odds_dict(nobs)
+    odds_dict_flat = create_odds_dict(nobs)
+    global_LH = datapacket.cutfit.get_globalLH_M0()
 
     Stokes = ['V', 'N1']
 
-    print()
-    print()
-
     for i in range(0,nobs):
-        print()
-        print(i)
-        print()
+
         odds_dict[i]['Obs']='Observation {}'.format(i)
         odds_dict_flat[i]['Obs']='Observation {}'.format(i)
 
@@ -1097,96 +1229,123 @@ def get_all_odds(LSDprof, folder_path=None):
             odds_dict[i]['{} ln(GLH_M0)'.format(S)] = global_LH[s][i]
             odds_dict_flat[i]['{} ln(GLH_M0)'.format(S)] = global_LH[s][i]
 
-            print('{}/lnpost_ODDS_mar_wprior_{}_obs{}.h5'.format(folder_path,S,i))
-            lnP = read_lnP_mar('{}/lnpost_ODDS_mar_wprior_{}_obs{}.h5'.format(folder_path,S,i))
-            GLH = lnP.get_globalLH()
-            print(GLH)
+            # Open the LH odds for the observation:
+            lnP = read_lnP_odds('{}/lnLH_ODDS_{}_obs{}.h5'.format(folder_path,S,i))
+            
+            # Apply the flat prior, mar over phase to create a ln_mar object, get the global LH
+            GLH = lnP.apply_all_priors(flat=False, Jeff_B=param['grid']['Jeff_B']).mar_phase().get_globalLH()
             odds_dict[i]['{} ln(GLH_M1)'.format(S)] = GLH
             odds_dict[i]['log10 Odds {}'.format(S)] = (global_LH[s][i] - GLH)*np.log10(np.exp(1.0))
 
-
-            print('{}/lnpost_ODDS_mar_flatprior_{}_obs{}.h5'.format(folder_path,S,i))
-            lnP = read_lnP_mar('{}/lnpost_ODDS_mar_flatprior_{}_obs{}.h5'.format(folder_path,S,i))
-            GLH = lnP.get_globalLH()
-            print(GLH)
+            # Now apply the flat priors instead
+            GLH = lnP.apply_all_priors(flat=True).mar_phase().get_globalLH()
             odds_dict_flat[i]['{} ln(GLH_M1)'.format(S)] = GLH
             odds_dict_flat[i]['log10 Odds {}'.format(S)] = (global_LH[s][i] - GLH)*np.log10(np.exp(1.0))
-
-    print()
-    print()
 
     # The last row in the list is for the combined obs info
     odds_dict[nobs]['Obs']='Combined'
     odds_dict_flat[nobs]['Obs']='Combined'
 
     for s,S in enumerate(Stokes):
-    
-        lnP = read_lnP_mar('{}/lnpost_ODDS_mar_wprior_{}.h5'.format(folder_path,S))
-        GLH = lnP.get_globalLH()
-        odds_dict[nobs]['{} ln(GLH_M1)'.format(S)] = GLH
+
         GLH_M0 = np.sum(global_LH[s]) # getting the joint GLH for M0
         odds_dict[nobs]['{} ln(GLH_M0)'.format(S)] = GLH_M0
+        odds_dict_flat[nobs]['{} ln(GLH_M0)'.format(S)] = GLH_M0
+
+        # Read in the combined likelihood 
+        lnP = read_lnP_mar('{}/lnLH_ODDS_{}_mar_combined.h5'.format(folder_path,S))
+
+        # compute the global likelihood with prior
+        GLH = lnP.apply_priors(flat=False, Jeff_B=param['grid']['Jeff_B']).get_globalLH()
+        odds_dict[nobs]['{} ln(GLH_M1)'.format(S)] = GLH
         odds_dict[nobs]['log10 Odds {}'.format(S)] = (GLH_M0 - GLH)*np.log10(np.exp(1.0))
 
-        lnP = read_lnP_mar('{}/lnpost_ODDS_mar_flatprior_{}.h5'.format(folder_path,S))
-        GLH = lnP.get_globalLH()
+        # compute the global likelohood with flat prior
+        GLH = lnP.apply_priors(flat=True).get_globalLH()
         odds_dict_flat[nobs]['{} ln(GLH_M1)'.format(S)] = GLH
-        GLH_M0 = np.sum(global_LH[s]) # getting the joint GLH for M0
-        odds_dict_flat[nobs]['{} ln(GLH_M0)'.format(S)] = GLH_M0
         odds_dict_flat[nobs]['log10 Odds {}'.format(S)] = (GLH_M0 - GLH)*np.log10(np.exp(1.0))
 
     return(odds_dict, odds_dict_flat)
 
 
 
-def overview_plots(nobs, folder_path):
+def overview_plots(datapacket, param, folder_path=None):
     '''
     Function to create a PDF with overview plots of the probabilities. 
     This function assumed that the files created by the combine_obs function are in the current directory. 
 
-    :param nobs: Number of observations
-    :param folder_path: Path of the lnLH and lnpost files. Default is current directory
+    :param datapacket: the datapacket used
+    :param param: the param object used
+    :param folder_path: Path of the lnLH files. Default is current directory
     '''
     
     if folder_path==None:
         folder_path='.'
 
-    # during the 'combine_obs' stage, all of the PARS probabilities have been appropriately normalized. 
-    # so this is not necessary to perform here. Just read in the data and plot. 
-    # However for the ODDS probabilities, these have not been normalized. 
+    nobs = datapacket.nobs
+    Jeff_B = param['grid']['Jeff_B']
 
     with PdfPages('{}/post_summary.pdf'.format(folder_path)) as pdf:
 
         # For each observation, the full parameter 1D marginalization
         for i in range(0,nobs):
 
+            #1. Get the lnLH_pars 
+            lnP = read_lnP_pars('{}/lnLH_PARS_V_obs{}.h5'.format(folder_path,i))
+
             #1. Plot the priors 
-            lnP = read_lnP_pars('{}/lnpost_PARS_wprior_V_obs{}.h5'.format(folder_path,i))
-            fig, ax = lnP.plot_prior(right=True, c='orchid', alpha=0.5, lw=5 )
-            fig, ax = lnP.plot_prior(fig=fig, ax=ax, right=False, c='orchid', alpha=0.5, lw=5, label='Normalized Prior' )
+            fig, ax = lnP.plot_prior(right=True, Jeff_B=Jeff_B, 
+                                     c='orchid', alpha=0.5, lw=5 )
+            fig, ax = lnP.plot_prior(fig=fig, ax=ax, right=False, Jeff_B=Jeff_B,
+                                     c='orchid', alpha=0.5, lw=5, label='Normalized Prior' )
+
+            ##### a. Stokes V
 
             # 2. The posterior with flat prior (aka no prior, with scale noise)
-            lnP = read_lnP_pars('{}/lnpost_PARS_noprior_N1_obs{}.h5'.format(folder_path,i))
-            fig, ax = lnP.plot_mar(fig=fig, ax=ax, right=True, c='k',ls='dotted', lw=4)
-            lnP = read_lnP_pars('{}/lnpost_PARS_noprior_V_obs{}.h5'.format(folder_path,i))
-            fig, ax = lnP.plot_mar(fig=fig, ax=ax, right=False, c='k',ls='dotted', lw=4, label='Post, Flat prior, \nwith scale noise')            
-            # 2. The posterior (aka with prior and scale noise)
-            lnP = read_lnP_pars('{}/lnpost_PARS_wprior_N1_obs{}.h5'.format(folder_path,i))
-            fig, ax = lnP.plot_mar(fig=fig, ax=ax, right=True, c='k', lw=4)
-            lnP = read_lnP_pars('{}/lnpost_PARS_wprior_V_obs{}.h5'.format(folder_path,i))
-            fig, ax = lnP.plot_mar(fig=fig, ax=ax, right=False, c='k', lw=4, label='Post, With prior, \nwith scale noise')
+            fig, ax = lnP.normalize().plot_mar(fig=fig, ax=ax, right=False, 
+                                c='k',ls='dotted', lw=4, label='Post, Flat prior, \nwith scale noise')
+            
+            # 3. The posterior (aka with prior and scale noise)
+            fig, ax = lnP.apply_all_priors(Jeff_B=Jeff_B).normalize() \
+                    .plot_mar(fig=fig, ax=ax, right=False, 
+                                c='k', lw=4, label='Post, With prior, \nwith scale noise')
 
-            # 3. The posterior with flat prior without scale noise
-            lnP = read_lnP_odds('{}/lnpost_ODDS_flatprior_N1_obs{}.h5'.format(folder_path,i))
-            fig, ax = lnP.normalize().plot_mar(fig=fig, ax=ax, right=True, c='0.75',ls='dotted') 
-            lnP = read_lnP_odds('{}/lnpost_ODDS_flatprior_V_obs{}.h5'.format(folder_path,i))
-            fig, ax = lnP.normalize().plot_mar(fig=fig, ax=ax, right=False, c='0.75',ls='dotted', label='Post, Flat prior,\n no scale noise')                    
-            # 4. The posterior with prior without scale noise
-            lnP = read_lnP_odds('{}/lnpost_ODDS_wprior_N1_obs{}.h5'.format(folder_path,i))
-            fig, ax = lnP.normalize().plot_mar(fig=fig, ax=ax, right=True, c='0.75') 
-            lnP = read_lnP_odds('{}/lnpost_ODDS_wprior_V_obs{}.h5'.format(folder_path,i))
-            fig, ax = lnP.normalize().plot_mar(fig=fig, ax=ax, right=False, c='0.75', label='Post, With prior,\n no scale noise')                    
+            #=> reading in the odds LH            
+            lnP = read_lnP_odds('{}/lnLH_ODDS_V_obs{}.h5'.format(folder_path,i))
 
+            # 4. The posterior with flat prior without scale noise
+            fig, ax = lnP.normalize().plot_mar(fig=fig, ax=ax, right=False, 
+                                c='0.75',ls='dotted', label='Post, Flat prior,\n no scale noise')                    
+            
+            # 5. The posterior with prior without scale noise
+            fig, ax = lnP.apply_all_priors(Jeff_B=Jeff_B).normalize() \
+                .plot_mar(fig=fig, ax=ax, right=False, 
+                                c='0.75', label='Post, With prior,\n no scale noise')                    
+
+
+            ##### b. Null
+            lnP = read_lnP_pars('{}/lnLH_PARS_N1_obs{}.h5'.format(folder_path,i))
+
+            # 2. The posterior with flat prior (aka no prior, with scale noise)
+            fig, ax = lnP.normalize().plot_mar(fig=fig, ax=ax, right=True, 
+                                c='k',ls='dotted', lw=4)
+
+            # 3. The posterior (aka with prior and scale noise)
+            fig, ax = lnP.apply_all_priors(Jeff_B=Jeff_B).normalize() \
+                    .plot_mar(fig=fig, ax=ax, right=True, 
+                                c='k',lw=4)
+
+            #=> reading in the odds LH            
+            lnP = read_lnP_odds('{}/lnLH_ODDS_N1_obs{}.h5'.format(folder_path,i))
+
+            # 4. The posterior with flat prior without scale noise
+            fig, ax = lnP.normalize().plot_mar(fig=fig, ax=ax, right=True, 
+                                c='0.75',ls='dotted')                    
+            
+            # 5. The posterior with prior without scale noise
+            fig, ax = lnP.apply_all_priors(Jeff_B=Jeff_B).normalize() \
+                .plot_mar(fig=fig, ax=ax, right=True, 
+                                c='0.75')                    
             
             h, l = ax[0,0].get_legend_handles_labels()
             ax[2,1].legend(h, l, borderaxespad=0)
@@ -1202,113 +1361,58 @@ def overview_plots(nobs, folder_path):
             fig.subplots_adjust(top=0.88)
             pdf.savefig()
 
-        # For each observation, the corner plot of beta, Bpole, incl. 
-        for i in range(0,nobs):
-
-            # 1. Flat prior, without scale noise
-            lnP = read_lnP_mar('{}/lnpost_ODDS_mar_flatprior_N1_obs{}.h5'.format(folder_path,i))
-            fig, ax = lnP.normalize().plot_corner(right=True)
-            lnP = read_lnP_mar('{}/lnpost_ODDS_mar_flatprior_V_obs{}.h5'.format(folder_path,i))
-            fig, ax = lnP.normalize().plot_corner(fig=fig, ax=ax, right=False)
-            ax[0,0].set_title('Stokes V')
-            ax[0,3].set_title('Null')
-            fig.suptitle("Observation {}, no scale noise, flat prior".format(i), fontsize=16)
-            for item in ax.flatten():
-                item.set_ylim(bottom=0)
-            fig.tight_layout()
-            fig.subplots_adjust(top=0.88)
-            pdf.savefig()            
-
-            # 2. Flat prior, with scale noise
-            lnP = read_lnP_mar('{}/lnpost_PARS_mar_noprior_N1_obs{}.h5'.format(folder_path,i))
-            fig, ax = lnP.plot_corner(right=True)
-            lnP = read_lnP_mar('{}/lnpost_PARS_mar_noprior_V_obs{}.h5'.format(folder_path,i))
-            fig, ax = lnP.plot_corner(fig=fig, ax=ax, right=False)
-            ax[0,0].set_title('Stokes V')
-            ax[0,3].set_title('Null')
-            fig.suptitle("Observation {}, with scale noise, flat prior".format(i), fontsize=16)
-            for item in ax.flatten():
-                item.set_ylim(bottom=0)
-            fig.tight_layout()
-            fig.subplots_adjust(top=0.88)
-            pdf.savefig()
-
-            # 3. With prior, without scale noise
-            lnP = read_lnP_mar('{}/lnpost_ODDS_mar_wprior_N1_obs{}.h5'.format(folder_path,i))
-            fig, ax = lnP.normalize().plot_corner(right=True)
-            lnP = read_lnP_mar('{}/lnpost_ODDS_mar_wprior_V_obs{}.h5'.format(folder_path,i))
-            fig, ax = lnP.normalize().plot_corner(fig=fig, ax=ax, right=False)
-            ax[0,0].set_title('Stokes V')
-            ax[0,3].set_title('Null')
-            fig.suptitle("Observation {}, no scale noise, with prior".format(i), fontsize=16)
-            for item in ax.flatten():
-                item.set_ylim(bottom=0)
-            fig.tight_layout()
-            fig.subplots_adjust(top=0.88)
-            pdf.savefig()
-
-            # 4. With prior, with scale noise
-            lnP = read_lnP_mar('{}/lnpost_PARS_mar_wprior_N1_obs{}.h5'.format(folder_path,i))
-            fig, ax = lnP.plot_corner(right=True)
-            lnP = read_lnP_mar('{}/lnpost_PARS_mar_wprior_V_obs{}.h5'.format(folder_path,i))
-            fig, ax = lnP.plot_corner(fig=fig, ax=ax, right=False)
-            ax[0,0].set_title('Stokes V')
-            ax[0,3].set_title('Null')
-            fig.suptitle("Observation {}, with scale noise, with prior".format(i), fontsize=16)
-            for item in ax.flatten():
-                item.set_ylim(bottom=0)
-            fig.tight_layout()
-            fig.subplots_adjust(top=0.88)
-            pdf.savefig()
-
-        lnP = read_lnP_mar('{}/lnpost_ODDS_mar_flatprior_N1.h5'.format(folder_path))
-        fig, ax = lnP.normalize().plot_corner(right=True)
-        lnP = read_lnP_mar('{}/lnpost_ODDS_mar_flatprior_V.h5'.format(folder_path))
-        fig, ax = lnP.normalize().plot_corner(fig=fig, ax=ax, right=False)
-        ax[0,0].set_title('Stokes V')
-        ax[0,3].set_title('Null')
-        for item in ax.flatten():
-            item.set_ylim(bottom=0)
-        fig.suptitle("Combined observations, without scale noise, flat prior".format(i), fontsize=16)
-        fig.tight_layout()
-        fig.subplots_adjust(top=0.88)
-        pdf.savefig()
-
-        lnP = read_lnP_mar('{}/lnpost_PARS_mar_noprior_N1.h5'.format(folder_path))
+        ### No scale noise, flat prior    
+        lnP = read_lnP_mar('{}/lnLH_ODDS_N1_mar_combined.h5'.format(folder_path)).normalize()
         fig, ax = lnP.plot_corner(right=True)
-        lnP = read_lnP_mar('{}/lnpost_PARS_mar_noprior_V.h5'.format(folder_path))
+        lnP = read_lnP_mar('{}/lnLH_ODDS_V_mar_combined.h5'.format(folder_path)).normalize()
         fig, ax = lnP.plot_corner(fig=fig, ax=ax, right=False)
         ax[0,0].set_title('Stokes V')
         ax[0,3].set_title('Null')
         for item in ax.flatten():
             item.set_ylim(bottom=0)
-        fig.suptitle("Combined observations, with scale noise, flat prior".format(i), fontsize=16)
+        fig.suptitle("Combined observations, without scale noise, flat prior", fontsize=16)
         fig.tight_layout()
         fig.subplots_adjust(top=0.88)
         pdf.savefig()
 
-        lnP = read_lnP_mar('{}/lnpost_ODDS_mar_wprior_N1.h5'.format(folder_path))
-        fig, ax = lnP.normalize().plot_corner(right=True)
-        lnP = read_lnP_mar('{}/lnpost_ODDS_mar_wprior_V.h5'.format(folder_path))
-        fig, ax = lnP.normalize().plot_corner(fig=fig, ax=ax, right=False)
-        ax[0,0].set_title('Stokes V')
-        ax[0,3].set_title('Null')
-        for item in ax.flatten():
-            item.set_ylim(bottom=0)
-        fig.suptitle("Combined observations, without scale noise, with prior".format(i), fontsize=16)
-        fig.tight_layout()
-        fig.subplots_adjust(top=0.88)
-        pdf.savefig()
-
-        lnP = read_lnP_mar('{}/lnpost_PARS_mar_wprior_N1.h5'.format(folder_path))
+        ### With scale noise, flat prior    
+        lnP = read_lnP_mar('{}/lnLH_PARS_N1_mar_combined_flatprior.h5'.format(folder_path)).normalize()
         fig, ax = lnP.plot_corner(right=True)
-        lnP = read_lnP_mar('{}/lnpost_PARS_mar_wprior_V.h5'.format(folder_path))
+        lnP = read_lnP_mar('{}/lnLH_PARS_V_mar_combined_flatprior.h5'.format(folder_path)).normalize()
         fig, ax = lnP.plot_corner(fig=fig, ax=ax, right=False)
         ax[0,0].set_title('Stokes V')
         ax[0,3].set_title('Null')
         for item in ax.flatten():
             item.set_ylim(bottom=0)
-        fig.suptitle("Combined observations, with scale noise, with prior".format(i), fontsize=16)
+        fig.suptitle("Combined observations, with scale noise, flat prior", fontsize=16)
+        fig.tight_layout()
+        fig.subplots_adjust(top=0.88)
+        pdf.savefig()
+
+        ### Without scale noise, with prior    
+        lnP = read_lnP_mar('{}/lnLH_ODDS_N1_mar_combined.h5'.format(folder_path)).apply_priors(Jeff_B=Jeff_B).normalize()
+        fig, ax = lnP.plot_corner(right=True)
+        lnP = read_lnP_mar('{}/lnLH_ODDS_V_mar_combined.h5'.format(folder_path)).apply_priors(Jeff_B=Jeff_B).normalize()
+        fig, ax = lnP.plot_corner(fig=fig, ax=ax, right=False)
+        ax[0,0].set_title('Stokes V')
+        ax[0,3].set_title('Null')
+        for item in ax.flatten():
+            item.set_ylim(bottom=0)
+        fig.suptitle("Combined observations, without scale noise, with prior", fontsize=16)
+        fig.tight_layout()
+        fig.subplots_adjust(top=0.88)
+        pdf.savefig()
+
+        ### With scale noise, with prior    
+        lnP = read_lnP_mar('{}/lnLH_PARS_N1_mar_combined_withprior.h5'.format(folder_path)).apply_priors(Jeff_B=Jeff_B).normalize()
+        fig, ax = lnP.plot_corner(right=True)
+        lnP = read_lnP_mar('{}/lnLH_PARS_V_mar_combined_withprior.h5'.format(folder_path)).apply_priors(Jeff_B=Jeff_B).normalize()
+        fig, ax = lnP.plot_corner(fig=fig, ax=ax, right=False)
+        ax[0,0].set_title('Stokes V')
+        ax[0,3].set_title('Null')
+        for item in ax.flatten():
+            item.set_ylim(bottom=0)
+        fig.suptitle("Combined observations, with scale noise, with prior", fontsize=16)
         fig.tight_layout()
         fig.subplots_adjust(top=0.88)
         pdf.savefig()
