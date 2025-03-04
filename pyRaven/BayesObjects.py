@@ -845,6 +845,27 @@ class lnP_mar():
                     lnpost.data[beta, Bpole, incl] += (lnp_beta+lnp_Bpole+lnp_incl)
         return(lnpost)
 
+    def get_mars1D(self):
+        '''
+        Function that returns a mars1D object with the marginalizations for Bpole, beta, and incl. 
+        '''
+        # Get the grid deltas:
+        lnd_beta, lnd_Bpole, lnd_incl = self.get_deltas(ln=True)
+        
+        # Bpole
+        lnmar = ln_mar_check(self.data, axis=(0,2)) + lnd_beta+lnd_incl
+        Bpole = mar1D(self.Bpole_arr, exp_check(lnmar))
+
+        #beta
+        lnmar = ln_mar_check(self.data, axis=(1,2)) + lnd_Bpole+lnd_incl
+        beta = mar1D(self.beta_arr, exp_check(lnmar))
+
+        #incl
+        lnmar = ln_mar_check(self.data, axis=(0,1)) + lnd_beta+lnd_Bpole
+        incl = mar1D(self.incl_arr, exp_check(lnmar))
+
+        return mars1D(Bpole, beta, incl)
+
     def plot_corner(self, fig=None, ax=None, right=False):
         '''
         Function to display the corner plot for the posterior PARS. 
@@ -934,8 +955,6 @@ class lnP_mar():
         lnd_beta, lnd_Bpole, lnd_incl = self.get_deltas(ln=True)
 
         return ln_mar_check(self.data, axis=None) + lnd_beta + lnd_Bpole + lnd_incl
-
-
 
 def read_lnP_mar(fname):
     '''
@@ -1029,18 +1048,16 @@ def calc_all_LHs(param, datapacket, chi_folder, output_path='.'):
         # Write to disk
         ln_P0_flat.normalize().write('{}/lnLH_PARS_{}_mar_combined_flatprior.h5'.format(output_path,S))
         ln_P0_withprior.normalize().write('{}/lnLH_PARS_{}_mar_combined_withprior.h5'.format(output_path,S))
-    
-
-
 
 def combine_obs(nobs,folder_path, Jeff_B=100):
     '''
-    Wrapper function to calculate a variety of posterior probabilities and
+    DEPRECATED  Wrapper function to calculate a variety of posterior probabilities and
     combine the probabilities for multiple observtions. 
 
     :param nobs: Number of observations
     :param folder_path: Path of the lnLH and lnpost files. Default is current directory
     '''
+    print('DEPRECATED')
 
     if folder_path==None:
         folder_path='.'
@@ -1186,7 +1203,6 @@ def combine_obs(nobs,folder_path, Jeff_B=100):
 
     return()
 
-
 def create_odds_dict(nobs):
     '''
     Helper function that creates a list of dictionaries to store the odds ratio results. 
@@ -1266,8 +1282,6 @@ def get_all_odds(datapacket, param, folder_path=None):
         odds_dict_flat[nobs]['log10 Odds {}'.format(S)] = (GLH_M0 - GLH)*np.log10(np.exp(1.0))
 
     return(odds_dict, odds_dict_flat)
-
-
 
 def overview_plots(datapacket, param, folder_path=None):
     '''
@@ -1418,4 +1432,148 @@ def overview_plots(datapacket, param, folder_path=None):
         pdf.savefig()
 
     return()
+
+class mar1D():
+    '''
+    Class to store a 1D marginalization over a parameter
+
+    Provides functions to compute credible regions and plot them. 
+    '''
+
+    def __init__(self, x, mar):
+        '''
+        Initialization of a mar1D object
+
+        :param x: the array with the parameter values
+        :param mar: the array with the marginalized PDF
+        '''
+        self.x = x
+        self.mar = mar
+
+    def __getitem__(self, key):
+        """
+        Returns a mar1D object with only the values at the specified index(s)
+
+        :param key: the index or slice being checked
+        :rtype: mar1D
+        """
+        x = self.x[key]
+        mar = self.mar[key]
+        return mar1D(x, mar)
+    
+    def __setitem__(self, key, newval):
+        """
+        Sets all values of the mar1D at the specified location equal
+        to the input values.
+
+        :param key: the index or slice being overwritten
+        :param newval: Spectrum whose values are to replace the overwritten ones
+        """
+        if not(isinstance(newval, mar1D)):
+            raise TypeError()
+        else:
+            self.x[key] = newval.x
+            self.mar[key] = newval.mar
+
+    def __len__(self):
+        return len(self.x)
+    
+    def fwrite(self, f):
+        '''
+        Helper function to add a mar1D object to a h5 file
+
+        :param f: the h5 object being written
+        '''
+        f.create_dataset('x', data = self.x)
+        f.create_dataset('mar', data = self.mar)
+
+        return
+
+    def _interpolate_normalize(self, refinement):
+        '''
+        This function normalizes the distribution given some refinement factor.
+
+        :param refinement: int, factor by which data is interpolated over
+    
+        :return interp_x_range: array, new x range
+        :return norm_interp_y_range: array, normalized y range
+        :rtype mar1D:
+        '''
+        ## INTERPOLATE VALUES
+        n = len(self.x) * refinement # number of bins
+        dn = (self.x[-1] - self.x[0]) / n # width of bin
+        interp_x_range = np.linspace(self.x[0], self.x[-1], num = n ) # range x data will be interpolated
+        interp_y_range = np.interp(interp_x_range, self.x, self.mar) # interpolation of y data
+
+        ## NORNMALIZE DISTRIBUTION
+        integral = np.sum(interp_y_range) * dn # integral of distribution
+        norm_interp_y_range = interp_y_range / integral # to normalize integral, divide y values by integral
+        #norm_integral = np.sum(norm_interp_y_range) * dn # just a check this equals 1, not returned anywhere
+
+        return mar1D(interp_x_range, norm_interp_y_range)
+    
+def fread_mar(f):
+    '''
+    Helper function to read in a mar1D object from an open h5 file
+    '''
+
+    x = np.array(f['x'])
+    mar = np.array(f['mar'])
+
+    return mar1D(x, mar)
+
+class mars1D():
+    '''
+    Sets of 1D marginalizations for Bpole, beta, and incl
+    '''
+
+    def __init__(self, Bpole, beta, incl):
+        '''
+        Initialize a mars1D object
+
+        :param Bpole: a mar1D object for the Bpole marginalization
+        :param beta: a mar1D object for the beta marginalization
+        :param incl: a mar1D object for the incl marginalization
+        '''
+
+        self.Bpole = Bpole
+        self.beta = beta
+        self.incl = incl
+
+    def write(self, fname):
+        '''
+        Function that writes the contents of a mars1D object to an h5 file
+
+        :param f: h5 file being written
+        :param lsds: LSDprofs object being stored in the file
+        :param obs_names: (List of string) the IDs to be used for each observations
+        '''
+
+        with h5py.File(fname,'w') as f:
+            #f.create_dataset('star_name', data = self.star_name)
+
+            f_Bpole = f.create_group('Bpole')
+            self.Bpole.fwrite(f_Bpole)
+
+            f_beta = f.create_group('beta')
+            self.beta.fwrite(f_beta)
+
+            f_incl = f.create_group('incl')
+            self.incl.fwrite(f_incl)
+
+def read_mars1D(fname):
+    '''
+    Function that reads a h5 file that contains a mars1D object. 
+
+    :param fname: name of the h5 file to read
+    '''
+
+    with h5py.File(fname) as f:
+        #read the mar1D into objects
+        Bpole = fread_mar(f['Bpole'])
+        beta = fread_mar(f['beta'])
+        incl = fread_mar(f['incl'])
+
+    return mars1D(Bpole, beta, incl)
+
 
