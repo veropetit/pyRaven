@@ -1049,6 +1049,15 @@ def calc_all_LHs(param, datapacket, chi_folder, output_path='.'):
         ln_P0_flat.normalize().write('{}/lnLH_PARS_{}_mar_combined_flatprior.h5'.format(output_path,S))
         ln_P0_withprior.normalize().write('{}/lnLH_PARS_{}_mar_combined_withprior.h5'.format(output_path,S))
 
+        # We will save the posterior with full priors
+        post = ln_P0_withprior.apply_priors(Jeff_B=param['grid']['Jeff_B']).normalize()
+        post.write('{}/lnpost_PARS_{}_mar_combined_withprior.h5'.format(output_path,S))
+        # And also save the 1D marginalizations
+        mars = post.get_mars1D()
+        mars.write('{}/lnpost_PARS_{}_mar_combined_withprior_1Dmars.h5'.format(output_path,S))
+
+        
+
 def combine_obs(nobs,folder_path, Jeff_B=100):
     '''
     DEPRECATED  Wrapper function to calculate a variety of posterior probabilities and
