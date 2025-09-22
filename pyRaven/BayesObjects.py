@@ -428,10 +428,10 @@ class lnP_pars(lnP_odds):
 
     def find_best(self):
         '''
-        Function to return dictionary witht the parameters of the max likelihood
+        Function to return dictionary with the parameters of the max likelihood
         (NEED TO: marginalized for the scale noise parameter)
         '''
-        index = np.argmax(self.data, keepdims=True)
+        index = np.unravel_index(np.argmax(self.data),self.data.shape)
         params = {'beta':self.beta_arr[index[0]],
                   'Bpole':self.Bpole_arr[index[1]],
                   'phi':self.phi_arr[index[2]],
