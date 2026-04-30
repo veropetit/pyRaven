@@ -4,12 +4,18 @@ import matplotlib.pyplot as plt
 import copy
 from matplotlib.backends.backend_pdf import PdfPages
 from . import data as rav_data
+from . import validators as valid
 
 ## Develop by Robin Moore and Veronique Petit
 
 ###########################################
 ###########################################
 ###########################################
+
+class GridDimensionError(ValueError):
+    """Exception raised when the data shape doesn't match the coordinate grids."""
+    pass
+
 
 def exp_check(lnP):
     '''
@@ -152,11 +158,41 @@ class lnP_odds:
         :param incl_arr: a 1D array with the grid values for the inclination axis (in degree)
         :param obsID: (string or float) the observation ID for this set of chi2s
         '''
+
+        ## validating the *_arr coordinates
+        coords = {
+            "beta_arr": beta_arr, 
+            "Bpole_arr": Bpole_arr, 
+            "phi_arr": phi_arr, 
+            "incl_arr": incl_arr
+        }
+        self.beta_arr = valid.convert_to_numpy_and_validate_numerical("beta_arr", beta_arr)
+        self.Bpole_arr = valid.convert_to_numpy_and_validate_numerical("Bpole_arr", Bpole_arr)
+        self.phi_arr = valid.convert_to_numpy_and_validate_numerical("phi_arr", phi_arr)
+        self.incl_arr = valid.convert_to_numpy_and_validate_numerical("incl_arr", incl_arr)
+
+        # Dimension Validation (assuming numpy conversion for length check)
+        # We use np.atleast_1d so that floats don't break the len() check
+        expected_shape = tuple(len(np.atleast_1d(v)) for v in coords.values())        
+
+        # Check if 'data' is actually a numpy array
+        if not isinstance(data, np.ndarray):
+            raise TypeError(f"data must be a numpy array, got {type(data)}")
+        
+        # Check for the correct number of dimensions (4)
+        if data.ndim != 4:
+            raise GridDimensionError(
+                f"Data must be 4D. Received a {data.ndim}D array."
+            )        
+        # Check if the actual shape matches the expected shape
+        if data.shape != expected_shape:
+            raise GridDimensionError(
+                f"Shape mismatch! Data is {data.shape}, but coordinate "
+                f"grids imply {expected_shape}. Check your array ordering: "
+                "(beta, Bpole, phi, incl)."
+            )
+        
         self.data = data
-        self.beta_arr = beta_arr
-        self.Bpole_arr = Bpole_arr
-        self.phi_arr = phi_arr
-        self.incl_arr = incl_arr
         self.obsID = obsID
         self.bestChi = bestChi
 
@@ -1456,8 +1492,18 @@ class mar1D():
         :param x: the array with the parameter values
         :param mar: the array with the marginalized PDF
         '''
-        self.x = x
-        self.mar = mar
+
+        self.x = valid.convert_to_numpy_and_validate_numerical("x", x)
+        self.mar = valid.convert_to_numpy_and_validate_numerical("mar", mar)
+
+        if self.x.ndim not in (0,1):
+            raise GridDimensionError(f"a mar1D array must be 0D or 1D. Received a {self.x.ndim}D array for x.")
+        if self.mar.ndim not in (0,1):
+            raise GridDimensionError(f"a mar1D array must be 0D or 1D. Received a {self.x.ndim}D array for mar.")
+        
+        if not np.array_equal(self.mar.shape, self.x.shape):
+            raise GridDimensionError(f"x and mar must have the same size. Received a {np.atleast_1d(self.x.shape)} and a {np.atleast_1d(self.mar.shape)}")
+
 
     def __getitem__(self, key):
         """
@@ -1466,9 +1512,12 @@ class mar1D():
         :param key: the index or slice being checked
         :rtype: mar1D
         """
-        x = self.x[key]
-        mar = self.mar[key]
-        return mar1D(x, mar)
+        try:
+            x = np.atleast_1d(self.x)[key]
+            mar = np.atleast_1d(self.mar)[key]
+            return mar1D(x, mar)
+        except IndexError as e:
+            raise IndexError(f"Index {key} is out of bounds for mar1D object.") from e
     
     def __setitem__(self, key, newval):
         """
@@ -1508,14 +1557,17 @@ class mar1D():
         :return norm_interp_y_range: array, normalized y range
         :rtype mar1D:
         '''
+        # Written by Tali, adapted by Vero to be a class funciton
         ## INTERPOLATE VALUES
-        n = len(self.x) * refinement # number of bins
-        dn = (self.x[-1] - self.x[0]) / n # width of bin
-        interp_x_range = np.linspace(self.x[0], self.x[-1], num = n ) # range x data will be interpolated
+        bin_width = self.x[1] - self.x[0]
+        step = bin_width/refinement
+
+        interp_x_range = np.arange(self.x[0], self.x[-1]+step/2, step = step) # range x data will be interpolated
+
         interp_y_range = np.interp(interp_x_range, self.x, self.mar) # interpolation of y data
 
         ## NORNMALIZE DISTRIBUTION
-        integral = np.sum(interp_y_range) * dn # integral of distribution
+        integral = np.sum(interp_y_range) * bin_width # integral of distribution
         norm_interp_y_range = interp_y_range / integral # to normalize integral, divide y values by integral
         #norm_integral = np.sum(norm_interp_y_range) * dn # just a check this equals 1, not returned anywhere
 
