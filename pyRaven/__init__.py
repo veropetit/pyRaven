@@ -11,4 +11,4 @@ import pyRaven.BayesObjects
 import pyRaven.fitparams
 import pyRaven.loop_datacube
 import pyRaven.validators
-
+import pyRaven.BaseBayesObject

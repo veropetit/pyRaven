@@ -49,7 +49,6 @@ class Test_mar1D:
 
     @pytest.mark.parametrize("bad_type", NON_NUMERIC_AND_NONE_INPUTS)
     def test_init_invalid_types(self, bad_type):
-        """Verify the coordinate type"""
         # Valid dummy data
         valid_arr = [1.0]
         # Test 1: Pass an bad input for "x"
@@ -63,8 +62,8 @@ class Test_mar1D:
         assert "must be a list, numpy array, or float" in str(excinfo.value)
 
     def test_init_not_1D(self):
-        good = np.zeros((3,3))
-        bad = np.zeros(4)
+        bad = np.zeros((3,3))
+        good = np.zeros(4)
         # Verify that GridDimensionError is raised
         with pytest.raises(bo.GridDimensionError) as excinfo:
             bo.mar1D(good, bad )
@@ -111,3 +110,40 @@ class Test_mar1D:
         with pytest.raises(IndexError) as excinfo:
             data[bad_index]
         assert "is out of bounds for mar1D object" in str(excinfo.value)
+
+    @pytest.mark.parametrize('index, slice, error_type, mesg', [
+        ([0], 'string', TypeError, 'Value must be a mar1D object'), # not passing a mar1D object
+        ([0], bo.mar1D([0,1], [0,1]), ValueError, 'Shape mismatch during mar1D object slicing'), # slice not matching indexes
+        ([20], bo.mar1D([0], [0]), IndexError, 'Invalid index or slice of mar1D object') # the key is out of bounds
+    ])
+    def test_setitem_failure(self, index, slice, error_type, mesg):
+        data = bo.mar1D([1,2,3], [4,5,6])
+        with pytest.raises(error_type) as excinfo:
+            data[index] = slice
+        assert mesg in str(excinfo.value)
+
+    def test_setitem_success(self):
+        # the following should pass
+        data = bo.mar1D([1,2,3], [4,5,6])
+        slice = bo.mar1D([10,11], [20,21])
+        data[0:2] = slice
+        np.testing.assert_array_equal(data.x, [10,11,3])
+        np.testing.assert_array_equal(data.mar, [20,21,6])
+        #
+        data = bo.mar1D([1,2,3], [4,5,6])
+        slice = bo.mar1D([10.,11.], [20.,21.])
+        data[0:2] = slice
+        np.testing.assert_array_equal(data.x, [10.0,11.0,3.0])
+        np.testing.assert_array_equal(data.mar, [20.0,21.0,6.0])
+        #
+        data = bo.mar1D([1,2,3], [4,5,6])
+        slice = bo.mar1D([10], [20])
+        data[0:2] = slice
+        np.testing.assert_array_equal(data.x, [10,10,3])
+        np.testing.assert_array_equal(data.mar, [20,20,6])
+        #
+        data = bo.mar1D([1,2,3], [4,5,6])
+        slice = bo.mar1D(10, 20)
+        data[0:2] = slice
+        np.testing.assert_array_equal(data.x, [10,10,3])
+        np.testing.assert_array_equal(data.mar, [20,20,6])

@@ -5,6 +5,7 @@ import copy
 from matplotlib.backends.backend_pdf import PdfPages
 from . import data as rav_data
 from . import validators as valid
+from . import BaseBayesObject as base
 
 ## Develop by Robin Moore and Veronique Petit
 
@@ -1478,100 +1479,116 @@ def overview_plots(datapacket, param, folder_path=None):
 
     return()
 
-class mar1D():
+class mar1D(base.BaseBayesObject):
     '''
     Class to store a 1D marginalization over a parameter
 
     Provides functions to compute credible regions and plot them. 
     '''
+    REQUIRED_COORDS = ['x']
+    def __init__(self, x, prob):    
+        # We manually pass them into the super constructor in the right order
+        super().__init__(prob, x=x)
 
-    def __init__(self, x, mar):
-        '''
-        Initialization of a mar1D object
+    @property
+    def x(self) -> np.ndarray: # this is so that Obj.x will show up in the autocompletion
+        return self.coords['x']
+    
 
-        :param x: the array with the parameter values
-        :param mar: the array with the marginalized PDF
-        '''
+    # def __init__(self, x, mar):
+    #    '''
+    #    Initialization of a mar1D object
+    
+    #    :param x: the array with the parameter values
+    #    :param mar: the array with the marginalized PDF
+    
+    #    '''
 
-        self.x = valid.convert_to_numpy_and_validate_numerical("x", x)
-        self.mar = valid.convert_to_numpy_and_validate_numerical("mar", mar)
+    #     self.x = valid.convert_to_numpy_and_validate_numerical("x", x)
+    #     self.mar = valid.convert_to_numpy_and_validate_numerical("mar", mar)
 
-        if self.x.ndim not in (0,1):
-            raise GridDimensionError(f"a mar1D array must be 0D or 1D. Received a {self.x.ndim}D array for x.")
-        if self.mar.ndim not in (0,1):
-            raise GridDimensionError(f"a mar1D array must be 0D or 1D. Received a {self.x.ndim}D array for mar.")
+    #     if self.x.ndim not in (0,1):
+    #         raise GridDimensionError(f"a mar1D array must be 0D or 1D. Received a {self.x.ndim}D array for x.")
+    #     if self.mar.ndim not in (0,1):
+    #         raise GridDimensionError(f"a mar1D array must be 0D or 1D. Received a {self.x.ndim}D array for mar.")
         
-        if not np.array_equal(self.mar.shape, self.x.shape):
-            raise GridDimensionError(f"x and mar must have the same size. Received a {np.atleast_1d(self.x.shape)} and a {np.atleast_1d(self.mar.shape)}")
+    #     if not np.array_equal(self.mar.shape, self.x.shape):
+    #         raise GridDimensionError(f"x and mar must have the same size. Received a {np.atleast_1d(self.x.shape)} and a {np.atleast_1d(self.mar.shape)}")
 
 
-    def __getitem__(self, key):
-        """
-        Returns a mar1D object with only the values at the specified index(s)
+    # def __getitem__(self, key):
+    #     """
+    #     Returns a mar1D object with only the values at the specified index(s)
 
-        :param key: the index or slice being checked
-        :rtype: mar1D
-        """
-        try:
-            x = np.atleast_1d(self.x)[key]
-            mar = np.atleast_1d(self.mar)[key]
-            return mar1D(x, mar)
-        except IndexError as e:
-            raise IndexError(f"Index {key} is out of bounds for mar1D object.") from e
+    #     :param key: the index or slice being checked
+    #     :rtype: mar1D
+    #     """
+    #     try:
+    #         return mar1D(np.atleast_1d(self.x)[key], np.atleast_1d(self.mar)[key])
+    #     except IndexError as e:
+    #         raise IndexError(f"Index {key} is out of bounds for mar1D object.") from e
     
-    def __setitem__(self, key, newval):
-        """
-        Sets all values of the mar1D at the specified location equal
-        to the input values.
+    # def __setitem__(self, key, newval):
+    #     """
+    #     Sets all values of the mar1D at the specified location equal
+    #     to the input values.
 
-        :param key: the index or slice being overwritten
-        :param newval: Spectrum whose values are to replace the overwritten ones
-        """
-        if not(isinstance(newval, mar1D)):
-            raise TypeError()
-        else:
-            self.x[key] = newval.x
-            self.mar[key] = newval.mar
+    #     :param key: the index or slice being overwritten
+    #     :param newval: Spectrum whose values are to replace the overwritten ones
+    #     """
+    #     if not(isinstance(newval, mar1D)):
+    #         raise TypeError((f"Value must be a mar1D object, not {type(newval).__name__}"))
+        
+    #     try:
+    #         self.x[key] = newval.x
+    #         self.mar[key] = newval.mar
+    #     except ValueError as e:
+    #         # This catches shape mismatches (e.g., trying to set a slice of 3 with 2 elements)
+    #         raise ValueError(f"Shape mismatch during mar1D object slicing: {e}") from e   
+    #     except IndexError as e:
+    #         # This catches out-of-bounds keys
+    #         raise IndexError(f"Invalid index or slice of mar1D object: {key}") from e         
 
-    def __len__(self):
-        return len(self.x)
+
+    # def __len__(self):
+    #     return len(self.x)
     
-    def fwrite(self, f):
-        '''
-        Helper function to add a mar1D object to a h5 file
+    # def fwrite(self, f):
+    #     '''
+    #     Helper function to add a mar1D object to a h5 file
 
-        :param f: the h5 object being written
-        '''
-        f.create_dataset('x', data = self.x)
-        f.create_dataset('mar', data = self.mar)
+    #     :param f: the h5 object being written
+    #     '''
+    #     f.create_dataset('x', data = self.x)
+    #     f.create_dataset('mar', data = self.mar)
 
-        return
+    #     return
 
-    def _interpolate_normalize(self, refinement):
-        '''
-        This function normalizes the distribution given some refinement factor.
+    # def _interpolate_normalize(self, refinement):
+    #     '''
+    #     This function normalizes the distribution given some refinement factor.
 
-        :param refinement: int, factor by which data is interpolated over
+    #     :param refinement: int, factor by which data is interpolated over
     
-        :return interp_x_range: array, new x range
-        :return norm_interp_y_range: array, normalized y range
-        :rtype mar1D:
-        '''
-        # Written by Tali, adapted by Vero to be a class funciton
-        ## INTERPOLATE VALUES
-        bin_width = self.x[1] - self.x[0]
-        step = bin_width/refinement
+    #     :return interp_x_range: array, new x range
+    #     :return norm_interp_y_range: array, normalized y range
+    #     :rtype mar1D:
+    #     '''
+    #     # Written by Tali, adapted by Vero to be a class funciton
+    #     ## INTERPOLATE VALUES
+    #     bin_width = self.x[1] - self.x[0]
+    #     step = bin_width/refinement
 
-        interp_x_range = np.arange(self.x[0], self.x[-1]+step/2, step = step) # range x data will be interpolated
+    #     interp_x_range = np.arange(self.x[0], self.x[-1]+step/2, step = step) # range x data will be interpolated
 
-        interp_y_range = np.interp(interp_x_range, self.x, self.mar) # interpolation of y data
+    #     interp_y_range = np.interp(interp_x_range, self.x, self.mar) # interpolation of y data
 
-        ## NORNMALIZE DISTRIBUTION
-        integral = np.sum(interp_y_range) * bin_width # integral of distribution
-        norm_interp_y_range = interp_y_range / integral # to normalize integral, divide y values by integral
-        #norm_integral = np.sum(norm_interp_y_range) * dn # just a check this equals 1, not returned anywhere
+    #     ## NORNMALIZE DISTRIBUTION
+    #     integral = np.sum(interp_y_range) * bin_width # integral of distribution
+    #     norm_interp_y_range = interp_y_range / integral # to normalize integral, divide y values by integral
+    #     #norm_integral = np.sum(norm_interp_y_range) * dn # just a check this equals 1, not returned anywhere
 
-        return mar1D(interp_x_range, norm_interp_y_range)
+    #     return mar1D(interp_x_range, norm_interp_y_range)
     
 def fread_mar(f):
     '''

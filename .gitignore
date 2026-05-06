@@ -20,3 +20,4 @@ docs-src/build
 JupyterBook/SimpleApplication/ExampleOutput
 JupyterBook/_build
 .DS_Store
+Tests/.ipynb_checkpoints/test_BayesObjects-checkpoint.ipynb
