@@ -242,7 +242,7 @@ class Test_Base_Math:
         
         result = obj3D * other
         
-        assert np.array_equal(result.prob, obj3D.prob**2 * 2)
+        assert np.all(result.prob == 2.0)
         assert isinstance(result, type(obj3D))
 
     def test_scalar_multiplication_sucess(self, obj3D):
@@ -262,7 +262,7 @@ class Test_Base_Math:
         other = type(obj3D)(obj3D.prob * 2, **obj3D.coords)
         
         result = obj3D + other
-        assert np.array_equal(result.prob, obj3D.prob * 3)
+        assert np.all(result.prob == 3.0)
         assert isinstance(result, type(obj3D))
 
     def test_scalar_addition_sucess(self, obj3D):
@@ -278,7 +278,7 @@ class Test_Base_Math:
         other = type(obj3D)(obj3D.prob * 2, **obj3D.coords)
         
         result = obj3D - other
-        assert np.array_equal(result.prob, -1*obj3D.prob)
+        assert np.all(result.prob == -1.0)
         assert isinstance(result, type(obj3D))
 
     def test_scalar_subtraction_sucess(self, obj3D):
@@ -290,6 +290,33 @@ class Test_Base_Math:
         # scalar - obj
         res2 = 10.0 - obj3D
         assert np.all(res2.prob == 9.0) # 10.0 - 1.0
+
+    def test_division_sucess(self, obj3D):
+        """Test multiplying two identical objects (e.g., Likelihood * Prior)."""
+        # Create a second object with the same coords but different data
+        other = type(obj3D)(obj3D.prob * 2, **obj3D.coords)
+        
+        result = obj3D / other
+        
+        assert np.all(result.prob == 0.5)
+        assert isinstance(result, type(obj3D))
+
+    def test_scalar_division_sucess(self, obj3D):
+        """Test obj / scalar and scalar / obj."""
+        # obj / scalar
+        res1 = obj3D / 2.0
+        assert np.all(res1.prob == 0.5)
+        
+        # scalar / obj
+        res2 = 2.0 / obj3D
+        assert np.all(res2.prob == 2.0)
+
+    def test_division_by_zero(self, obj3D):
+        """Verify standard NumPy behavior for div by zero (usually a warning/inf)."""
+        # NumPy will issue a RuntimeWarning and return inf
+        with np.errstate(divide='ignore'):
+            res = obj3D / 0.0
+            assert np.all(np.isinf(res.prob))
 
     def test_math_mismatch_coords(self, obj3D, obj3D_not_compatible):
         """Should fail if coordinate values are different."""
