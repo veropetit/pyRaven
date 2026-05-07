@@ -245,6 +245,52 @@ class Test_Base_Math:
         assert np.array_equal(result.prob, obj3D.prob**2 * 2)
         assert isinstance(result, type(obj3D))
 
+    def test_scalar_multiplication_sucess(self, obj3D):
+        """Test obj * 2 and 2 * obj."""
+        # obj * scalar
+        result = obj3D * 10
+        assert np.all(result.prob == 10.0) # Since obj3D is all ones
+        assert result.prob.shape == obj3D.prob.shape
+        
+        # scalar * obj (handled by __rmul__)
+        result_rev = 5 * obj3D
+        assert np.all(result_rev.prob == 5.0)
+
+    def test_addition_success(self, obj3D):
+        """Test adding two identical objects"""
+        # Create a second object with the same coords but different data
+        other = type(obj3D)(obj3D.prob * 2, **obj3D.coords)
+        
+        result = obj3D + other
+        assert np.array_equal(result.prob, obj3D.prob * 3)
+        assert isinstance(result, type(obj3D))
+
+    def test_scalar_addition_sucess(self, obj3D):
+            """Test obj + 1.5."""
+            result = obj3D + 1.5
+            assert np.all(result.prob == 2.5)
+            # Verify coordinates are still there
+            assert len(result.x) == len(obj3D.x)
+
+    def test_subtraction_success(self, obj3D):
+        """Test adding two identical objects"""
+        # Create a second object with the same coords but different data
+        other = type(obj3D)(obj3D.prob * 2, **obj3D.coords)
+        
+        result = obj3D - other
+        assert np.array_equal(result.prob, -1*obj3D.prob)
+        assert isinstance(result, type(obj3D))
+
+    def test_scalar_subtraction_sucess(self, obj3D):
+        """Test obj - scalar and scalar - obj."""
+        # obj - scalar
+        res1 = obj3D - 1.0
+        assert np.all(res1.prob == 0.0) # 1.0 - 1.0
+        
+        # scalar - obj
+        res2 = 10.0 - obj3D
+        assert np.all(res2.prob == 9.0) # 10.0 - 1.0
+
     def test_math_mismatch_coords(self, obj3D, obj3D_not_compatible):
         """Should fail if coordinate values are different."""
         # Same names, but x-axis is shifted
