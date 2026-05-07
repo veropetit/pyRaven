@@ -26,6 +26,9 @@ class BaseBayesObject(ABC):
     # This is to make science functions for a given BayesObject 
     # (the LH, the posterior, etc) more clear. 
     # The subclasses MUST define it.
+    
+    IS_LOG = False # Default to Linear
+
     @property
     @abstractmethod
     def REQUIRED_COORDS(self):
@@ -199,6 +202,55 @@ class BaseBayesObject(ABC):
         if isinstance(other, (int, float, np.number)):
             return type(self)(other / self.prob, **self.coords)
         return NotImplemented
+    
+    def _log_sum_exp(self, axis):
+        """Robust Log-Sum-Exp implementation."""
+        norm = np.nanmax(self.prob)
+        # Handle the case where all values are -inf
+        if not np.isfinite(norm):
+            # If axis is None, return a simple scalar -inf
+            if axis is None:
+                return -np.inf
+            # Otherwise, return an array of -inf with reduced dimensions
+            return np.full(np.delete(self.prob.shape, axis), -np.inf) 
+                   
+        p_array = np.exp(self.prob - norm)
+        return np.log(np.nansum(p_array, axis=axis)) + norm        
+
+    def _log_integrate_uniform(self, axis=None):
+        """
+        Integrates log(probability) over specified axes.
+        Standard: Coordinate values represent the LEFT EDGES of the bins.
+        Total Volume = Product of (Number of bins * bin_width) for each axis.
+        """
+        # 1. Normalize axes to a list of indices
+        if axis is None:
+            axis_indices = list(range(len(self.REQUIRED_COORDS)))
+        elif isinstance(axis, (int, np.integer)):
+            axis_indices = [axis]
+        else:
+            axis_indices = list(axis)
+
+        # 2. Basic Log-Sum-Exp (The sum of the 'heights')
+        total_ln_prob = self._log_sum_exp(axis=axis)
+
+        # 3. Add the log-volume (The 'widths')
+        ln_total_volume = 0
+        for idx in axis_indices:
+            coord_name = self.REQUIRED_COORDS[idx]
+            vals = self.coords[coord_name]
+            
+            if len(vals) > 1:
+                # Width of one bin
+                dx = vals[1] - vals[0]
+                # Total width for this axis = (Number of Left Edges) * dx
+                ln_total_volume += np.log(len(vals) * dx)
+            else:
+                # If it's a single point, we treat it as a delta function (width=1)
+                ln_total_volume += 0
+
+        return total_ln_prob + ln_total_volume
+     
 
     def writef(self, f):
         """
@@ -228,4 +280,28 @@ class BaseBayesObject(ABC):
             #    f.attrs[key] = value
             # if I need to be able to add some addition stuff on the fly
 
-    
+    def marginalize(self, axis_name):
+        """
+        Marginalizes over a specific coordinate by name.
+        Returns the necessary elements to create a DIFFERENT class (e.g., Grid3D -> Grid2D).
+        """
+        if axis_name not in self.REQUIRED_COORDS:
+            raise ValueError(f"Cannot marginalize over '{axis_name}'. Not in coords.")
+        
+        axis_idx = self.REQUIRED_COORDS.index(axis_name)
+        coord_vals = self.coords[axis_name]   
+
+        # 1. Perform the math based on representation
+        if self.IS_LOG:
+            new_prob = self._log_sum_exp(axis=axis_idx)
+        else:
+            new_prob = np.sum(self.prob, axis=axis_idx)
+            
+        # 2. Prepare new coordinates (drop the marginalized one)
+        new_coords = self.coords.copy()
+        new_coords.pop(axis_name)    
+
+        # Note: You'll likely need a 'Factory' or a specific target class here
+        # because the REQUIRED_COORDS of the current class won't match 
+        # the new 2D data.
+        return new_prob, new_coords

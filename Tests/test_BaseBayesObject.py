@@ -326,3 +326,45 @@ class Test_Base_Math:
             _ = obj3D + obj3D_not_compatible
         with pytest.raises(ValueError, match="Coordinates must match exactly to multiply"):
             _ = obj3D * obj3D_not_compatible
+
+    def test_log_sum_exp_global_sum(self, obj3D):
+        # Create a 2x2x2 cube of ln(1) [which is 0.0]
+        # Sum of eight 1s should be ln(8)
+        obj3D.prob = np.zeros((2, 2, 2)) 
+    
+        result = obj3D._log_sum_exp(axis=None)
+    
+        assert np.isclose(result, np.log(8.0))
+        # Ensure it's a scalar (or a 0D array)
+        assert np.isscalar(result) or result.ndim == 0
+
+    def test_log_sum_exp_global_sum(self, obj3D):
+        # Create a 2x2x2 cube of ln(1) [which is 0.0]
+        # Sum of eight 1s should be ln(8)
+        obj3D.prob = np.zeros((2, 2, 2)) 
+    
+        result = obj3D._log_sum_exp(axis=(0))
+        v = np.log(2)
+        expected = np.array([[v,v],[v,v]])
+        np.testing.assert_allclose(result, expected)
+        # Ensure it's a scalar (or a 0D array)
+        assert result.ndim == 2
+        assert result.shape == (2,2)
+
+    def test_log_sum_exp_extreme_values(self, obj3D):
+        """
+        Test that _log_sum_exp handles values that usually cause overflows.
+        exp(1000) is larger than a 64-bit float can handle.
+        """
+        # ln(P) values that are massive
+        # ln(e^1000 + e^1000) should be 1000 + ln(2)
+        large_data = np.array([1000.0, 1000.0])
+        
+        obj = obj3D
+        obj.prob = large_data #overwriting the "prob" just for this test
+        
+        result = obj._log_sum_exp(axis=0)
+        
+        assert np.isclose(result, 1000.0 + np.log(2.0))
+        assert np.isfinite(result) # Ensure it didn't become 'inf'
+
