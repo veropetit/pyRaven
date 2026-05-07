@@ -121,7 +121,7 @@ class BaseBayesObject(ABC):
             return False
         
         # 1. Check if coordinate names match
-        if self.REQUIRED_COORDS != other.REQUIRED_COORDS:
+        if self.REQUIRED_COORDS != other.REQUIRED_COORDS:   
             return False
             
         # 2. Check if the coordinate arrays themselves are identical
@@ -132,16 +132,74 @@ class BaseBayesObject(ABC):
         return True
 
     def __add__(self, other):
-        if not self._is_compatible(other):
-            raise ValueError("Objects are incompatible: Coordinates must match exactly to add.")
-        # Create a new instance of the same class (e.g., Mar1D + Mar1D = Mar1D)
-        return type(self)(self.prob + other.prob, **self.coords)
+        # Case 1: Adding another Bayes Object
+        if isinstance(other, BaseBayesObject):
+            if not self._is_compatible(other):
+                raise ValueError("Objects are incompatible: Coordinates must match exactly to add.")
+            # Create a new instance of the same class (e.g., Mar1D + Mar1D = Mar1D)
+            return type(self)(self.prob + other.prob, **self.coords)
+
+        # Case 2: Adding a scalar
+        if isinstance(other, (int, float, np.number)):
+            return type(self)(self.prob + other, **self.coords)
+        
+        return NotImplemented
     
+    # Allow scalar + obj
+    def __radd__(self, other):
+        return self.__add__(other)
+
     def __mul__(self, other):
-        if not self._is_compatible(other):
-            raise ValueError("Objects are incompatible: Coordinates must match exactly to multiply.")    
-        return type(self)(self.prob * other.prob, **self.coords)
+        # Case 1: Adding another Bayes Object
+        if isinstance(other, BaseBayesObject):
+            if not self._is_compatible(other):
+                raise ValueError("Objects are incompatible: Coordinates must match exactly to multiply.")    
+            return type(self)(self.prob * other.prob, **self.coords)
+        
+        # Case 2: Multiplying by a scalar
+        if isinstance(other, (int, float, np.number)):
+            return type(self)(self.prob * other, **self.coords)
+        
+        return NotImplemented
     
+    # Allow scalar * obj
+    def __rmul__(self, other):
+        return self.__mul__(other)
+    
+    def __sub__(self, other):
+        if isinstance(other, BaseBayesObject):
+            if not self._is_compatible(other):
+                raise ValueError("Incompatible coordinates for subtraction.")
+            return type(self)(self.prob - other.prob, **self.coords)
+        
+        if isinstance(other, (int, float, np.number)):
+            return type(self)(self.prob - other, **self.coords)
+        
+        return NotImplemented
+
+    def __rsub__(self, other):
+        # Handles: scalar - obj
+        if isinstance(other, (int, float, np.number)):
+            return type(self)(other - self.prob, **self.coords)
+        return NotImplemented
+    
+    def __truediv__(self, other):
+        if isinstance(other, BaseBayesObject):
+            if not self._is_compatible(other):
+                raise ValueError("Incompatible coordinates for division.")
+            return type(self)(self.prob / other.prob, **self.coords)
+        
+        if isinstance(other, (int, float, np.number)):
+            return type(self)(self.prob / other, **self.coords)
+        
+        return NotImplemented
+
+    def __rtruediv__(self, other):
+        # Handles: scalar / obj
+        if isinstance(other, (int, float, np.number)):
+            return type(self)(other / self.prob, **self.coords)
+        return NotImplemented
+
     def writef(self, f):
         """
         Helper function to create datasets in the passed h5 file object.
