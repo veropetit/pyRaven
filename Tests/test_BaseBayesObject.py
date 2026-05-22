@@ -29,10 +29,12 @@ class Test_Base_init:
         return MockSciObject3D(prob, x=x, y=y, z=z)
         
     def test_no_base_instantiate(self):
+        '''Check that a user cannot instantiate a Base Class directly'''
         with pytest.raises(TypeError, match="Can't instantiate abstract class BaseBayesObject"):
             bo.BaseBayesObject()
 
     def test_no_REQUIRED_COORDS_defined_in_subclass(self):
+        '''Check that an error is returned if the child class does not define the coordinates in REQUIRED_COORDS'''
         class SciObj(bo.BaseBayesObject):
             pass
         with pytest.raises(TypeError, match="Can't instantiate abstract class SciObj without an"):
@@ -66,10 +68,9 @@ class Test_Base_init:
             MockSciObject3D(prob, x=arr, y=arr)
 
     def test_more_than_required_coord(self, MockSciObject3D):
-        """Should fail if a required name is missing."""
+        """Should fail if an extra coordinate name is given."""
         prob = np.zeros((5, 5, 5))
         arr = np.zeros((5))
-        # Missing 'z'
         with pytest.raises(KeyError, match="Unexpected: {'w'}"):
             MockSciObject3D(prob, x=arr, y=arr, z=arr, w=arr)
 
@@ -90,7 +91,7 @@ class Test_Base_init:
         with pytest.raises(bo.GridDimensionError, match="Coordinate 'x' must be 0D or 1D. Received a 2D array."):
             MockSciObject3D(prob, x=badcoord, y=goodcoord, z=goodcoord)
 
-    def test_dimension_mismatch(self, MockSciObject3D):
+    def test_coordinate_dimension_mismatch(self, MockSciObject3D):
         """Test that it raises GridDimensionError when dims don't match coord count."""
         prob_2d = np.zeros((5, 5))
         arr = np.zeros(5)
@@ -99,7 +100,7 @@ class Test_Base_init:
                 f"but 3 coordinates were provided."):
             MockSciObject3D(prob_2d, x=arr, y=arr, z=arr)
 
-    def test_length_mismatch(self, MockSciObject3D):
+    def test_coordinate_length_mismatch(self, MockSciObject3D):
         """Test that it raises GridDimensionError when coord length doesn't match data shape."""
         prob = np.zeros((5,5,5))
         goodcoord = np.zeros(5)
@@ -209,7 +210,43 @@ class Test_Base_init:
             assert np.array_equal(f['z'][:], correct_obj3D.z)
             assert f.attrs['class_name'] == "MockSciObject3Dclass"    
 
+    @pytest.mark.parametrize("axis_input, expected_indices",[
+            (None, [0, 1, 2]),
+            (1, [1]),
+            ((0, 1), [0, 1]),
+            ([0, 1], [0, 1]),
+            ('x', [0]),
+            (['x', 'y'], [0, 1]),
+            (['x', 'z'], [0, 2]),
+            (['z', 'x'], [0, 2]),
+            (['z', 0, 0], [0, 2]),
+        ]
+    )
+    def test_get_validated_axes_indexes(self, correct_obj3D, axis_input, expected_indices):
+        """Verify that _get_validated_axes_indexes standardizes various inputs correctly."""
+        result = correct_obj3D._get_validated_axes_indexes(axis=axis_input)
+        assert result == expected_indices
+
+    @pytest.mark.parametrize("invalid_axis, expected_exception, match_msg",[
+            # Test out-of-bounds indices
+            (3, IndexError, "Axis index 3 is out of bounds."),
+            (-1, IndexError, "Axis index -1 is out of bounds."),
+            # Test invalid coordinate string names
+            ('a', ValueError, "Coordinate 'a' is not valid for this object."),
+            (['x', 'invalid_name'], ValueError, "Coordinate 'invalid_name' is not valid for this object."),
+            # Test completely unsupported data types
+            (2.3, TypeError, "Invalid axis identifier type: <class 'float'>"),
+            ({'x': 1}, TypeError, "Invalid axis identifier type: <class 'dict'>"),
+            ([0, 1.5], TypeError, "Invalid axis identifier type: <class 'float'>"),
+        ]
+    )
+    def test_get_validated_axes_indexes_exceptions(self, correct_obj3D, invalid_axis, expected_exception, match_msg):
+        """Verify that _get_validated_axes_indexes raises correct exceptions for bad inputs."""
+        with pytest.raises(expected_exception, match=match_msg):
+            correct_obj3D._get_validated_axes_indexes(axis=invalid_axis)                   
+
 class Test_Base_Math:
+    
     @pytest.fixture
     def MockSciObject3D(self):
         """A helper to create a 'temporary' 3D science subclass for testing."""
@@ -228,7 +265,7 @@ class Test_Base_Math:
 
     @pytest.fixture
     def obj3D_not_compatible(self, MockSciObject3D):
-        """Returns a valid BaseBayesObject for use in tests."""
+        """Returns a valid BaseBayesObject that has different coordinate values than obj3D."""
         prob = np.ones( (3,4,5) )
         x = np.array([60, 61, 62])
         y = np.array([40, 41, 42, 43])
@@ -319,37 +356,59 @@ class Test_Base_Math:
             assert np.all(np.isinf(res.prob))
 
     def test_math_mismatch_coords(self, obj3D, obj3D_not_compatible):
-        """Should fail if coordinate values are different."""
+        """Math operations should fail if coordinate values are different."""
         # Same names, but x-axis is shifted
         
         with pytest.raises(ValueError, match="Coordinates must match exactly to add"):
             _ = obj3D + obj3D_not_compatible
         with pytest.raises(ValueError, match="Coordinates must match exactly to multiply"):
             _ = obj3D * obj3D_not_compatible
+        with pytest.raises(ValueError, match="Coordinates must match exactly to divide"):
+            _ = obj3D / obj3D_not_compatible
+        with pytest.raises(ValueError, match="Coordinates must match exactly to subtract"):
+            _ = obj3D - obj3D_not_compatible
+
+    def test_get_axis_log_dv_sucess(self, MockSciObject3D):
+        '''Test the return value of get_axis_log_dv'''
+        prob = np.ones( (3,3,3) )
+        x = np.array([1,2,3])
+        y = np.array([0.5, 1.0, 1.5])
+        z = np.array([0.1, 0.2, 0.3])
+        obj = MockSciObject3D(prob, x=x, y=y, z=z)
+        dv = obj._get_axis_log_dv([0,1,2])
+        np.testing.assert_allclose(dv, np.log(0.05))
 
     def test_log_sum_exp_global_sum(self, obj3D):
+        '''Test the total sum for probability in log'''
+        # Overwriting the prob in obj3D just for this test
+        # (The coordinate dimensions won't match)        
         # Create a 2x2x2 cube of ln(1) [which is 0.0]
         # Sum of eight 1s should be ln(8)
         obj3D.prob = np.zeros((2, 2, 2)) 
     
-        result = obj3D._log_sum_exp(axis=None)
+        result = obj3D._log_sum_exp([0,1,2])
     
-        assert np.isclose(result, np.log(8.0))
         # Ensure it's a scalar (or a 0D array)
         assert np.isscalar(result) or result.ndim == 0
+        # Check the actual value
+        assert np.isclose(result, np.log(8.0))
 
-    def test_log_sum_exp_global_sum(self, obj3D):
+    def test_log_sum_exp_axis_sum(self, obj3D):
+        '''Test the sum over a single axis for the probability in log'''
+        # Overwriting the prob in obj3D just for this test
+        # (The coordinate dimensions won't match)        
         # Create a 2x2x2 cube of ln(1) [which is 0.0]
         # Sum of eight 1s should be ln(8)
         obj3D.prob = np.zeros((2, 2, 2)) 
     
-        result = obj3D._log_sum_exp(axis=(0))
+        result = obj3D._log_sum_exp([0])
         v = np.log(2)
         expected = np.array([[v,v],[v,v]])
-        np.testing.assert_allclose(result, expected)
-        # Ensure it's a scalar (or a 0D array)
+        # Ensure it's a 2D array with the correct shape
         assert result.ndim == 2
         assert result.shape == (2,2)
+        # Check the actual values
+        np.testing.assert_allclose(result, expected)
 
     def test_log_sum_exp_extreme_values(self, obj3D):
         """
@@ -359,12 +418,161 @@ class Test_Base_Math:
         # ln(P) values that are massive
         # ln(e^1000 + e^1000) should be 1000 + ln(2)
         large_data = np.array([1000.0, 1000.0])
-        
+
+        # Overwriting the prob in obj3D just for this test
+        # (The coordinate dimensions won't match)        
+
         obj = obj3D
         obj.prob = large_data #overwriting the "prob" just for this test
         
-        result = obj._log_sum_exp(axis=0)
+        result = obj._log_sum_exp([0])
         
         assert np.isclose(result, 1000.0 + np.log(2.0))
         assert np.isfinite(result) # Ensure it didn't become 'inf'
+
+    def test_log_sum_all_minf(self, MockSciObject3D):
+        '''Testing when all values are -inf in logP'''
+
+        # Overwriting the prob in obj3D just for this test
+        # (The coordinate dimensions won't match)   
+        prob = np.full((2, 3, 4), -np.inf)
+        obj = MockSciObject3D(prob, x=[1,2], y=[1,2,3], z=[1,2,3,4])
+        
+        # Case 1: Collapse ALL axes ([0, 1, 2])
+        # Expected: A single scalar value (no shape), or a 0D array
+        res_all = obj._log_sum_exp([0, 1, 2])
+        np.testing.assert_equal(res_all, -np.inf)
+        assert np.isscalar(res_all) or res_all.ndim == 0
+
+        # Case 2: Collapse only axis 1 (the 'y' axis, length 3)
+        # Expected shape: (2, 4) — since axis 0 (len 2) and axis 2 (len 4) remain
+        res_one = obj._log_sum_exp([1])
+        np.testing.assert_equal(res_one, np.full((2, 4), -np.inf))
+        assert res_one.shape == (2, 4)
+
+        # Case 3: Collapse axes 0 and 2 (the 'x' and 'z' axes)
+        # Expected shape: (3,) — only axis 1 (the 'y' axis, length 3) remains
+        res_two = obj._log_sum_exp([0, 2])
+        np.testing.assert_equal(res_two, np.full((3,), -np.inf))
+        assert res_two.shape == (3,)
+
+    def test_left_edge_integration1D(self):
+        """Verify that 4 left-edges with dx=1 covers a volume of 4.0."""
+        class MockLog(bo.BaseBayesObject):
+            REQUIRED_COORDS = ['x'] 
+            PROB_IS_LOG = True
+        
+        # Left edges at 0, 1, 2, 3. Total width should be 4.
+        x = np.array([0, 1, 2, 3])
+        prob = np.zeros(4) # ln(1)
+        obj = MockLog(prob, x=x)
+        
+        # sum(exp(0)) = 4. 
+        # Integral = 4 (sum) * 1 (dx) = 4.0
+        # ln(Integral) = ln(4.0)
+        result = obj._log_integrate_uniform([0])
+        np.testing.assert_allclose(result, np.log(4.0))        
+
+    def test_left_edge_integration_2d_to_scalar(self):
+        """
+        Integrate 2D -> Scalar.
+        Grid: x (width 0.5), y (width 2.0).
+        P = 1.0 everywhere.
+        Expected Integral: (N_x * dx) * (N_y * dy)
+        """
+        class MockLog(bo.BaseBayesObject):
+            REQUIRED_COORDS = ['x', 'y']; PROB_IS_LOG = True
+
+        # x: 10 bins, dx=0.5 -> Total span = 5.0
+        # y: 5 bins,  dy=2.0 -> Total span = 10.0
+        x = np.arange(0, 5, 0.5) 
+        y = np.arange(0, 10, 2.0)
+        prob = np.zeros((10, 5)) # ln(1.0)
+        
+        obj = MockLog(prob, x=x, y=y)
+        
+        # Integrate over both axes (None)
+        # Sum is ln(50)
+        # ln_weight is ln(0.5) + ln(2.0) = ln(1.0) = 0
+        # Result should be ln(50 * 1.0) = ln(50)
+        result = obj._log_integrate_uniform([0,1])
+        
+        assert np.isclose(result, np.log(50.0))
+
+    def test_left_edge_integration_2d_to_1D(self):
+        """
+        Integrate 2D -> 1D (Integrate over y, keep x).
+        We expect a 1D array where each element is the integral along the y-column.
+        """
+        class MockLog(bo.BaseBayesObject):
+            REQUIRED_COORDS = ['x', 'y']; IS_LOG = True
+
+        x = np.array([0, 1])     # dx = 1
+        y = np.array([0, 2, 4])  # dy = 2
+        
+        # Create data where x=0 is all ln(1) and x=1 is all ln(2)
+        prob = np.array([
+            [np.log(1), np.log(1), np.log(1)],
+            [np.log(2), np.log(2), np.log(2)]
+        ])
+
+        obj = MockLog(prob, x=x, y=y)
+        
+        # Integrate over y (axis 1)
+        # For x=0: sum is 3, weight is dy=2 -> integral is 6
+        # For x=1: sum is 6, weight is dy=2 -> integral is 12
+        result_prob = obj._log_integrate_uniform([1])
+        
+        expected = np.log([6.0, 12.0])
+        assert np.allclose(result_prob, expected)
+        assert result_prob.shape == (2,)
+
+    def test_left_edge_integration_with_negative_inf(self):
+        """
+        Ensure that zero-probability regions (-inf) are handled correctly 
+        and don't result in NaNs when combined with log-weights.
+        """
+        class MockLog(bo.BaseBayesObject):
+            REQUIRED_COORDS = ['x']; IS_LOG = True
+            
+        x = np.array([0, 1, 2]) # dx = 1
+        prob = np.array([-np.inf, 0.0, -np.inf]) # [0, 1, 0] in linear
+        
+        obj = MockLog(prob, x=x)
+        
+        # Integral should be 1.0 * dx = 1.0. ln(1.0) = 0.0
+        result = obj._log_integrate_uniform([0])
+        assert np.isclose(result, 0.0)
+
+class Test_User_Facing_Marginalize:
+
+    def test_marginalize_linear_removes_metadata_and_sums(self):
+        """Verify 3D -> 2D reduction in linear space drops the correct axis."""
+        class MockLinear3D(bo.BaseBayesObject):
+            REQUIRED_COORDS = ['x', 'y', 'z']
+            PROB_IS_LOG = False
+
+        # Setup a 3D space: shapes (2, 3, 4)
+        x = np.array([1, 2])
+        y = np.array([10, 20, 30])
+        z = np.array([100, 200, 300, 400])
+        
+        # Fill with ones: a sum over 'y' (axis length 3) should result in 30.0s
+        prob = np.ones((2, 3, 4))
+        obj = MockLinear3D(prob, x=x, y=y, z=z)
+
+        # Act: marginalize out 'y'
+        new_prob, new_coords = obj.marginalize(axis='y')
+
+        # Assert 1: Data values and shapes are correct
+        expected_prob = np.full((2, 4), 30.0)  # np.sum over axis=1
+        np.testing.assert_allclose(new_prob, expected_prob)
+        
+        # Assert 2: Metadata keys are correct
+        assert 'y' not in new_coords
+        assert list(new_coords.keys()) == ['x', 'z']
+        
+        # Assert 3: Remaining coordinate arrays are untouched
+        np.testing.assert_array_equal(new_coords['x'], x)
+        np.testing.assert_array_equal(new_coords['z'], z)    
 

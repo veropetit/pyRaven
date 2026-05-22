@@ -18,6 +18,13 @@ class BaseBayesObject(ABC):
     Base class for objects that will contain probability data. 
     This class should not be really used as is in the science codes --
     it is mean to be inherited by specific classes for the science objects. 
+
+    Standard Convention: Coordinates in this package are treated as Left Edges.
+    * For Physical Ranges: If you want to cover $0$ to $10$ Gauss with $10$ bins, 
+      your coordinate array should be `np.linspace(0, 9, 10)`.
+    * For Periodic Angles: To avoid double-counting, do not include the endpoint. 
+      Use `np.arange(0, 360, 5)` (which stops at $355$) rather than `np.linspace(0, 360, 73)`.
+
     '''
 
     # This list allows the science classes to provide a specific
@@ -27,7 +34,7 @@ class BaseBayesObject(ABC):
     # (the LH, the posterior, etc) more clear. 
     # The subclasses MUST define it.
     
-    IS_LOG = False # Default to Linear
+    PROB_IS_LOG = False # Default to Linear
 
     @property
     @abstractmethod
@@ -172,7 +179,7 @@ class BaseBayesObject(ABC):
     def __sub__(self, other):
         if isinstance(other, BaseBayesObject):
             if not self._is_compatible(other):
-                raise ValueError("Incompatible coordinates for subtraction.")
+                raise ValueError("Objects are incompatible: Coordinates must match exactly to subtract.")
             return type(self)(self.prob - other.prob, **self.coords)
         
         if isinstance(other, (int, float, np.number)):
@@ -189,7 +196,7 @@ class BaseBayesObject(ABC):
     def __truediv__(self, other):
         if isinstance(other, BaseBayesObject):
             if not self._is_compatible(other):
-                raise ValueError("Incompatible coordinates for division.")
+                raise ValueError("Objects are incompatible: Coordinates must match exactly to divide.")
             return type(self)(self.prob / other.prob, **self.coords)
         
         if isinstance(other, (int, float, np.number)):
@@ -202,41 +209,65 @@ class BaseBayesObject(ABC):
         if isinstance(other, (int, float, np.number)):
             return type(self)(other / self.prob, **self.coords)
         return NotImplemented
-    
-    def _log_sum_exp(self, axis):
+
+    def _get_validated_axes_indexes(self, axis=None):
+        """
+        Standardize any input (None, int, str, or sequence of ints/strs) for listing axes to use in sum or marginalize
+        into a list of integer axis indices.
+        """
+        # Handle the global option
+        if axis is None:
+            return list(range(len(self.REQUIRED_COORDS)))
+        
+        # Coerce single items (strings or integers) into an iterable list
+        # If it is a basic scalar type, wrap it in a list.
+        if isinstance(axis, (str, int, np.integer)):
+            axis_list = [axis]
+        # If it's already a sequence/iterable (excluding strings), convert to a list
+        elif isinstance(axis, (list, tuple, set, np.ndarray)):
+            axis_list = list(axis)
+            axis_list = list(axis)
+        else:
+            raise TypeError(f"Invalid axis identifier type: {type(axis)}")
+            
+        axis_indices = []
+        for item in axis_list:
+            if isinstance(item, str):
+                if item not in self.REQUIRED_COORDS:
+                    raise ValueError(f"Coordinate '{item}' is not valid for this object.")
+                axis_indices.append(self.REQUIRED_COORDS.index(item))
+            elif isinstance(item, (int, np.integer)):
+                if item < 0 or item >= len(self.REQUIRED_COORDS):
+                    raise IndexError(f"Axis index {item} is out of bounds.")
+                axis_indices.append(int(item))
+            else:
+                raise TypeError(f"Invalid axis identifier type: {type(item)}")
+                
+        # Return sorted unique indices (collapsing dimensions in order prevents shape bugs)
+        return sorted(list(set(axis_indices)))  
+
+    def _log_sum_exp(self, validated_axis_indices):
         """Robust Log-Sum-Exp implementation."""
         norm = np.nanmax(self.prob)
         # Handle the case where all values are -inf
         if not np.isfinite(norm):
-            # If axis is None, return a simple scalar -inf
-            if axis is None:
+            # If we integrated over ALL available dimensions, return a scalar
+            if len(validated_axis_indices) == len(self.prob.shape):
                 return -np.inf
-            # Otherwise, return an array of -inf with reduced dimensions
-            return np.full(np.delete(self.prob.shape, axis), -np.inf) 
+            # Otherwise, calculate the exact shape of the remaining uncollapsed dimensions
+            remaining_shape = tuple(dim for i, dim in enumerate(self.prob.shape) if i not in validated_axis_indices)
+            return np.full(remaining_shape, -np.inf)
                    
         p_array = np.exp(self.prob - norm)
-        return np.log(np.nansum(p_array, axis=axis)) + norm        
+        return np.log(np.nansum(p_array, axis=tuple(validated_axis_indices))) + norm        
 
-    def _log_integrate_uniform(self, axis=None):
-        """
-        Integrates log(probability) over specified axes.
-        Standard: Coordinate values represent the LEFT EDGES of the bins.
-        Total Volume = Product of (Number of bins * bin_width) for each axis.
-        """
-        # 1. Normalize axes to a list of indices
-        if axis is None:
-            axis_indices = list(range(len(self.REQUIRED_COORDS)))
-        elif isinstance(axis, (int, np.integer)):
-            axis_indices = [axis]
-        else:
-            axis_indices = list(axis)
+    def _get_axis_log_dv(self, validated_axis_indices):
+        '''Helper function to get the log(dV) of the grid for integration over the given axis'''
 
-        # 2. Basic Log-Sum-Exp (The sum of the 'heights')
-        total_ln_prob = self._log_sum_exp(axis=axis)
-
-        # 3. Add the log-volume (The 'widths')
-        ln_total_volume = 0
-        for idx in axis_indices:
+        # Assumes that the axis have already been validates with _standardize_axes?        
+        ln_total_dx_volume = 0
+        
+        for idx in validated_axis_indices:
             coord_name = self.REQUIRED_COORDS[idx]
             vals = self.coords[coord_name]
             
@@ -244,14 +275,28 @@ class BaseBayesObject(ABC):
                 # Width of one bin
                 dx = vals[1] - vals[0]
                 # Total width for this axis = (Number of Left Edges) * dx
-                ln_total_volume += np.log(len(vals) * dx)
+                ln_total_dx_volume += np.log(dx)
             else:
                 # If it's a single point, we treat it as a delta function (width=1)
-                ln_total_volume += 0
+                ln_total_dx_volume += 0
 
-        return total_ln_prob + ln_total_volume
+        return ln_total_dx_volume
+
+    def _log_integrate_uniform(self, validated_axis_indices):
+        """
+        Integrates log(probability) over specified axes.
+        Standard: Coordinate values represent the LEFT EDGES of the bins.
+        Total Volume = Product of (Number of bins * bin_width) for each axis.
+        """
+
+        # 2. Basic Log-Sum-Exp (The sum of the 'heights')
+        total_ln_prob = self._log_sum_exp(validated_axis_indices)
+
+        # 3. The log-volume of one grid point (The 'widths')
+        ln_total_dx_volume = self._get_axis_log_dv(validated_axis_indices)
+
+        return total_ln_prob + ln_total_dx_volume
      
-
     def writef(self, f):
         """
         Helper function to create datasets in the passed h5 file object.
@@ -280,26 +325,26 @@ class BaseBayesObject(ABC):
             #    f.attrs[key] = value
             # if I need to be able to add some addition stuff on the fly
 
-    def marginalize(self, axis_name):
+    def marginalize(self, axis=None):
         """
-        Marginalizes over a specific coordinate by name.
+        Marginalizes over a specific coordinate by name or by index.
         Returns the necessary elements to create a DIFFERENT class (e.g., Grid3D -> Grid2D).
         """
-        if axis_name not in self.REQUIRED_COORDS:
-            raise ValueError(f"Cannot marginalize over '{axis_name}'. Not in coords.")
         
-        axis_idx = self.REQUIRED_COORDS.index(axis_name)
-        coord_vals = self.coords[axis_name]   
+        # 1. Validate the axis input
+        axis_idx = self._get_validated_axes_indexes(axis)  
 
-        # 1. Perform the math based on representation
-        if self.IS_LOG:
-            new_prob = self._log_sum_exp(axis=axis_idx)
+        # 2. Run the integral
+        if self.PROB_IS_LOG:
+            new_prob = self._log_integrate_uniform(axis_idx)
         else:
-            new_prob = np.sum(self.prob, axis=axis_idx)
+            dv = np.exp(self._get_axis_log_dv(axis_idx))
+            new_prob = np.sum(self.prob, axis=tuple(axis_idx)) * dv
             
-        # 2. Prepare new coordinates (drop the marginalized one)
+        # 3. Handle structural metadata metadata
         new_coords = self.coords.copy()
-        new_coords.pop(axis_name)    
+        for idx in axis_idx:
+            new_coords.pop(self.REQUIRED_COORDS[idx])
 
         # Note: You'll likely need a 'Factory' or a specific target class here
         # because the REQUIRED_COORDS of the current class won't match 
