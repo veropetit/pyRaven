@@ -27,18 +27,23 @@ class BaseBayesObject(ABC):
 
     '''
 
-    # This list allows the science classes to provide a specific
-    # list of coordinate needed for each science bayes object. 
-    # For example, ['Bpole', 'beta', 'phi'].
-    # This is to make science functions for a given BayesObject 
-    # (the LH, the posterior, etc) more clear. 
-    # The subclasses MUST define it.
-    
+    #-------------------------------------
+    # 1. Properties & Initialization
+    #-------------------------------------
+
+    # Properties used by the sum and integration to determine
+    # whether the probability is stores in P or ln(P)    
     PROB_IS_LOG = False # Default to Linear
 
     @property
     @abstractmethod
     def REQUIRED_COORDS(self):
+        '''This list allows the science classes to provide a specific
+        list of coordinate needed for each science bayes object. 
+        For example, ['Bpole', 'beta', 'phi'].
+        This is to make science functions for a given BayesObject 
+        (the LH, the posterior, etc) more clear. 
+        The subclasses MUST define it.'''
         pass
     
     def __init__(self, prob, **coords):
@@ -85,7 +90,11 @@ class BaseBayesObject(ABC):
                 )            
             if len(np.atleast_1d(arr)) != np.atleast_1d(self.prob).shape[i]:
                 raise GridDimensionError(f"Bayes object Probability data dimension {i} ({np.atleast_1d(self.prob).shape[i]} elements) does not match the lenght of the '{name}' coordinate array ({len(np.atleast_1d(arr))} elements)")
-            
+
+    #-------------------------------------
+    # 2. Magic Methods & Overloads
+    #-------------------------------------
+
     def __getattr__(self, name):
         # This allows obj.coord_name to look inside the self.coords dict
         if name in self.coords:
@@ -125,22 +134,6 @@ class BaseBayesObject(ABC):
         coord_info = ", ".join([f"{k}={v.shape}" for k, v in self.coords.items()])
         return f"{type(self).__name__}(prob={self.prob.shape}, {coord_info})"
 
-    def _is_compatible(self, other):
-        """Checks if another object has identical coordinates and shapes."""
-        if not isinstance(other, BaseBayesObject):
-            return False
-        
-        # 1. Check if coordinate names match
-        if self.REQUIRED_COORDS != other.REQUIRED_COORDS:   
-            return False
-            
-        # 2. Check if the coordinate arrays themselves are identical
-        for name in self.REQUIRED_COORDS:
-            if not np.array_equal(self.coords[name], other.coords[name]):
-                return False
-                
-        return True
-
     def __add__(self, other):
         # Case 1: Adding another Bayes Object
         if isinstance(other, BaseBayesObject):
@@ -155,10 +148,26 @@ class BaseBayesObject(ABC):
         
         return NotImplemented
     
-    # Allow scalar + obj
     def __radd__(self, other):
         return self.__add__(other)
 
+    def __sub__(self, other):
+        if isinstance(other, BaseBayesObject):
+            if not self._is_compatible(other):
+                raise ValueError("Objects are incompatible: Coordinates must match exactly to subtract.")
+            return type(self)(self.prob - other.prob, **self.coords)
+        
+        if isinstance(other, (int, float, np.number)):
+            return type(self)(self.prob - other, **self.coords)
+        
+        return NotImplemented
+    
+    def __rsub__(self, other):
+        # Handles: scalar - obj
+        if isinstance(other, (int, float, np.number)):
+            return type(self)(other - self.prob, **self.coords)
+        return NotImplemented
+    
     def __mul__(self, other):
         # Case 1: Adding another Bayes Object
         if isinstance(other, BaseBayesObject):
@@ -172,26 +181,8 @@ class BaseBayesObject(ABC):
         
         return NotImplemented
     
-    # Allow scalar * obj
     def __rmul__(self, other):
         return self.__mul__(other)
-    
-    def __sub__(self, other):
-        if isinstance(other, BaseBayesObject):
-            if not self._is_compatible(other):
-                raise ValueError("Objects are incompatible: Coordinates must match exactly to subtract.")
-            return type(self)(self.prob - other.prob, **self.coords)
-        
-        if isinstance(other, (int, float, np.number)):
-            return type(self)(self.prob - other, **self.coords)
-        
-        return NotImplemented
-
-    def __rsub__(self, other):
-        # Handles: scalar - obj
-        if isinstance(other, (int, float, np.number)):
-            return type(self)(other - self.prob, **self.coords)
-        return NotImplemented
     
     def __truediv__(self, other):
         if isinstance(other, BaseBayesObject):
@@ -209,6 +200,52 @@ class BaseBayesObject(ABC):
         if isinstance(other, (int, float, np.number)):
             return type(self)(other / self.prob, **self.coords)
         return NotImplemented
+
+    #-------------------------------------
+    # 3. User-Facing Public API
+    #-------------------------------------
+
+    def marginalize(self, axis=None):
+        """
+        Marginalizes over a specific coordinate by name or by index.
+        Returns the necessary elements to create a DIFFERENT class (e.g., Grid3D -> Grid2D).
+        """
+        
+        # 1. Validate the axis input
+        axis_idx = self._get_validated_axes_indexes(axis)  
+
+        # 2. Run the integral
+        if self.PROB_IS_LOG:
+            new_prob = self._log_integrate_uniform(axis_idx)
+        else:
+            dv = np.exp(self._get_axis_log_dv(axis_idx))
+            new_prob = np.sum(self.prob, axis=tuple(axis_idx)) * dv
+            
+        # 3. Handle structural metadata metadata
+        new_coords = self.coords.copy()
+        for idx in axis_idx:
+            new_coords.pop(self.REQUIRED_COORDS[idx])
+
+        # Note: You'll likely need a 'Factory' or a specific target class here
+        # because the REQUIRED_COORDS of the current class won't match 
+        # the new 2D data.
+        return new_prob, new_coords
+    
+    def write(self, fname):
+        """
+        Standard entry point to write the object to an HDF5 file.
+        """
+        import h5py
+        with h5py.File(fname, 'w') as f:
+            self._writef(f)
+            ## Here, could add a **metadata to the call, and do
+            #for key, value in metadata.items():
+            #    f.attrs[key] = value
+            # if I need to be able to add some addition stuff on the fly
+
+    #-------------------------------------
+    # 4. Input Processing / Validation Helpers
+    #-------------------------------------
 
     def _get_validated_axes_indexes(self, axis=None):
         """
@@ -245,6 +282,46 @@ class BaseBayesObject(ABC):
                 
         # Return sorted unique indices (collapsing dimensions in order prevents shape bugs)
         return sorted(list(set(axis_indices)))  
+
+    def _is_compatible(self, other):
+        """Checks if another object has identical coordinates and shapes."""
+        if not isinstance(other, BaseBayesObject):
+            return False
+        
+        # 1. Check if coordinate names match
+        if self.REQUIRED_COORDS != other.REQUIRED_COORDS:   
+            return False
+            
+        # 2. Check if the coordinate arrays themselves are identical
+        for name in self.REQUIRED_COORDS:
+            if not np.array_equal(self.coords[name], other.coords[name]):
+                return False
+                
+        return True
+
+    #-------------------------------------
+    # 5. IO helpers
+    #-------------------------------------
+
+    def _writef(self, f):
+        """
+        Helper function to create datasets in the passed h5 file object.
+        Works for any number of dimensions and coordinate names.
+        """
+        # Save the main probability data
+        f.create_dataset('prob', data=self.prob)
+        
+        # Dynamically save all coordinates found in self.coords
+        for name, arr in self.coords.items():
+            f.create_dataset(name, data=arr)
+            
+        # Optional: Save the class name so you know what object to 
+        # recreate when reading the file back
+        f.attrs['class_name'] = type(self).__name__
+
+    #-------------------------------------
+    # 6. Core Mathematical Backends
+    #-------------------------------------
 
     def _log_sum_exp(self, validated_axis_indices):
         """Robust Log-Sum-Exp implementation."""
@@ -297,56 +374,5 @@ class BaseBayesObject(ABC):
 
         return total_ln_prob + ln_total_dx_volume
      
-    def writef(self, f):
-        """
-        Helper function to create datasets in the passed h5 file object.
-        Works for any number of dimensions and coordinate names.
-        """
-        # Save the main probability data
-        f.create_dataset('prob', data=self.prob)
-        
-        # Dynamically save all coordinates found in self.coords
-        for name, arr in self.coords.items():
-            f.create_dataset(name, data=arr)
-            
-        # Optional: Save the class name so you know what object to 
-        # recreate when reading the file back
-        f.attrs['class_name'] = type(self).__name__
 
-    def write(self, fname):
-        """
-        Standard entry point to write the object to an HDF5 file.
-        """
-        import h5py
-        with h5py.File(fname, 'w') as f:
-            self.writef(f)
-            ## Here, could add a **metadata to the call, and do
-            #for key, value in metadata.items():
-            #    f.attrs[key] = value
-            # if I need to be able to add some addition stuff on the fly
-
-    def marginalize(self, axis=None):
-        """
-        Marginalizes over a specific coordinate by name or by index.
-        Returns the necessary elements to create a DIFFERENT class (e.g., Grid3D -> Grid2D).
-        """
-        
-        # 1. Validate the axis input
-        axis_idx = self._get_validated_axes_indexes(axis)  
-
-        # 2. Run the integral
-        if self.PROB_IS_LOG:
-            new_prob = self._log_integrate_uniform(axis_idx)
-        else:
-            dv = np.exp(self._get_axis_log_dv(axis_idx))
-            new_prob = np.sum(self.prob, axis=tuple(axis_idx)) * dv
-            
-        # 3. Handle structural metadata metadata
-        new_coords = self.coords.copy()
-        for idx in axis_idx:
-            new_coords.pop(self.REQUIRED_COORDS[idx])
-
-        # Note: You'll likely need a 'Factory' or a specific target class here
-        # because the REQUIRED_COORDS of the current class won't match 
-        # the new 2D data.
-        return new_prob, new_coords
+    
