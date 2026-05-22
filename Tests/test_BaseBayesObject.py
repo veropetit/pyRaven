@@ -576,3 +576,32 @@ class Test_User_Facing_Marginalize:
         np.testing.assert_array_equal(new_coords['x'], x)
         np.testing.assert_array_equal(new_coords['z'], z)    
 
+    def test_marginalize_log_removes_metadata_and_sums(self):
+        """Verify 3D -> 2D reduction in log space drops the correct axis."""
+        class MockLinear3D(bo.BaseBayesObject):
+            REQUIRED_COORDS = ['x', 'y', 'z']
+            PROB_IS_LOG = True
+
+        # Setup a 3D space: shapes (2, 3, 4)
+        x = np.array([1, 2])
+        y = np.array([10, 20, 30])
+        z = np.array([100, 200, 300, 400])
+        
+        # Fill with ones: a sum over 'y' (axis length 3) should result in 30.0s
+        prob = np.zeros((2, 3, 4))
+        obj = MockLinear3D(prob, x=x, y=y, z=z)
+
+        # Act: marginalize out 'y'
+        new_prob, new_coords = obj.marginalize(axis='y')
+
+        # Assert 1: Data values and shapes are correct
+        expected_prob = np.full((2, 4), np.log(30.0))  # np.sum over axis=1
+        np.testing.assert_allclose(new_prob, expected_prob)
+        
+        # Assert 2: Metadata keys are correct
+        assert 'y' not in new_coords
+        assert list(new_coords.keys()) == ['x', 'z']
+        
+        # Assert 3: Remaining coordinate arrays are untouched
+        np.testing.assert_array_equal(new_coords['x'], x)
+        np.testing.assert_array_equal(new_coords['z'], z) 
