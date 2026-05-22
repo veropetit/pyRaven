@@ -373,6 +373,5 @@ class BaseBayesObject(ABC):
         ln_total_dx_volume = self._get_axis_log_dv(validated_axis_indices)
 
         return total_ln_prob + ln_total_dx_volume
-     
-
+    
     
