@@ -195,6 +195,43 @@ class Test_Base_init:
         assert "y" in representation
         assert "z" in representation
 
+    def test_added_attr_persist_after_slicing(self):
+        '''Test that the extra Science class attributes stay after slicing'''
+        # 1. Define a temporary mock science class that uses the base class
+        
+        class MockScienceGrid(bo.BaseBayesObject):
+            REQUIRED_COORDS = ['x', 'y']
+            PROB_IS_LOG = False
+
+            def __init__(self, prob, x, y, a, b):
+                super().__init__(prob=prob, x=x, y=y)
+                self.a = a
+                self.b = b
+        
+        # 2. Initialize the mock science object with distinct metadata
+        prob_data = np.ones((3, 4))
+        x_vals = np.array([10, 20, 30])
+        y_vals = np.array([1, 2, 3, 4])     
+        
+        orig_obj = MockScienceGrid(
+            prob=prob_data, 
+            x=x_vals, 
+            y=y_vals, 
+            a='a', 
+            b=3
+        )
+
+        # Slice a subgrid out of the object
+        sliced_obj = orig_obj[0:2, :]   
+
+        # Verify array slicing happened properly
+        assert sliced_obj.prob.shape == (2, 4)
+        # Verify metadata survived the slice dynamically
+        assert hasattr(sliced_obj, 'a')
+        assert sliced_obj.a == 'a'
+        assert hasattr(sliced_obj, 'b')
+        assert sliced_obj.b == 3
+
     def test_h5_persistence(self, correct_obj3D, tmp_path):
         """Verify that all arrays are correctly saved to HDF5."""
         file_path = tmp_path / "test_data.h5"
@@ -210,6 +247,44 @@ class Test_Base_init:
             assert np.array_equal(f['z'][:], correct_obj3D.z)
             assert f.attrs['class_name'] == "MockSciObject3Dclass"    
 
+    def test_h5_persistance_extra_key(self, tmp_path):
+        '''Check that the k5 writer captures the extra science object attirbutes'''
+        # 1. Define a temporary mock science class that uses the base class
+        class MockScienceGrid(bo.BaseBayesObject):
+            REQUIRED_COORDS = ['x', 'y']
+            PROB_IS_LOG = False
+
+            def __init__(self, prob, x, y, a, b):
+                super().__init__(prob=prob, x=x, y=y)
+                self.a = a
+                self.b = b
+        
+        # 2. Initialize the mock science object with distinct metadata
+        prob_data = np.ones((3, 4))
+        x_vals = np.array([10, 20, 30])
+        y_vals = np.array([1, 2, 3, 4])     
+        
+        obj = MockScienceGrid(
+            prob=prob_data, 
+            x=x_vals, 
+            y=y_vals, 
+            a='a', 
+            b=3
+        )   
+
+        # 1. Write the file
+        file_path = tmp_path / "test_data.h5"
+        obj.write(file_path)
+        
+        # 2. Read it back and verify
+        with h5py.File(file_path, 'r') as f:
+            assert np.array_equal(f['prob'][:], obj.prob)
+            assert np.array_equal(f['x'][:], obj.x)
+            assert np.array_equal(f['y'][:], obj.y)
+            assert f.attrs['class_name'] == "MockScienceGrid"
+            assert f.attrs['a'] == 'a'
+            assert f.attrs['b'] == 3    
+     
     @pytest.mark.parametrize("axis_input, expected_indices",[
             (None, [0, 1, 2]),
             (1, [1]),

@@ -128,7 +128,20 @@ class BaseBayesObject(ABC):
             coord_key = new_key[i] if i < len(new_key) else slice(None)
             new_coords[name] = arr[coord_key]                
         
-        return type(self)(new_prob, **new_coords)
+        # 5. Create a raw instance of the current class without invoking __init__
+        new_obj = type(self).__new__(type(self))
+        
+        # 6. Manually assign the freshly sliced core arrays
+        new_obj.prob = new_prob
+        new_obj.coords = new_coords
+
+        # 7. Automatically copy over all remaining science metadata and properties
+        core_attrs = {'prob', 'coords'}
+        for attr, value in self.__dict__.items():
+            if attr not in core_attrs:
+                setattr(new_obj, attr, value)
+                
+        return new_obj
 
     def __repr__(self):
         coord_info = ", ".join([f"{k}={v.shape}" for k, v in self.coords.items()])
@@ -315,9 +328,13 @@ class BaseBayesObject(ABC):
         for name, arr in self.coords.items():
             f.create_dataset(name, data=arr)
             
-        # Optional: Save the class name so you know what object to 
-        # recreate when reading the file back
+        # Automatically record class name and ALL extra science metadata
         f.attrs['class_name'] = type(self).__name__
+
+        core_attrs = {'prob', 'coords'}
+        for attr, value in self.__dict__.items():
+            if attr not in core_attrs and np.isscalar(value):
+                f.attrs[attr] = value        
 
     #-------------------------------------
     # 6. Core Mathematical Backends
@@ -373,5 +390,4 @@ class BaseBayesObject(ABC):
         ln_total_dx_volume = self._get_axis_log_dv(validated_axis_indices)
 
         return total_ln_prob + ln_total_dx_volume
-    
     
