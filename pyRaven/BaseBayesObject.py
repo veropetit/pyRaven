@@ -91,6 +91,28 @@ class BaseBayesObject(ABC):
             if len(np.atleast_1d(arr)) != np.atleast_1d(self.prob).shape[i]:
                 raise GridDimensionError(f"Bayes object Probability data dimension {i} ({np.atleast_1d(self.prob).shape[i]} elements) does not match the lenght of the '{name}' coordinate array ({len(np.atleast_1d(arr))} elements)")
 
+    @classmethod
+    def empty(cls, **kwargs):
+        """
+        Universal factory method in the base class.
+        Automatically constructs a zeroed array matching the subclass REQUIRED_COORDS.
+        """
+        shape = []
+        for name in cls.REQUIRED_COORDS:
+            if name not in kwargs:
+                raise ValueError(f"Missing required coordinate array: '{name}'")
+            
+            # Safely measure length whether given an array, list, or tuple
+            # or other unallowed types -- the __init__ will validate
+            array_size = np.atleast_1d(kwargs[name]).size
+            shape.append(array_size)
+            
+        # Allocate the core probability array shell
+        data = np.zeros(shape)
+        
+        # Instantiate the subclass, passing the new array as the 'prob' keyword argument
+        return cls(prob=data, **kwargs)
+
     #-------------------------------------
     # 2. Magic Methods & Overloads
     #-------------------------------------

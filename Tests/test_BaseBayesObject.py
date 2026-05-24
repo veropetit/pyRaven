@@ -320,6 +320,62 @@ class Test_Base_init:
         with pytest.raises(expected_exception, match=match_msg):
             correct_obj3D._get_validated_axes_indexes(axis=invalid_axis)                   
 
+class TestBaseClassEmptyFactory:
+    def test_base_empty_factory_allocates_correct_shape(self):  
+        """
+        Verify that the base class .empty() factory dynamically inspects REQUIRED_COORDS,
+        handles mixed sequence types (lists, arrays), and instantiates the correct shape and type.
+        """
+        # 1. Define a temporary mock class with unique coordinate names and ordering
+        class MockGrid(bo.BaseBayesObject):
+            REQUIRED_COORDS = ['coord_A', 'coord_B', 'coord_C']
+            PROB_IS_LOG = False
+
+            def __init__(self, prob, coord_A, coord_B, coord_C, extra_metadata):
+                super().__init__(prob=prob, coord_A=coord_A, coord_B=coord_B, coord_C=coord_C)
+                self.extra_metadata = extra_metadata
+
+        # 2. Define coordinate inputs of different lengths and sequence types
+        list_input = [10, 20, 30]                # len = 3
+        array_input = np.array([1.0, 2.0])       # len = 2
+        float_input = 10.0                       # len = 0
+        metadata_input = "MetaData_01"
+
+        # 3. Call the factory method from the subclass
+        # Pass the list and array to make sure np.asarray().size works on both
+        obj = MockGrid.empty(
+            coord_A=list_input, 
+            coord_B=array_input, 
+            coord_C=float_input,
+            extra_metadata=metadata_input
+        )
+
+        # 4. Assertions
+        # Verify it created the correct type
+        assert isinstance(obj, MockGrid)
+        
+        # Verify the underlying 'prob' array was allocated with zeros and has the correct shape
+        expected_shape = (3, 2, 1)  # (len(coord_A), len(coord_B), len(coord_C))
+        assert obj.prob.shape == expected_shape
+        np.testing.assert_array_equal(obj.prob, np.zeros(expected_shape))
+        
+        # Verify extra metadata fields passed through **kwargs were preserved
+        assert obj.extra_metadata == "MetaData_01"    
+
+    def test_base_empty_factory_missing_coords_raises_error(self):
+        """Verify that the factory raises an error if a required coordinate is omitted."""
+        class MockGridSimple(bo.BaseBayesObject):
+            REQUIRED_COORDS = ['x', 'y']
+            PROB_IS_LOG = False
+
+        # Omit 'y' intentionally to trigger the validation check
+        with pytest.raises(ValueError, match="Missing required coordinate array: 'y'"):
+            MockGridSimple.empty(x=[1, 2, 3])
+
+        # Pass a coordinte that is not allowed
+        with pytest.raises(TypeError, match="y must be a list, numpy array, or float. Got str instead."):
+            MockGridSimple.empty(x=[1, 2, 3], y='Bad')   
+
 class Test_Base_Math:
     
     @pytest.fixture
