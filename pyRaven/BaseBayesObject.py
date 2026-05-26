@@ -6,6 +6,7 @@
 
 from . import validators as valid
 import numpy as np
+import matplotlib.pyplot as plt
 from abc import ABC, abstractmethod
 import h5py
 
@@ -314,6 +315,113 @@ class BaseBayesObject(ABC):
             
             # 5. Dynamically instantiate the subclass
             return cls(**constructor_inputs)
+
+    def plot_2d_slice(self, **slices: int):
+        """
+        Universally plots a 2D heatmap of the probability/likelihood matrix by 
+        slicing out all but two of the coordinate dimensions.
+        
+        Parameters:
+            **slices (int): Keyword arguments matching coordinate names and the 
+                            integer index to lock down.
+        Returns:
+            fig, ax: The matplotlib figure and axis objects.
+        """
+        # 1. Dynamically figure out how many coordinates must be frozen
+        total_dimensions = len(self.REQUIRED_COORDS)
+        required_slice_count = total_dimensions - 2
+        
+        if len(slices) != required_slice_count:
+            raise ValueError(
+                f"For a 2D plot of a {total_dimensions}D dataset, you must slice exactly "
+                f"{required_slice_count} coordinates. You provided {len(slices)}."
+            )
+
+        # 2. Set up an open selector [:, :, :, ...] for the slicing operation
+        slice_selector = [slice(None)] * total_dimensions
+        remaining_axes = list(self.REQUIRED_COORDS)
+        
+        # Track titles for the frozen dimensions
+        frozen_labels = []
+
+        # 3. Apply the user's slice index restrictions
+        for coord_name, index_val in slices.items():
+            if coord_name not in self.REQUIRED_COORDS:
+                raise KeyError(
+                    f"'{coord_name}' is not a valid coordinate for {self.__class__.__name__}. "
+                    f"Valid choices are: {self.REQUIRED_COORDS}"
+                )
+            
+            # Fetch the actual coordinate array bound to the instance
+            coord_array = getattr(self, coord_name)
+            axis_len = len(coord_array)
+            
+            # Index Bound Validation (supports negative indexing)
+            if index_val >= axis_len or index_val < -axis_len:
+                raise IndexError(
+                    f"Index {index_val} is out of bounds for coordinate '{coord_name}' "
+                    f"with length {axis_len}."
+                )
+                
+            # Extract the actual scientific value (e.g., 15.0, 45.0)
+            actual_value = coord_array[index_val]
+            clean_name = coord_name.replace('_arr', '').replace('_grid', '').replace('_coord', '')
+            frozen_labels.append(f"{clean_name}={actual_value}")
+            
+            axis_index = self.REQUIRED_COORDS.index(coord_name)
+            slice_selector[axis_index] = index_val
+            remaining_axes.remove(coord_name)
+
+        # 4. Map the remaining 2 axes to the plotting grid
+        y_coord_name = remaining_axes[0]
+        x_coord_name = remaining_axes[1]
+
+        y_ticks = getattr(self, y_coord_name)
+        x_ticks = getattr(self, x_coord_name)
+
+        # 5. Extract the 2D matrix slice
+        sliced_data = self.prob[tuple(slice_selector)]
+
+        # Ensure matrix layout aligns correctly with our X and Y grid dimensions
+        if sliced_data.shape != (len(y_ticks), len(x_ticks)):
+            sliced_data = sliced_data.T
+
+        # 6. Plotting Engine
+        fig, ax = plt.subplots(figsize=(8, 6))
+        
+        extent = [x_ticks[0], x_ticks[-1], y_ticks[0], y_ticks[-1]]
+        
+        img = ax.imshow(
+            sliced_data, 
+            extent=extent, 
+            origin='lower', 
+            aspect='auto', 
+            cmap='viridis'
+        )
+        
+        # Format labels nicely by stripping trailing internal naming conventions
+        ax.set_xlabel(x_coord_name.replace('_arr', '').replace('_grid', '').replace('_coord', ''))
+        ax.set_ylabel(y_coord_name.replace('_arr', '').replace('_grid', '').replace('_coord', ''))
+        
+        # Build an informative title showing exactly what is frozen and where
+        # Look for any variation of the observation ID keyword
+        obs_label = ''
+        for identifier in ['obsID', 'ObsID', 'obs_id', 'OBS_ID']:
+            if hasattr(self, identifier):
+                obs_label = getattr(self, identifier)
+                break  # Stop searching as soon as we find a match
+                
+        # Build your title smoothly
+        title_str = f"{self.__class__.__name__} ({obs_label})"
+        if frozen_labels:
+            title_str += f"\nSliced at: {', '.join(frozen_labels)}"
+        ax.set_title(title_str)
+        
+        # Attach the colorbar using the specific active axis image reference
+        cbar = fig.colorbar(img, ax=ax)
+        cbar.set_label("ln(value)" if getattr(self, 'PROB_IS_LOG', False) else "Value")
+        
+        return fig, ax
 
     #-------------------------------------
     # 4. Input Processing / Validation Helpers

@@ -1,5 +1,6 @@
 import pytest
 import numpy as np
+import matplotlib.pyplot as plt
 import h5py
 from pyRaven import BaseBayesObject as bo
 
@@ -795,3 +796,97 @@ class Test_User_Facing_Marginalize:
         # Assert 3: Remaining coordinate arrays are untouched
         np.testing.assert_array_equal(new_coords['x'], x)
         np.testing.assert_array_equal(new_coords['z'], z) 
+
+class TestPlot2D:
+    
+    class Mock4DObject(bo.BaseBayesObject):
+        REQUIRED_COORDS = ['beta_coord', 'Bpole_coord', 'phi_coord', 'incl_coord']
+        PROB_IS_LOG = True   
+
+    @pytest.fixture
+    def mock_instance(self):
+        """Generates a populated 4D object shell for testing plot slices."""
+        dummy_prob = np.random.random((2, 3, 4, 5))
+        
+        # Instantiate it using self.Mock4DObject
+        obj = self.Mock4DObject(
+            prob=dummy_prob,
+            beta_coord=np.array([10.0, 20.0]),
+            Bpole_coord=np.array([1000, 2000, 3000]),
+            phi_coord=np.array([0, 90, 180, 270]),
+            incl_coord=np.array([15.0, 30.0, 45.0, 60.0, 75.0])
+        )
+        return obj
+    
+    def test_successful_slice_returns_fig_and_ax(self, mock_instance):
+        """Verify that slicing down all but two dimensions successfully returns matplotlib objects."""
+        # Freeze beta (axis 0) and incl (axis 3), leaving Bpole and phi to plot
+        fig, ax = mock_instance.plot_2d_slice(beta_coord=0, incl_coord=2)
+        
+        try:
+            assert isinstance(fig, plt.Figure)
+            assert isinstance(ax, plt.Axes)
+        finally:
+            # Clean up memory
+            #plt.show()
+            plt.close(fig)    
+
+    def test_wrong_number_of_slice_dimensions_raises_value_error(self, mock_instance):
+        """A 4D dataset requires exactly 2 frozen axes. Passing 1 or 3 must fail."""
+        # Too few parameters (only freezing 1 axis instead of 2)
+        with pytest.raises(ValueError, match="must slice exactly 2 coordinates"):
+            mock_instance.plot_2d_slice(beta_coord=0)
+            
+        # Too many parameters (freezing 3 axes instead of 2)
+        with pytest.raises(ValueError, match="must slice exactly 2 coordinates"):
+            mock_instance.plot_2d_slice(beta_coord=0, Bpole_arr=1, phi_arr=2)
+
+    def test_invalid_coordinate_keyword_raises_key_error(self, mock_instance):
+        """Passing an unrecognized coordinate keyword name must raise a KeyError."""
+        with pytest.raises(KeyError, match="is not a valid coordinate"):
+            mock_instance.plot_2d_slice(fake_coordinate_name=0, incl_coord=2)
+
+    def test_index_out_of_bounds_raises_index_error(self, mock_instance):
+        """Passing an index value beyond the length of that coordinate must raise an IndexError."""
+        # beta_coord only has 2 elements (indices 0 and 1). Index 5 is out of bounds.
+        with pytest.raises(IndexError, match="is out of bounds for coordinate"):
+            mock_instance.plot_2d_slice(beta_coord=5, incl_coord=0)
+
+    def test_negative_indexing_is_supported_safely(self, mock_instance):
+        """Ensure standard Python negative index positions don't raise out-of-bounds exceptions."""
+        # -1 refers to the last element of that array axis
+        fig, ax = mock_instance.plot_2d_slice(beta_coord=-1, incl_coord=-1)
+        try:
+            assert isinstance(fig, plt.Figure)
+        finally:
+            plt.close(fig)    
+
+    def test_alternative_obs_id_spellings_handled_without_crashing(self, mock_instance):
+        """Verify the title formatting scans variable variants (like obs_id) gracefully."""
+        # Inject the alternative snake_case variable name directly into the object instance
+        mock_instance.obs_id = "OBS_SNAKE_CASE_123"
+        
+        fig, ax = mock_instance.plot_2d_slice(beta_coord=0, incl_coord=0)
+        
+        # Verify the plot title successfully harvested the variation value
+        title_text = ax.get_title()
+        try:
+            assert "OBS_SNAKE_CASE_123" in title_text
+        finally:
+            plt.close(fig)
+
+    def test_default_simulation_fallback_when_no_obs_id_exists(self, mock_instance):
+        """If the object does not specify an observation identifier at all, it should fallback to '()'."""
+        # Ensure no variants exist on the test mock
+        for attr in ['obsID', 'ObsID', 'obs_id', 'OBS_ID']:
+            if hasattr(mock_instance, attr):
+                delattr(mock_instance, attr)
+                
+        fig, ax = mock_instance.plot_2d_slice(beta_coord=0, incl_coord=0)
+        
+        title_text = ax.get_title()
+        try:
+            assert "()" in title_text
+        finally:
+            plt.close(fig)
+
