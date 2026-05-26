@@ -296,24 +296,44 @@ class BaseBayesObject(ABC):
                     f"Mismatched file type! File '{filename}' contains a '{file_class_type}' object, "
                     f"but you are trying to read it using the '{expected_type}' class."
                 )            
-            
-            # 1. Dynamically read the core probability matrix and coordinates
-            loaded_args = {
-                'prob': f['prob'][:]
-            }
+
+            # 1. Dynamically read the coordinates, securing them with np.atleast_1d
+            loaded_args = {}
             for coord_name in cls.REQUIRED_COORDS:
-                loaded_args[coord_name] = f[coord_name][:]
+                # np.atleast_1d prevents a 1-element coordinate array from turning into a 0D scalar
+                loaded_args[coord_name] = np.atleast_1d(f[coord_name][()])
             
-            # 2. Automatically harvest every HDF5 attribute into a metadata dict
+            # 2. Extract the raw probability matrix
+            prob_matrix = f['prob'][()]
+            
+            # Dynamically compile what the true shape layout must look like based on coordinate lengths
+            expected_shape = tuple(len(loaded_args[name]) for name in cls.REQUIRED_COORDS)
+            
+            # If h5py or an external writer collapsed trailing size-1 dimensions, 
+            # this reconstructs the missing dimensions cleanly
+            if prob_matrix.shape != expected_shape:
+                try:
+                    prob_matrix = prob_matrix.reshape(expected_shape)
+                except ValueError as e:
+                    raise ValueError(
+                        f"Cannot reconstruct H5 probability matrix with shape {prob_matrix.shape} "
+                        f"into the required {len(cls.REQUIRED_COORDS)}D coordinate layout {expected_shape}."
+                    ) from e
+            
+            # Store the safely shaped matrix back into the constructor dictionary
+            loaded_args['prob'] = prob_matrix
+            # ------------------------------
+
+            # 3. Automatically harvest every HDF5 attribute into a metadata dict
             metadata = dict(f.attrs)
             
-            # 3. Merge them together, prioritizing any runtime overrides passed in via **kwargs
+            # 4. Merge them together, prioritizing any runtime overrides passed in via **kwargs
             constructor_inputs = {**loaded_args, **metadata, **kwargs}
             
-            # 4. Remove internal identifiers like 'class_type' so they don't break __init__
+            # 5. Remove internal identifiers like 'class_type' so they don't break __init__
             constructor_inputs.pop('class_name', None)
             
-            # 5. Dynamically instantiate the subclass
+            # 6. Dynamically instantiate the subclass
             return cls(**constructor_inputs)
 
     def plot_2d_slice(self, transpose: bool = False, **slices: int):

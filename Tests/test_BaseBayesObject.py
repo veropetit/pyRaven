@@ -379,45 +379,60 @@ class TestBaseClassEmptyFactory:
 
 class TestBaseClassReader:
 
+    class MockScienceGrid(bo.BaseBayesObject):
+        CLASS_ID = 'MockScienceGrid'
+        REQUIRED_COORDS = ['coord_X', 'coord_Y', 'coord_Z']
+        
+        def __init__(self, prob, coord_X, coord_Y, coord_Z, science_meta=None):
+            self.prob = prob
+            self.coord_X = coord_X
+            self.coord_Y = coord_Y
+            self.coord_Z = coord_Z
+            self.science_meta = science_meta
+
     @pytest.fixture
     def sample_h5_file(self, tmp_path):
-        """Fixture to generate a valid temporary HDF5 file formatted by the base class."""
+        """Fixture to generate a temporary HDF5 file with an implicitly collapsed 3D matrix."""
         file_path = tmp_path / "test_data.h5"
         
         with h5py.File(file_path, 'w') as f:
-            # Simulate datasets written by the base class
+            # The matrix is structurally 2D in the file shape=(2, 3) because 
+            # the trailing Z-dimension was collapsed out during storage
             f.create_dataset('prob', data=np.ones((2, 3)))
-            f.create_dataset('coord_X', data=[10.0, 20.0])
-            f.create_dataset('coord_Y', data=[1.0, 2.0, 3.0])
             
-            # Simulate attributes/metadata written by the base class
+            # Coordinate axes matching the layout
+            f.create_dataset('coord_X', data=[10.0, 20.0])        # Length 2
+            f.create_dataset('coord_Y', data=[1.0, 2.0, 3.0])     # Length 3
+            f.create_dataset('coord_Z', data=100.0)               # Length 1 (Saved as scalar)
+            
+            # Metadata
             f.attrs['class_name'] = 'MockScienceGrid'
             f.attrs['science_meta'] = 42.0
             
         return str(file_path)
+    
+    def test_read_factory_reconstructs_3d_matrix(self, sample_h5_file):
+        """Verify the reader catches the 2D file array and re-inflates it into a proper 3D matrix."""
+        # Action: Run the file through your base class factory loader
+        loaded_obj = self.MockScienceGrid.read(sample_h5_file)
 
-    def test_base_reader_successfully_reconstructs_object(self, sample_h5_file):
-        """Verify the base class .read() dynamically parses datasets and attributes into a subclass."""
-        
-        # 1. Define a mock subclass that matches the file layout
-        class MockScienceGrid(bo.BaseBayesObject):
-            REQUIRED_COORDS = ['coord_X', 'coord_Y']
-            PROB_IS_LOG = False
-            CLASS_ID = 'MockScienceGrid'
+        assert isinstance(loaded_obj, self.MockScienceGrid)
 
-            def __init__(self, prob, coord_X, coord_Y, science_meta):
-                super().__init__(prob=prob, coord_X=coord_X, coord_Y=coord_Y)
-                self.science_meta = science_meta
+        np.testing.assert_array_equal(loaded_obj.coord_X, np.array([10.0, 20.0]))
+        np.testing.assert_array_equal(loaded_obj.coord_Y, np.array([1.0, 2.0, 3.0]))
 
-        # 2. Trigger the dynamic read from the mock subclass
-        obj = MockScienceGrid.read(sample_h5_file)
+        # Assertions: Check that the scalar Z coordinate is now a 1D vector
+        assert isinstance(loaded_obj.coord_Z, np.ndarray)
+        assert len(loaded_obj.coord_Z) == 1
+        assert loaded_obj.coord_Z[0] == 100.0
 
-        # 3. Assertions
-        assert isinstance(obj, MockScienceGrid)
-        assert obj.prob.shape == (2, 3)
-        np.testing.assert_array_equal(obj.coord_X, np.array([10.0, 20.0]))
-        np.testing.assert_array_equal(obj.coord_Y, np.array([1.0, 2.0, 3.0]))
-        assert obj.science_meta == 42.0
+        # Assertions: Verify the prob matrix was re-inflated from (2, 3) back to (2, 3, 1)
+        expected_3d_shape = (2, 3, 1)
+        assert loaded_obj.prob.ndim == 3
+        assert loaded_obj.prob.shape == expected_3d_shape
+
+        # Assertions: Check that attribute harvesting transferred correctly
+        assert loaded_obj.science_meta == 42.0  
 
     def test_base_reader_raises_error_on_mismatched_class_type(self, sample_h5_file):
         """Verify the reader catches a user trying to open a file with the wrong science class."""
