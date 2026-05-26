@@ -890,3 +890,8 @@ class TestPlot2D:
         finally:
             plt.close(fig)
 
+    def test_string_index_raises_type_error(self, mock_instance):
+        """Passing a string instead of an integer for a slice index must raise a TypeError."""
+        # User accidentally passes a string representation of an integer
+        with pytest.raises(TypeError, match="must be an integer, but got str"):
+            mock_instance.plot_2d_slice(beta_coord="0", incl_coord=2)

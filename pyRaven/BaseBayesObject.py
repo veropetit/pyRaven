@@ -352,6 +352,12 @@ class BaseBayesObject(ABC):
                     f"Valid choices are: {self.REQUIRED_COORDS}"
                 )
             
+            if not isinstance(index_val, (int, np.integer)):
+                raise TypeError(
+                    f"Slice index for '{coord_name}' must be an integer, "
+                    f"but got {type(index_val).__name__} ('{index_val}')."
+                )            
+            
             # Fetch the actual coordinate array bound to the instance
             coord_array = getattr(self, coord_name)
             axis_len = len(coord_array)
