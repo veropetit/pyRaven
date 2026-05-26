@@ -12,12 +12,12 @@ class Chi(base.BaseBayesObject):
     """    
 
     # 1. MUST define REQUIRED_COORDS to match the expected dimension ordering of the data array
-    REQUIRED_COORDS = ['beta_coord', 'Bpole_coord', 'phi_coord']    
+    REQUIRED_COORDS = ['beta_coord', 'Bpole_coord', 'phi_coord', 'incl_coord']    
 
     # The chi are not stored in log
     PROB_IS_LOG = False
 
-    def __init__(self, prob, beta_coord, Bpole_coord, phi_coord, incl, obsID):
+    def __init__(self, prob, beta_coord, Bpole_coord, phi_coord, incl_coord, obsID):
         """
         Initialization of a Chi object.
         """
@@ -26,11 +26,11 @@ class Chi(base.BaseBayesObject):
             prob=prob, 
             beta_coord=beta_coord, 
             Bpole_coord=Bpole_coord, 
-            phi_coord=phi_coord
+            phi_coord=phi_coord,
+            incl_coord=incl_coord
         )
         
         # Store the extra scientific metadata attributes
-        self.incl = incl
         self.obsID = obsID
 
     @classmethod
@@ -38,7 +38,7 @@ class Chi(base.BaseBayesObject):
         beta_coord: np.typing.ArrayLike, 
         Bpole_coord: np.typing.ArrayLike, 
         phi_coord: np.typing.ArrayLike, 
-        incl: float, 
+        incl_coord: np.typing.ArrayLike, 
         obsID: str | int
         ) -> Chi:
         """
@@ -50,7 +50,7 @@ class Chi(base.BaseBayesObject):
             beta_coord=beta_coord,
             Bpole_coord=Bpole_coord,
             phi_coord=phi_coord,
-            incl=incl,
+            incl_coord=incl_coord,
             obsID=obsID
         )
 
@@ -61,34 +61,7 @@ class Chi(base.BaseBayesObject):
         """
         # Simply hand the filename up to the base class engine
         return super().read(filename)
-
-    def plot(self, index_phi):
-        '''Function to plot a slice of Chi'''
-        # Validate the index
-        #   1. is an integer
-        if not isinstance(index_phi, (int, np.integer)):
-            raise TypeError(
-                f"Invalid index_phi type: {type(index_phi).__name__}. "
-                f"The index must be a single integer."
-            )
-        #   2. is within range
-        n_phi = len(self.phi_coord)
-        if index_phi < 0 or index_phi >= n_phi:
-            raise IndexError(
-                f"Invalid index_phi={index_phi}. Must be between 0 and {n_phi - 1} "
-                f"(phi range: {self.phi_coord[0]} to {self.phi_coord[-1]})."
-            )
-
-        fig, ax = plt.subplots(1,1)
-        im = ax.pcolormesh(self.Bpole_coord, self.beta_coord, self.prob[:,:,index_phi], 
-                        cmap='Purples_r', vmin=0, vmax=np.max(self.prob))
-        co = plt.colorbar(im)
-        co.ax.set_ylabel('Chi2')
-        ax.set_xlabel('Bpole')
-        ax.set_ylabel('Beta')
-        ax.set_title('Obs: {} incl: {:3.1f}, phi: {:3.1f}'.format(self.obsID, self.incl,self.phi_coord[index_phi]))
-        return(fig, ax)
-    
+ 
 class LnLikelihood(base.BaseBayesObject):
     '''
     Likelihood class for the odds ratios
