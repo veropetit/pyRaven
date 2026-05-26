@@ -2,7 +2,7 @@ import numpy as np
 
 def validate_array_like_container(name, value):
     """Utility to ensure a variable is a list, ndarray, or scalar."""
-    allowed_types = (list, np.ndarray, np.number, float, int)
+    allowed_types = (list, tuple, np.ndarray, np.number, float, int)
     if not isinstance(value, allowed_types):
         raise TypeError(
             f"{name} must be a list, numpy array, or float. "

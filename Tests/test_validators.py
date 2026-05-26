@@ -8,6 +8,7 @@ class Test_validate_array_like_container:
         """Test that valid inputs do NOT raise an error."""
         # No error should be raised for these
         v.validate_array_like_container("test", [1, 2, 3])
+        v.validate_array_like_container("test", (1, 2, 3))
         v.validate_array_like_container("test", np.array([1, 2]))
         v.validate_array_like_container("test", np.zeros((2,3,4)))
         v.validate_array_like_container("test", 10.5)
@@ -20,7 +21,6 @@ class Test_validate_array_like_container:
         "string", 
         {"a": 1}, 
         None, 
-        (1, 2),
         ])
     def test_validate_numeric_failure(self, bad_val):
         """Test that invalid inputs raise a TypeError."""
@@ -43,6 +43,7 @@ class Test_convert_container_to_numpy_and_validate:
 
     @pytest.mark.parametrize("bad_val", [
         ['a', 'b'], 
+        ('a', 'b'),
         [{'a':2}]*2,
         np.array(['a', 'b']),
         np.array([{'a':2}])
