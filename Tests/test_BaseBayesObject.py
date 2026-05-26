@@ -822,14 +822,70 @@ class TestPlot2D:
         """Verify that slicing down all but two dimensions successfully returns matplotlib objects."""
         # Freeze beta (axis 0) and incl (axis 3), leaving Bpole and phi to plot
         fig, ax = mock_instance.plot_2d_slice(beta_coord=0, incl_coord=2)
-        
         try:
             assert isinstance(fig, plt.Figure)
             assert isinstance(ax, plt.Axes)
+
+            # Check text properties
+            assert ax.get_xlabel() == 'Bpole'
+            assert ax.get_ylabel() == 'phi'
+            title_lines = ax.get_title().split('\n')
+            assert len(title_lines) == 2
+            assert title_lines[0] == "Mock4DObject ()"
+            assert title_lines[1] == "Sliced at: beta=10.0, incl=45.0"
         finally:
             # Clean up memory
             #plt.show()
-            plt.close(fig)    
+            plt.close(fig) 
+
+    def test_transpose_swaps_data_and_labels_simultaneously(self, mock_instance):
+        """
+        Verify that transpose=True physically flips the underlying data matrix
+        and correctly swaps the corresponding X and Y axis labels.
+        """
+        # 1. Setup an asymmetric 2D slice profile (Bpole_coord shape=3, phi_coord shape=4)
+        # The gradient increases across columns (phi_coord)
+        gradient_slice = np.array([
+            [1, 2, 3, 4],
+            [1, 2, 3, 4],
+            [1, 2, 3, 4]
+        ])
+        
+        # Inject it into our mock object (Freezing beta_coord at 0 and incl_coord at 0)
+        mock_instance.prob[0, :, :, 0] = gradient_slice
+
+        # 2. Test the STANDARD layout (transpose=False)
+        fig_std, ax_std = mock_instance.plot_2d_slice(beta_coord=0, incl_coord=0, transpose=False)
+        
+        matrix_std = ax_std.get_images()[0].get_array()
+        label_x_std = ax_std.get_xlabel()
+        label_y_std = ax_std.get_ylabel()
+        
+        # 3. Test the TRANSPOSED layout (transpose=True)
+        fig_tr, ax_tr = mock_instance.plot_2d_slice(beta_coord=0, incl_coord=0, transpose=True)
+        
+        matrix_tr = ax_tr.get_images()[0].get_array()
+        label_x_tr = ax_tr.get_xlabel()
+        label_y_tr = ax_tr.get_ylabel()
+
+        # 4. DATA MATRIX ASSERTIONS
+        # Confirm the array shapes are completely inverted
+        assert matrix_tr.shape == matrix_std.T.shape
+        # Confirm every single data cell is perfectly transposed mathematically
+        np.testing.assert_array_equal(matrix_tr, matrix_std.T)
+        
+        # 5. AXIS LABEL ASSERTIONS
+        # Verify that labels are present and match your sequential EXPECTATIONS
+        assert label_x_std == "Bpole"
+        assert label_y_std == "phi"
+        
+        # Verify that toggling transpose cleanly flips them
+        assert label_x_tr == label_y_std  # New X becomes Old Y ("phi")
+        assert label_y_tr == label_x_std  # New Y becomes Old X ("Bpole")
+
+        # Clean up figure objects from memory
+        plt.close(fig_std)
+        plt.close(fig_tr)  
 
     def test_wrong_number_of_slice_dimensions_raises_value_error(self, mock_instance):
         """A 4D dataset requires exactly 2 frozen axes. Passing 1 or 3 must fail."""

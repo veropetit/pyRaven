@@ -316,7 +316,7 @@ class BaseBayesObject(ABC):
             # 5. Dynamically instantiate the subclass
             return cls(**constructor_inputs)
 
-    def plot_2d_slice(self, **slices: int):
+    def plot_2d_slice(self, transpose: bool = False, **slices: int):
         """
         Universally plots a 2D heatmap of the probability/likelihood matrix by 
         slicing out all but two of the coordinate dimensions.
@@ -379,17 +379,22 @@ class BaseBayesObject(ABC):
             remaining_axes.remove(coord_name)
 
         # 4. Map the remaining 2 axes to the plotting grid
-        y_coord_name = remaining_axes[0]
-        x_coord_name = remaining_axes[1]
+        # The remaining_axes list naturally preserves the order from REQUIRED_COORDS!
+        if not transpose:
+            x_coord_name = remaining_axes[0]
+            y_coord_name = remaining_axes[1]
+        else:
+            x_coord_name = remaining_axes[1]
+            y_coord_name = remaining_axes[0]
 
-        y_ticks = getattr(self, y_coord_name)
         x_ticks = getattr(self, x_coord_name)
+        y_ticks = getattr(self, y_coord_name)
 
         # 5. Extract the 2D matrix slice
         sliced_data = self.prob[tuple(slice_selector)]
 
-        # Ensure matrix layout aligns correctly with our X and Y grid dimensions
-        if sliced_data.shape != (len(y_ticks), len(x_ticks)):
+        # If transpose=True was requested, flip the matrix to match the swapped labels
+        if transpose:
             sliced_data = sliced_data.T
 
         # 6. Plotting Engine
