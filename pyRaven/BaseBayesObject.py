@@ -278,6 +278,43 @@ class BaseBayesObject(ABC):
             #    f.attrs[key] = value
             # if I need to be able to add some addition stuff on the fly
 
+    @classmethod
+    def read(cls, filename: str, **kwargs):
+        """
+        Universal HDF5 reader factory in the base class.
+        Dynamically extracts required datasets and file attributes.
+        """
+        with h5py.File(filename, 'r') as f:
+            # SAFETY CHECK: Verify that the file matches the class calling it
+            file_class_type = f.attrs.get('class_name')
+            # Look at an attribute on the class itself, like cls.__name__ or a custom CLASS_ID
+            expected_type = getattr(cls, 'CLASS_ID', cls.__name__) 
+            
+            if file_class_type and file_class_type != expected_type:
+                raise TypeError(
+                    f"Mismatched file type! File '{filename}' contains a '{file_class_type}' object, "
+                    f"but you are trying to read it using the '{expected_type}' class."
+                )            
+            
+            # 1. Dynamically read the core probability matrix and coordinates
+            loaded_args = {
+                'prob': f['prob'][:]
+            }
+            for coord_name in cls.REQUIRED_COORDS:
+                loaded_args[coord_name] = f[coord_name][:]
+            
+            # 2. Automatically harvest every HDF5 attribute into a metadata dict
+            metadata = dict(f.attrs)
+            
+            # 3. Merge them together, prioritizing any runtime overrides passed in via **kwargs
+            constructor_inputs = {**loaded_args, **metadata, **kwargs}
+            
+            # 4. Remove internal identifiers like 'class_type' so they don't break __init__
+            constructor_inputs.pop('class_name', None)
+            
+            # 5. Dynamically instantiate the subclass
+            return cls(**constructor_inputs)
+
     #-------------------------------------
     # 4. Input Processing / Validation Helpers
     #-------------------------------------

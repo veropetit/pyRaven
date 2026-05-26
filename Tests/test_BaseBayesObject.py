@@ -376,6 +376,65 @@ class TestBaseClassEmptyFactory:
         with pytest.raises(TypeError, match="y must be a list, numpy array, or float. Got str instead."):
             MockGridSimple.empty(x=[1, 2, 3], y='Bad')   
 
+class TestBaseClassReader:
+
+    @pytest.fixture
+    def sample_h5_file(self, tmp_path):
+        """Fixture to generate a valid temporary HDF5 file formatted by the base class."""
+        file_path = tmp_path / "test_data.h5"
+        
+        with h5py.File(file_path, 'w') as f:
+            # Simulate datasets written by the base class
+            f.create_dataset('prob', data=np.ones((2, 3)))
+            f.create_dataset('coord_X', data=[10.0, 20.0])
+            f.create_dataset('coord_Y', data=[1.0, 2.0, 3.0])
+            
+            # Simulate attributes/metadata written by the base class
+            f.attrs['class_name'] = 'MockScienceGrid'
+            f.attrs['science_meta'] = 42.0
+            
+        return str(file_path)
+
+    def test_base_reader_successfully_reconstructs_object(self, sample_h5_file):
+        """Verify the base class .read() dynamically parses datasets and attributes into a subclass."""
+        
+        # 1. Define a mock subclass that matches the file layout
+        class MockScienceGrid(bo.BaseBayesObject):
+            REQUIRED_COORDS = ['coord_X', 'coord_Y']
+            PROB_IS_LOG = False
+            CLASS_ID = 'MockScienceGrid'
+
+            def __init__(self, prob, coord_X, coord_Y, science_meta):
+                super().__init__(prob=prob, coord_X=coord_X, coord_Y=coord_Y)
+                self.science_meta = science_meta
+
+        # 2. Trigger the dynamic read from the mock subclass
+        obj = MockScienceGrid.read(sample_h5_file)
+
+        # 3. Assertions
+        assert isinstance(obj, MockScienceGrid)
+        assert obj.prob.shape == (2, 3)
+        np.testing.assert_array_equal(obj.coord_X, np.array([10.0, 20.0]))
+        np.testing.assert_array_equal(obj.coord_Y, np.array([1.0, 2.0, 3.0]))
+        assert obj.science_meta == 42.0
+
+    def test_base_reader_raises_error_on_mismatched_class_type(self, sample_h5_file):
+        """Verify the reader catches a user trying to open a file with the wrong science class."""
+        
+        # Define a completely different science subclass
+        class WrongScienceClass(bo.BaseBayesObject):
+            REQUIRED_COORDS = ['coord_X', 'coord_Y']
+            PROB_IS_LOG = False
+            CLASS_ID = 'WrongScienceClass'  # This won't match 'MockScienceGrid' in the file
+
+            def __init__(self, prob, coord_X, coord_Y, science_meta):
+                super().__init__(prob=prob, coord_X=coord_X, coord_Y=coord_Y)
+
+        # Attempting to load the mock file with the wrong class must raise a TypeError
+        expected_error_msg = "Mismatched file type! File '.*' contains a 'MockScienceGrid' object"
+        with pytest.raises(TypeError, match=expected_error_msg):
+            WrongScienceClass.read(sample_h5_file)
+
 class Test_Base_Math:
     
     @pytest.fixture
