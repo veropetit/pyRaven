@@ -20,4 +20,4 @@ def convert_to_numpy_and_validate_numerical(name, value):
     if not np.issubdtype(arr_value.dtype, np.number):
         raise TypeError(f"{name} must contain numeric data, got {arr_value.dtype}")
     
-    return arr_value
+    return np.atleast_1d(arr_value)

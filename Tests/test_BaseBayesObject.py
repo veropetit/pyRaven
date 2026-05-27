@@ -110,9 +110,9 @@ class Test_Base_init:
             MockSciObject3D(prob, x=goodcoord, y=badcoord, z=goodcoord)
 
     @pytest.mark.parametrize("coord, coord_dim, prob, prob_dim", [
-        (10, 0, 0.5, 0), # A 0D prob array with a single 0D coordinate
-        (10, 0, [0.5], 1), # A 1D prob array with a single 0D coordinate
-        ([10], 1, 0.5, 0), # A 0D prob array with a single 1D coordinate
+        (10, 1, 0.5, 1), # A 0D prob array with a single 0D coordinate
+        (10, 1, [0.5], 1), # A 1D prob array with a single 0D coordinate
+        ([10], 1, 0.5, 1), # A 0D prob array with a single 1D coordinate
         ([10], 1, [0.5], 1) # A 1D prob array with a single 1D coordinate
     ])
     def test_scalar_coordinate_success(self, prob, prob_dim, coord, coord_dim, MockSciObject1D):

@@ -149,28 +149,30 @@ class Test_LnLikelihood_Object:
 
     def test_lnlikelihood_metadata_assignment(self):
         """Verify that subclass-specific properties are correctly assigned."""
-        data = np.zeros((2, 3, 4, 2))
+        data = np.zeros((2, 3, 4, 2, 1))
         beta = np.array([10, 20])
         bpole = np.array([100, 200, 300])
         phi = np.array([0, 90, 180, 270])
         incl = np.array([0, 90])
+        noise = 1.0
         
-        lnlh_obj = bo.LnLikelihood(data, beta, bpole, phi, incl, obsID="OBS_A")
+        lnlh_obj = bo.LnLikelihood(data, beta, bpole, phi, incl, noise, obsID="OBS_A")
         
         assert lnlh_obj.obsID == "OBS_A"      
 
     def test_lnlikelihood_slicing_returns_LnLikelihood_type(self):
         """Verify slicing a Chi object retains the exact child class type and fields."""
-        data = np.zeros((2, 3, 4, 2))
+        data = np.zeros((2, 3, 4, 2, 1))
         lnlh_obj = bo.LnLikelihood(data, 
                          [10, 20], 
                          [100, 200, 300], 
                          [0, 90, 180, 270], 
                          [0, 90],
+                         1.0,
                          obsID="B")
         
         # Slice it
-        sliced = lnlh_obj[0:1, :, :, :]
+        sliced = lnlh_obj[0:1, :, :, :, :]
         
         # Assert type polymorphism rules
         assert isinstance(sliced, bo.LnLikelihood)
@@ -178,19 +180,21 @@ class Test_LnLikelihood_Object:
 
     def test_lnlikelihood_coordinate_accessors(self):
         """Verify that coordinates are bound to the exact expected REQUIRED_COORDS strings."""
-        data = np.zeros((2, 3, 4))
-        lnlh_obj = bo.Chi(data, 
+        data = np.zeros((2, 3, 4, 2, 1))
+        lnlh_obj = bo.LnLikelihood(data, 
                          [10, 20], 
                          [100, 200, 300], 
                          [0, 90, 180, 270], 
-                         incl=[0,90], 
+                         [0,90],
+                         1.0,
                          obsID="TEST")
         
         # Test __getattr__ routing through base class works with the object's explicit science keys
         np.testing.assert_array_equal(lnlh_obj.beta_coord, np.array([10, 20]))
         np.testing.assert_array_equal(lnlh_obj.Bpole_coord, np.array([100, 200, 300]))
         np.testing.assert_array_equal(lnlh_obj.phi_coord, np.array([0, 90, 180, 270]))
-        np.testing.assert_array_equal(lnlh_obj.phi_coord, np.array([0, 90, 180, 270]))
+        np.testing.assert_array_equal(lnlh_obj.incl_coord, np.array([0, 90]))
+        np.testing.assert_array_equal(lnlh_obj.noise_coord, np.array([1.0]))
 
     def test_lnlikelihood_dimension_mismatch_raises_error(self):
         """Verify that providing transposed arrays triggers GridDimensionError."""
@@ -200,11 +204,12 @@ class Test_LnLikelihood_Object:
         bpole = np.array([10, 20, 30])   # len = 3
         phi = np.array([0, 1, 2, 3])     # len = 4
         incl = np.array([0,90])          # len = 2
+        noise = np.array([0.5, 1.0, 2.0]) # len = 3
         
         from pyRaven.BaseBayesObject import GridDimensionError
         
         with pytest.raises(GridDimensionError):
-            bo.LnLikelihood(wrong_shaped_data, beta, bpole, phi, incl, obsID="ERR")    
+            bo.LnLikelihood(wrong_shaped_data, beta, bpole, phi, incl, noise, obsID="ERR")    
 
     def test_lnlikelihood_empty_factory_initialization(self):
         """
@@ -217,6 +222,7 @@ class Test_LnLikelihood_Object:
         bpole_grid = np.array([1000, 2000, 3000, 4000]) # len = 4
         phi_grid = (0, 90, 180, 270, 360)            # len = 5
         incl_grid = [0, 90.0]                         #len = 2
+        noise_grid = [1.0]                             # len = 1
         test_obsID = "OBS_12345"
 
         # 2. Call the explicit alternative constructor
@@ -226,6 +232,7 @@ class Test_LnLikelihood_Object:
             Bpole_coord=bpole_grid,
             phi_coord=phi_grid,
             incl_coord=incl_grid,
+            noise_coord = noise_grid,
             obsID=test_obsID
         )
 
@@ -233,8 +240,8 @@ class Test_LnLikelihood_Object:
         # Verify type integrity
         assert isinstance(lnlh_obj, bo.LnLikelihood)
 
-        # Verify the multi-dimensional shape calculation (3, 4, 5, 2)
-        expected_shape = (3, 4, 5, 2)
+        # Verify the multi-dimensional shape calculation (3, 4, 5, 2, 1)
+        expected_shape = (3, 4, 5, 2, 1)
         assert lnlh_obj.prob.shape == expected_shape
         
         # Verify the matrix is perfectly pre-allocated with zeros
@@ -245,6 +252,7 @@ class Test_LnLikelihood_Object:
         np.testing.assert_array_equal(lnlh_obj.Bpole_coord, bpole_grid)
         np.testing.assert_array_equal(lnlh_obj.phi_coord, np.array(phi_grid))
         np.testing.assert_array_equal(lnlh_obj.incl_coord, np.array(incl_grid))
+        np.testing.assert_array_equal(lnlh_obj.noise_coord, np.array(noise_grid))
 
         # Verify subclass-specific metadata attributes are securely bound
         assert lnlh_obj.obsID == test_obsID 
@@ -262,6 +270,7 @@ class Test_LnLikelihood_Object:
             Bpole_coord=[1000, 2000], 
             phi_coord=[0, 90, 180], 
             incl_coord=[0,90], 
+            noise_coord=1.0,
             obsID="ROUNDTRIP_TEST"
         )
         # Give the probability array some distinctive dummy data values
@@ -283,4 +292,5 @@ class Test_LnLikelihood_Object:
         np.testing.assert_array_equal(loaded_lnlh.Bpole_coord, original_lnlh.Bpole_coord)
         np.testing.assert_array_equal(loaded_lnlh.phi_coord, original_lnlh.phi_coord)
         np.testing.assert_array_equal(loaded_lnlh.incl_coord, original_lnlh.incl_coord)
+        np.testing.assert_array_equal(loaded_lnlh.noise_coord, original_lnlh.noise_coord)
 

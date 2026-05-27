@@ -75,8 +75,8 @@ class Test_convert_container_to_numpy_and_validate:
 
         res = v.convert_to_numpy_and_validate_numerical("test", 10.5)
         assert isinstance(res, np.ndarray)
-        assert res.shape == ()
-        np.testing.assert_array_equal(res, np.array(10.5))            
+        assert res.shape == (1,)
+        np.testing.assert_array_equal(res, np.array([10.5]))            
        
         res = v.convert_to_numpy_and_validate_numerical("test", [100])
         assert isinstance(res, np.ndarray)
