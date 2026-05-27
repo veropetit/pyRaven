@@ -26,6 +26,12 @@ class BaseBayesObject(ABC):
     * For Periodic Angles: To avoid double-counting, do not include the endpoint. 
       Use `np.arange(0, 360, 5)` (which stops at $355$) rather than `np.linspace(0, 360, 73)`.
 
+
+    Individual coordinate validations:
+    * Coordinates must always be 1D arrays. Single scalar values (0D) 
+      are automatically normalized to 1D vectors of length 1 at initialization
+      to prevent structural slicing errors.
+
     '''
 
     #-------------------------------------
@@ -75,22 +81,22 @@ class BaseBayesObject(ABC):
         # Universal validation: Do the lengths match the Prob data dimensions?
         
         # 1. Dimension count check
-        if np.atleast_1d(self.prob).ndim != len(self.coords):
+        if self.prob.ndim != len(self.coords):
             raise GridDimensionError(
-                f"Bayes Object Dimension mismatch: Prob is {self.prob.ndim}D, "
+                f"{type(self).__name__} dimension mismatch: Prob is {self.prob.ndim}D, "
                 f"but {len(self.coords)} coordinates were provided."
             )
 
         # 2. Individual coordinate validations
         for i, (name, arr) in enumerate(self.coords.items()):
-            # Check for 0D or 1D:
-            if arr.ndim > 1:
+            # Check for 1D:
+            if arr.ndim != 1:  #the _init_ pass the coordinate through np.atleast1D 
                 raise GridDimensionError(
-                    f"Bayes Object Coordinate '{name}' must be 0D or 1D. "
+                    f"{type(self).__name__} coordinate '{name}' must be 0D or 1D. "
                     f"Received a {arr.ndim}D array."
                 )            
-            if len(np.atleast_1d(arr)) != np.atleast_1d(self.prob).shape[i]:
-                raise GridDimensionError(f"Bayes object Probability data dimension {i} ({np.atleast_1d(self.prob).shape[i]} elements) does not match the lenght of the '{name}' coordinate array ({len(np.atleast_1d(arr))} elements)")
+            if len(arr) != self.prob.shape[i]: # the _init_ passes the prob through np.atleast1D
+                raise GridDimensionError(f"{type(self).__name__} probability data dimension {i} ({self.prob.shape[i]} elements) does not match the lenght of the '{name}' coordinate array ({len(arr)} elements)")
 
     @classmethod
     def empty(cls, **kwargs):

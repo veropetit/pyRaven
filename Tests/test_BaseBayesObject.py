@@ -89,7 +89,7 @@ class Test_Base_init:
         goodcoord = np.zeros(5)
         badcoord = np.zeros((5, 2)) 
         
-        with pytest.raises(bo.GridDimensionError, match="Coordinate 'x' must be 0D or 1D. Received a 2D array."):
+        with pytest.raises(bo.GridDimensionError, match="MockSciObject3Dclass coordinate 'x' must be 0D or 1D. Received a 2D array."):
             MockSciObject3D(prob, x=badcoord, y=goodcoord, z=goodcoord)
 
     def test_coordinate_dimension_mismatch(self, MockSciObject3D):
@@ -97,7 +97,7 @@ class Test_Base_init:
         prob_2d = np.zeros((5, 5))
         arr = np.zeros(5)
         # Only providing one coord for a 2D array
-        with pytest.raises(bo.GridDimensionError, match="Dimension mismatch: Prob is 2D, "
+        with pytest.raises(bo.GridDimensionError, match="MockSciObject3Dclass dimension mismatch: Prob is 2D, "
                 f"but 3 coordinates were provided."):
             MockSciObject3D(prob_2d, x=arr, y=arr, z=arr)
 
@@ -106,7 +106,7 @@ class Test_Base_init:
         prob = np.zeros((5,5,5))
         goodcoord = np.zeros(5)
         badcoord = np.zeros((7)) 
-        with pytest.raises(bo.GridDimensionError, match=r"Bayes object Probability data dimension 1 \(5 elements\) does not match the lenght of the 'y' coordinate array \(7 elements\)"):
+        with pytest.raises(bo.GridDimensionError, match=r"MockSciObject3Dclass probability data dimension 1 \(5 elements\) does not match the lenght of the 'y' coordinate array \(7 elements\)"):
             MockSciObject3D(prob, x=goodcoord, y=badcoord, z=goodcoord)
 
     @pytest.mark.parametrize("coord, coord_dim, prob, prob_dim", [
