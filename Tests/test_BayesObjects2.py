@@ -294,3 +294,130 @@ class Test_LnLikelihood_Object:
         np.testing.assert_array_equal(loaded_lnlh.incl_coord, original_lnlh.incl_coord)
         np.testing.assert_array_equal(loaded_lnlh.noise_coord, original_lnlh.noise_coord)
 
+class Test_statmethod_compute_core_matrix_in_LnLikelihood:
+
+    @pytest.mark.parametrize('chi2_red, noise, expected', [
+        (1.0, 1.0, -0.5),
+        (2.0, 1.0, -1.0),
+        (1, 2, np.log(2)/2-1)
+    ])
+    def test_math_chi_and_noise_success(self, chi2_red, noise, expected):
+        """Test that the non-constant portion of the math is correct"""
+        dummy_chi = np.array([[[[chi2_red]]]]) # Simple 4D array
+        dummy_noise = np.array([noise])     # Simple 1D array
+    
+        # Test just the variable broadcasting math by leaving metadata as None
+        raw_result = bo.LnLikelihood._compute_core_matrix(dummy_chi, dummy_noise)
+
+        assert raw_result.shape == (1,1,1,1,1)
+
+        # Assert exact expected values from your formula
+        np.testing.assert_almost_equal(raw_result[0,0,0,0,0], expected)
+
+    def test_broadcast_of_noise(self):
+        """Test that the array broadcast correctly"""
+        dummy_chi = np.ones((1,1,2,2)) # Simple 4D array filled with ones
+        dummy_chi[0,0,:,0] = 10.0 # set the last dimension to be 2.0
+        dummy_noise = np.array([1,2,3])     # Simple 1D array
+    
+        # Test just the variable broadcasting math by leaving metadata as None
+        raw_result = bo.LnLikelihood._compute_core_matrix(dummy_chi, dummy_noise)
+
+        assert raw_result.shape == (1,1,2,2,3)
+
+        slice = raw_result[0,0,:,:,0] # this should be a 2x2
+        expected = np.full((2,2), -0.5)
+        expected[:,0] = -5.0
+        np.testing.assert_allclose(slice, expected)
+
+        slice = raw_result[0,0,:,:,1] # this should be a 2x2
+        expected = np.full((2,2), np.log(2)/2-1)
+        expected[:,0] = np.log(2)/2-10
+        np.testing.assert_allclose(slice, expected)
+
+    def test_add_constant(self):
+        """Test the calculation with the constant"""
+        dummy_chi = np.array([[[[1]]]]) # Simple 4D array
+        dummy_noise = np.array([1])     # Simple 1D array
+        exp_value_of_variable_part_of_math = -0.5
+        dummy_N = 20
+        dummy_avg_ln_error = -10.0
+        exp_value_of_const_part_of_math = -0.5*np.log(2*np.pi) - dummy_avg_ln_error
+    
+        # Test just the variable broadcasting math by leaving metadata as None
+        raw_result = bo.LnLikelihood._compute_core_matrix(dummy_chi, dummy_noise, 
+                                                          num_datapoints=dummy_N, avg_ln_error=dummy_avg_ln_error)
+
+        assert raw_result.shape == (1,1,1,1,1)
+
+        # Assert exact expected values from your formula
+        expected = (exp_value_of_const_part_of_math + exp_value_of_variable_part_of_math) * dummy_N
+        np.testing.assert_almost_equal(raw_result[0,0,0,0,0], expected)    
+
+class Test_LnLikelihood_from_chi2:
+
+    @pytest.fixture
+    def correct_chi_obj(self):
+        "Returns a correctly populated chi object"
+        chi = np.ones((2, 3, 4, 1))
+        beta = np.array([10, 20])
+        bpole = np.array([100, 200, 300])
+        phi = np.array([0, 90, 180, 270])
+        incl = np.array([45])
+        return bo.Chi(chi, beta, bpole, phi, incl, obsID="OBS_A")      
+
+    def test_sucess_with_default_noise(self, correct_chi_obj):
+        """Test the successful construction of a lnLHobject"""
+        dummy_N = 20
+        dummy_avg_ln_err = -10
+        lnlh = bo.LnLikelihood.from_redchi2(correct_chi_obj, dummy_N, dummy_avg_ln_err)
+
+        assert isinstance(lnlh, bo.LnLikelihood)
+        assert lnlh.prob.ndim == 5
+        assert lnlh.prob.shape == (2,3,4,1,1)
+        np.testing.assert_array_equal(correct_chi_obj.beta_coord, lnlh.beta_coord)
+        np.testing.assert_array_equal(correct_chi_obj.Bpole_coord, lnlh.Bpole_coord)
+        np.testing.assert_array_equal(correct_chi_obj.phi_coord, lnlh.phi_coord)
+        np.testing.assert_array_equal(correct_chi_obj.incl_coord, lnlh.incl_coord)
+        np.testing.assert_array_equal(np.array([1]), lnlh.noise_coord)
+
+        assert lnlh.obsID == 'OBS_A'
+
+        np.testing.assert_almost_equal(lnlh.prob[0,0,0,0,0], dummy_N*(-0.5 - dummy_avg_ln_err - 0.5*np.log(2*np.pi)) )
+
+    def test_sucess_with_vector_noise(self, correct_chi_obj):
+        """Test the successful construction of a lnLHobject"""
+        dummy_N = 20
+        dummy_avg_ln_err = -10
+        lnlh = bo.LnLikelihood.from_redchi2(correct_chi_obj, dummy_N, dummy_avg_ln_err,  noise_coord=[1,2,3])
+
+        assert isinstance(lnlh, bo.LnLikelihood)
+        assert lnlh.prob.ndim == 5
+        assert lnlh.prob.shape == (2,3,4,1,3)
+        np.testing.assert_array_equal(correct_chi_obj.beta_coord, lnlh.beta_coord)
+        np.testing.assert_array_equal(correct_chi_obj.Bpole_coord, lnlh.Bpole_coord)
+        np.testing.assert_array_equal(correct_chi_obj.phi_coord, lnlh.phi_coord)
+        np.testing.assert_array_equal(correct_chi_obj.incl_coord, lnlh.incl_coord)
+        np.testing.assert_array_equal(np.array([1,2,3]), lnlh.noise_coord)
+
+        assert lnlh.obsID == 'OBS_A'            
+
+        np.testing.assert_almost_equal(lnlh.prob[0,0,0,0,0], dummy_N*(-0.5 - dummy_avg_ln_err - 0.5*np.log(2*np.pi)) )
+        np.testing.assert_almost_equal(lnlh.prob[0,0,0,0,1], dummy_N*(0.5*np.log(2)-1 - dummy_avg_ln_err - 0.5*np.log(2*np.pi)) )
+
+    def test_input_failure(self, correct_chi_obj):
+
+        with pytest.raises(TypeError, match = "User Error: num_datapoints must be a valid number. Received type: str"):
+            bo.LnLikelihood.from_redchi2(correct_chi_obj, 'wrong_Npoints', -10,  noise_coord=[1,2,3])
+
+        with pytest.raises(TypeError, match='User Error: avg_ln_error must be a valid number. Received type: list'):
+            bo.LnLikelihood.from_redchi2(correct_chi_obj, 20, [2],  noise_coord=[1,2,3])
+
+        with pytest.raises(TypeError, match='noise_coord must be a list, numpy array, or float. Got str instead.'):
+            bo.LnLikelihood.from_redchi2(correct_chi_obj, 20, -10,  noise_coord='wrong_string')
+
+        with pytest.raises(TypeError, match='User Error: chi_obj must be a valid Chi object. Received type: str'):
+            bo.LnLikelihood.from_redchi2('wrong_chi', 20, -10,  noise_coord=[1,2,3])
+
+        
+           
