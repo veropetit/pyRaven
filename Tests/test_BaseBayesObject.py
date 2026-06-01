@@ -966,3 +966,94 @@ class TestPlot2D:
         # User accidentally passes a string representation of an integer
         with pytest.raises(TypeError, match="must be an integer, but got str"):
             mock_instance.plot_2d_slice(beta_coord="0", incl_coord=2)
+
+class Test_Apply_Prior_Inplace:
+
+    class Mock3DObject(bo.BaseBayesObject):
+        REQUIRED_COORDS = ['x', 'y', 'z']
+        PROB_IS_LOG = True 
+
+    @pytest.fixture
+    def mock_obj(self):
+        """Generates a populated 3D object."""
+        dummy_prob = np.zeros((2, 3, 4))
+        
+        # Instantiate it using self.Mock2DObject
+        obj = self.Mock3DObject(
+            prob=dummy_prob,
+            x=np.array([10, 11]),
+            y=np.array([20, 21, 22]),
+            z=np.array([30, 31, 32, 33])
+        )
+        return obj
+    
+    @pytest.fixture
+    def mock_workspace(self, mock_obj):
+        """Generates a workspace matrix that matches mock_obj"""
+        return np.zeros(mock_obj.prob.shape)
+    
+    @pytest.fixture
+    def mock_dict(self, mock_obj):
+        """Generates a mock dictionary that matched mock_obj."""
+        return {'x':mock_obj.x, 'y':mock_obj.y, 'z':mock_obj.z}
+
+    def test_bad_dict(self, mock_obj, mock_workspace):
+        '''Test the validation on the dictionary'''
+
+        with pytest.raises(TypeError, match='Architecture Error: ln_priors_dict must be a dictionary. Received type: str'):
+            mock_obj._apply_ln_priors_inplace(mock_workspace, 'bad_dict')
+
+        with pytest.raises(ValueError, match=r"Architecture Error: 'a' is not a valid coordinate axis for Mock3DObject. Valid axes: \['x', 'y', 'z'\]"):
+            mock_obj._apply_ln_priors_inplace(mock_workspace, {'a': 2})
+
+        # Test the link with the validator functions. 
+        with pytest.raises(TypeError, match='prior_val must be a list, numpy array, or float. Got str instead.'):
+            mock_obj._apply_ln_priors_inplace(mock_workspace, {'x':'bad_prior_type'})            
+
+        with pytest.raises(ValueError, match="Prior Size Mismatch: Axis 'x' expects length 2. Received prior of length 5"):
+            mock_obj._apply_ln_priors_inplace(mock_workspace, {'x':[1,2,3,4,5]})            
+
+    def test_bad_workspace(self, mock_obj, mock_dict):
+        '''Test the validation on the workspace'''
+
+        with pytest.raises(TypeError, match='Architecture Error: workspace_matrix must be a numpy ndarray. Received type: str'):
+            mock_obj._apply_ln_priors_inplace('bad_workspace', mock_dict)
+
+        with pytest.raises(ValueError, match=r'Architecture Error: workspace_matrix shape \(2, 2\) does not match the expected shape of this Mock3DObject grid \(2, 3, 4\).'):
+            mock_obj._apply_ln_priors_inplace(np.zeros((2,2)), mock_dict)
+
+    def test_success_all_coords(self, mock_obj, mock_workspace, mock_dict):
+        mock_obj._apply_ln_priors_inplace(mock_workspace, mock_dict)
+
+        # check that the object itself didn't change. 
+        np.testing.assert_allclose(mock_obj.prob, np.zeros(mock_obj.prob.shape))
+
+        #checking a few values to make sure it all works:
+        np.testing.assert_allclose(mock_workspace[0,0,0], 60)
+        np.testing.assert_allclose(mock_workspace[-1,-1,-1], 66)
+        np.testing.assert_allclose(mock_workspace[0,-1,0], 62)
+
+    def test_success_one_coord(self, mock_obj, mock_workspace, mock_dict):
+        mock_obj._apply_ln_priors_inplace(mock_workspace, {'y':mock_obj.y})
+
+        # check that the object itself didn't change. 
+        np.testing.assert_allclose(mock_obj.prob, np.zeros(mock_obj.prob.shape))
+
+        #checking a few values to make sure it all works:
+        np.testing.assert_allclose(mock_workspace[0,0,0], 20)
+        np.testing.assert_allclose(mock_workspace[-1,-1,-1], 22)
+        np.testing.assert_allclose(mock_workspace[0,-1,0], 22)
+
+    def test_broadcast_ln_prior_success(self, mock_obj):
+        '''Test the public interface that actually allocate the object'''
+        broadcast_prior = mock_obj.broadcast_ln_prior(x=mock_obj.x,
+                                                      y=mock_obj.y,
+                                                      z=mock_obj.z)
+
+        # check that the object itself didn't change. 
+        np.testing.assert_allclose(mock_obj.prob, np.zeros(mock_obj.prob.shape))
+
+        #checking a few values to make sure it all works:
+        np.testing.assert_allclose(broadcast_prior[0,0,0], 60)
+        np.testing.assert_allclose(broadcast_prior[-1,-1,-1], 66)
+        np.testing.assert_allclose(broadcast_prior[0,-1,0], 62)

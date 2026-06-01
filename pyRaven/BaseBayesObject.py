@@ -460,6 +460,34 @@ class BaseBayesObject(ABC):
         
         return fig, ax
 
+    def broadcast_ln_prior(self, **kwargs) -> np.ndarray:
+        """
+        Public Inspection API. Dynamically broadcasts 1D coordinate ln(prior) arrays 
+        or scalar values into an N-dimensional log-prior matrix matching this 
+        object's exact grid shape.
+
+        Expects keyword arguments to match REQUIRED_COORDS explicitly (e.g., beta_coord).
+
+        Parameters
+        ----------
+        **kwargs : float or array-like
+            Keyword arguments representing coordinate tracking axes (e.g., beta_coord=my_array).
+
+        Returns
+        -------
+        np.ndarray
+            An N-dimensional array matching self.prob.shape containing the 
+            fully summed and broadcasted log-priors for visualization or inspection.
+        """
+
+        # 1. Allocate a clean template of zeros (log(1.0) = 0) matching our exact shape
+        total_prior_matrix = np.zeros_like(self.prob)
+
+        # 2. Leverage the underlying in-place architecture to populate it!
+        self._apply_ln_priors_inplace(total_prior_matrix, kwargs)
+
+        return total_prior_matrix
+
     #-------------------------------------
     # 4. Input Processing / Validation Helpers
     #-------------------------------------
@@ -543,6 +571,82 @@ class BaseBayesObject(ABC):
     #-------------------------------------
     # 6. Core Mathematical Backends
     #-------------------------------------
+
+    def _apply_ln_priors_inplace(self, 
+                             workspace_matrix:np.ndarray,
+                             ln_prior_dict: dict
+                             )-> None:
+        """
+        Internal Helper Engine. Loops through a dictionary of coordinate priors 
+        and applies them to a workspace matrix in-place using virtual on-the-fly 
+        broadcasting to maintain a zero-RAM-allocation footprint.
+
+        Parameters
+        ----------
+        workspace_matrix : np.ndarray
+            The mutable data matrix to update in-place. Must match the dimensionality 
+            and structural axis layout of self.prob.
+        ln_prior_dict : dict
+            A dictionary mapping raw coordinate names (e.g., 'beta', 'noise') 
+            to their corresponding 1D natural-log-prior vectors or scalar constants.
+        """
+
+        # 1. Structural validation on incoming types and shapes
+        if not isinstance(ln_prior_dict, dict):
+            raise TypeError(
+                f"Architecture Error: ln_priors_dict must be a dictionary. "
+                f"Received type: {type(ln_prior_dict).__name__}"
+            )
+
+        if not isinstance(workspace_matrix, np.ndarray):
+            raise TypeError(
+                f"Architecture Error: workspace_matrix must be a numpy ndarray. "
+                f"Received type: {type(workspace_matrix).__name__}"
+            )
+            
+        if workspace_matrix.shape != self.prob.shape:
+            raise ValueError(
+                f"Architecture Error: workspace_matrix shape {workspace_matrix.shape} "
+                f"does not match the expected shape of this {type(self).__name__} grid {self.prob.shape}."
+            )   
+
+        # --- PASS 1: Validation Only) ---
+        # Yes, this means two loops, but because we are changing the array in place,
+        # we need to make sure to do all the check before modifying anything. 
+        validated_priors = [] # Temporarily store the validated priod vectors and their target axes
+        
+        for coord_axis_name, prior_val in ln_prior_dict.items():
+            # Direct match against REQUIRED_COORDS (e.g., 'beta_coord')
+            if coord_axis_name not in self.REQUIRED_COORDS:
+                raise ValueError(
+                    f"Architecture Error: '{coord_axis_name}' is not a valid coordinate axis "
+                    f"for {type(self).__name__}. Valid axes: {self.REQUIRED_COORDS}"
+                )   
+            
+            # Name is verified; safe to skip if the pipeline explicitly passed None
+            if prior_val is None:
+                continue
+
+            # Find the physical index of this axis in our data cube
+            axis_idx = self.REQUIRED_COORDS.index(coord_axis_name)
+            #prior_arr = np.atleast_1d(np.asarray(prior_val))
+            prior_arr = valid.convert_to_numpy_and_validate_numerical("prior_val", prior_val)
+
+            if prior_arr.size > 1 and len(prior_arr) != workspace_matrix.shape[axis_idx]:
+                raise ValueError(
+                    f"Prior Size Mismatch: Axis '{coord_axis_name}' expects length {workspace_matrix.shape[axis_idx]}. "
+                    f"Received prior of length {len(prior_arr)}."
+                )
+            
+            # Stash the verified components for Pass 2
+            validated_priors.append((axis_idx, prior_arr))  
+
+        # --- PASS 2: calcuation ---
+        for axis_idx, prior_arr in validated_priors:
+            slices = [np.newaxis] * workspace_matrix.ndim
+            slices[axis_idx] = slice(None)
+            # the passed prior is in natural log, so adding. 
+            workspace_matrix += prior_arr[tuple(slices)]          
 
     def _log_sum_exp(self, validated_axis_indices):
         """Robust Log-Sum-Exp implementation."""
