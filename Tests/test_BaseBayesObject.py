@@ -967,7 +967,7 @@ class TestPlot2D:
         with pytest.raises(TypeError, match="must be an integer, but got str"):
             mock_instance.plot_2d_slice(beta_coord="0", incl_coord=2)
 
-class Test_Apply_Prior_Inplace:
+class Test_Apply_Prior_In_Place:
 
     class Mock3DObject(bo.BaseBayesObject):
         REQUIRED_COORDS = ['x', 'y', 'z']
@@ -1001,29 +1001,29 @@ class Test_Apply_Prior_Inplace:
         '''Test the validation on the dictionary'''
 
         with pytest.raises(TypeError, match='Architecture Error: ln_priors_dict must be a dictionary. Received type: str'):
-            mock_obj._apply_ln_priors_inplace(mock_workspace, 'bad_dict')
+            mock_obj._apply_ln_priors_in_place(mock_workspace, 'bad_dict')
 
         with pytest.raises(ValueError, match=r"Architecture Error: 'a' is not a valid coordinate axis for Mock3DObject. Valid axes: \['x', 'y', 'z'\]"):
-            mock_obj._apply_ln_priors_inplace(mock_workspace, {'a': 2})
+            mock_obj._apply_ln_priors_in_place(mock_workspace, {'a': 2})
 
         # Test the link with the validator functions. 
         with pytest.raises(TypeError, match='prior_val must be a list, numpy array, or float. Got str instead.'):
-            mock_obj._apply_ln_priors_inplace(mock_workspace, {'x':'bad_prior_type'})            
+            mock_obj._apply_ln_priors_in_place(mock_workspace, {'x':'bad_prior_type'})            
 
         with pytest.raises(ValueError, match="Prior Size Mismatch: Axis 'x' expects length 2. Received prior of length 5"):
-            mock_obj._apply_ln_priors_inplace(mock_workspace, {'x':[1,2,3,4,5]})            
+            mock_obj._apply_ln_priors_in_place(mock_workspace, {'x':[1,2,3,4,5]})            
 
-    def test_bad_workspace(self, mock_obj, mock_dict):
+    def test_bad_target_array(self, mock_obj, mock_dict):
         '''Test the validation on the workspace'''
 
-        with pytest.raises(TypeError, match='Architecture Error: workspace_matrix must be a numpy ndarray. Received type: str'):
-            mock_obj._apply_ln_priors_inplace('bad_workspace', mock_dict)
+        with pytest.raises(TypeError, match='Architecture Error: target_array must be a numpy ndarray. Received type: str'):
+            mock_obj._apply_ln_priors_in_place('bad_workspace', mock_dict)
 
-        with pytest.raises(ValueError, match=r'Architecture Error: workspace_matrix shape \(2, 2\) does not match the expected shape of this Mock3DObject grid \(2, 3, 4\).'):
-            mock_obj._apply_ln_priors_inplace(np.zeros((2,2)), mock_dict)
+        with pytest.raises(ValueError, match=r'Architecture Error: target_array shape \(2, 2\) does not match the expected shape of this Mock3DObject grid \(2, 3, 4\).'):
+            mock_obj._apply_ln_priors_in_place(np.zeros((2,2)), mock_dict)
 
     def test_success_all_coords(self, mock_obj, mock_workspace, mock_dict):
-        mock_obj._apply_ln_priors_inplace(mock_workspace, mock_dict)
+        mock_obj._apply_ln_priors_in_place(mock_workspace, mock_dict)
 
         # check that the object itself didn't change. 
         np.testing.assert_allclose(mock_obj.prob, np.zeros(mock_obj.prob.shape))
@@ -1034,7 +1034,7 @@ class Test_Apply_Prior_Inplace:
         np.testing.assert_allclose(mock_workspace[0,-1,0], 62)
 
     def test_success_one_coord(self, mock_obj, mock_workspace, mock_dict):
-        mock_obj._apply_ln_priors_inplace(mock_workspace, {'y':mock_obj.y})
+        mock_obj._apply_ln_priors_in_place(mock_workspace, {'y':mock_obj.y})
 
         # check that the object itself didn't change. 
         np.testing.assert_allclose(mock_obj.prob, np.zeros(mock_obj.prob.shape))
@@ -1057,3 +1057,204 @@ class Test_Apply_Prior_Inplace:
         np.testing.assert_allclose(broadcast_prior[0,0,0], 60)
         np.testing.assert_allclose(broadcast_prior[-1,-1,-1], 66)
         np.testing.assert_allclose(broadcast_prior[0,-1,0], 62)
+
+class Test_Normalize_in_place:
+    """
+    Unit test suite verifying the behavior, correctness, and safety boundaries
+    of the protected _normalize_in_place engine using exact hand-calculated values.
+    """   
+
+    @pytest.fixture
+    def log_instance(self):
+        """
+        Provides a valid 2D log probability object.
+        lnP = 1.5, so P = exp(1.5) so sumP = 4*exp(1.5)
+        and thus lnSumP = ln(4) + 1.5. 
+        The total integral will be ln(4) + 1.5 + ln(10*1)
+        the ln normalized probability will be 1.5 - [ln(4) + 1.5 + ln(10*1)] = -ln(4) - ln(10) or -ln(40)
+        """
+        class Mock2DGridLog(bo.BaseBayesObject):
+            """Minimal test class tracking x, y grid spaces in log space."""
+            REQUIRED_COORDS = ["x", "y"]
+            PROB_IS_LOG = True
+
+        prob = np.ones((2, 2)) * 1.5
+        x = np.array([0.0, 1.0])   # dx = 1.0
+        y = np.array([10.0, 20.0]) # dy = 10.0        
+        
+        obj = Mock2DGridLog(prob, x=x, y=y)
+        return obj
+    
+    @pytest.fixture
+    def linear_instance(self):
+        """
+        Provides a pristine, 2D log probability object.
+        Integral should be (4*4) * (1*10) = 160
+        Normalized values should be 4 / 160
+
+        """
+        class Mock2DGridLin(bo.BaseBayesObject):
+            """Minimal test class tracking x, y grid spaces in log space."""
+            REQUIRED_COORDS = ["x", "y"]
+            PROB_IS_LOG = False
+
+        prob = np.ones((2, 2)) * 4.0
+        x = np.array([0.0, 1.0])   # dx = 1.0
+        y = np.array([10.0, 20.0]) # dy = 10.0        
+
+        obj = Mock2DGridLin(prob, x=x, y=y)
+        return obj
+
+    def test_log_space_normalization_mutates_in_place(self, log_instance):
+        """Verifies log normalization accurately subtracts the exact log-hypervolume."""
+        original_shape = log_instance.prob.shape
+        
+        log_instance._normalize_in_place(log_instance.prob)
+        
+        assert np.allclose(log_instance.prob, -np.log(40.0))
+        assert log_instance.prob.shape == original_shape
+
+    def test_linear_space_normalization_mutates_in_place(self, linear_instance):
+        """Verifies linear normalization accurately divides by the exact linear hypervolume."""
+        original_shape = linear_instance.prob.shape
+
+        linear_instance._normalize_in_place(linear_instance.prob)
+        
+        # Assertions (Expected cell value: 4.0 / 160.0 = 0.025)
+        assert np.allclose(linear_instance.prob, 0.025)
+        assert linear_instance.prob.shape == original_shape
+
+    def test_can_normalize_external_working_array(self, log_instance):
+        """Verifies that the engine can safely mutate an external temporary matrix."""
+        # Separate external temporary array workspace
+        working_array = np.ones_like(log_instance.prob) * 10.0
+        exact_log_volume = np.log(40.0) + 1.5
+        
+        # Action
+        log_instance._normalize_in_place(working_array)
+        
+        # Assertions
+        assert np.allclose(working_array, 10.0 - exact_log_volume)
+        # Ensure the host instance's main matrix was completely protected
+        assert np.allclose(log_instance.prob, 1.5)
+
+    def test_linear_space_zero_volume_exception_guard(self, linear_instance):
+        """Verifies an explicit crash happens if a linear space volume hits zero."""
+        linear_instance.prob = np.zeros_like(linear_instance.prob)
+        
+        with pytest.raises(ValueError, match="Cannot normalize an array with zero or negative volume"):
+            linear_instance._normalize_in_place(linear_instance.prob)
+
+    def test_public_interface_leaves_original_unmodified(self, log_instance):
+        """Verifies that the public API stays immutable by executing via deep copy sandboxing."""
+        # Action
+        normalized_clone = log_instance.normalize()
+        
+        # Assertions
+        assert normalized_clone is not log_instance
+        # The returned instance should hold the hand-calculated normalized array
+        assert np.allclose(normalized_clone.prob, -np.log(40.0))
+        # The original calling instance must remain totally untouched
+        assert np.allclose(log_instance.prob, 1.5)    
+
+class TestBaseBayesObjectCopy:
+    """
+    Unit test suite verifying that the low-level __new__ allocation copy engine 
+    bypasses constructor locks, ensures data isolation, and retains extra metadata.
+    """
+
+    class SimpleScienceGrid(bo.BaseBayesObject):
+        """
+        A minimal concrete subclass that invokes the true base class __init__.
+        Tracks a simple 2D 'x' and 'y' grid layout.
+        """
+        CLASS_ID = "SimpleScienceGrid"
+        REQUIRED_COORDS = ["x", "y"]
+        PROB_IS_LOG = False
+
+        def __init__(self, prob_matrix, x, y, experiment_id, flag):
+            # 1. Initialize the base class requirements
+            super().__init__(prob=prob_matrix, x=x, y=y)
+            
+            # 2. Define custom domain-specific scientific metadata inside the constructor
+            self.custom_experiment_id = experiment_id
+            self.execution_flag = flag
+
+    @pytest.fixture
+    def science_object(self):
+        """
+        Instantiates the science object via its strict, fully-loaded __init__ constructor.
+        """
+        # Create standard 2D arrays (dx=1, dy=2)
+        x = np.array([0.0, 1.0])
+        y = np.array([10.0, 12.0])
+        
+        prob = np.array([[0.1, 0.2], [0.3, 0.4]])
+        
+        # Instantiate through the full constructor signature
+        obj = self.SimpleScienceGrid(
+            prob_matrix=prob, 
+            x=x, y=y,
+            experiment_id="EXP-2026-ALPHA",
+            flag=True
+        )
+
+        return obj
+
+    def test_copy_creates_distinct_instance_bypassing_init_signature(self, science_object):
+        """
+        Verifies that .copy() successfully allocates a new object memory address 
+        without crashing on the required __init__ constructor parameters.
+        """
+        # Action
+        cloned_obj = science_object.copy()
+        
+        # Assertions
+        assert cloned_obj is not science_object
+        assert isinstance(cloned_obj, self.SimpleScienceGrid)
+        assert cloned_obj.__class__ == science_object.__class__
+
+    def test_copy_retains_all_custom_and_base_metadata(self, science_object):
+        """
+        Verifies that standard configurations and runtime-injected scientific metadata
+        are successfully ported over to the clone.
+        """
+        # Action
+        cloned_obj = science_object.copy()
+        
+        # Assertions
+        assert cloned_obj.custom_experiment_id == "EXP-2026-ALPHA"
+        assert cloned_obj.execution_flag is True
+
+    def test_copy_allocates_fresh_independent_numpy_memory(self, science_object):
+        """
+        Crucial Safety Check: Verifies that mutating a matrix value in the clone 
+        does NOT bleed back or corrupt the original scientific container.
+        """
+        # Action
+        cloned_obj = science_object.copy()
+        
+        # Mutate the cloned matrix explicitly
+        cloned_obj.prob[0, 0] = 999.9
+        
+        # Assertions
+        assert cloned_obj.prob[0, 0] == 999.9
+        # The original object must remain shielded and completely untouched!
+        assert science_object.prob[0, 0] == 0.1
+
+    def test_copy_isolates_nested_coordinates_dictionary(self, science_object):
+        """
+        Verifies that the arrays wrapped inside the 'coords' dictionary are 
+        deeply cloned, preventing coordinate mutations from leaking.
+        """
+        # Action
+        cloned_obj = science_object.copy()
+        
+        # Mutate an array inside the cloned coords dictionary
+        cloned_obj.coords["x"][0] = -50.0
+        
+        # Assertions
+        assert cloned_obj.coords["x"][0] == -50.0
+        # The original coordinate array must stay intact
+        assert science_object.coords["x"][0] == 0.0
+

@@ -120,6 +120,38 @@ class BaseBayesObject(ABC):
         # Instantiate the subclass, passing the new array as the 'prob' keyword argument
         return cls(prob=data, **kwargs)
 
+    def copy(self) -> "BaseBayesObject":
+        """
+        Creates a complete, independent copy of the object container.
+        Automatically copies all extra base class and runtime attributes dynamically
+        using the framework's standard internal workspace mutation patterns.
+
+        Returns
+        -------
+        BaseBayesObject
+            A fresh, independent clone of this object containing duplicate 
+            memory allocations for all tracking arrays and data dictionaries.
+        """
+        # 1. Allocate raw object memory space, completely bypassing __init__
+        working_instance = self.__class__.__new__(self.__class__)
+
+        # 2. Dynamically loop through all attributes currently attached to this instance
+        for key, value in self.__dict__.items():
+            
+            # If the attribute is a NumPy array, explicitly clone its memory block
+            if isinstance(value, np.ndarray):
+                setattr(working_instance, key, value.copy())
+                
+            # If it's the coords dictionary, duplicate both the container and its nested arrays
+            elif key == "coords" and isinstance(value, dict):
+                setattr(working_instance, key, {k: v.copy() for k, v in value.items()})
+                
+            # For standard configurations (strings, scalars, booleans)
+            else:
+                setattr(working_instance, key, value)
+
+        return working_instance
+
     #-------------------------------------
     # 2. Magic Methods & Overloads
     #-------------------------------------
@@ -270,9 +302,30 @@ class BaseBayesObject(ABC):
 
         # Note: You'll likely need a 'Factory' or a specific target class here
         # because the REQUIRED_COORDS of the current class won't match 
-        # the new 2D data.
         return new_prob, new_coords
-    
+
+    def normalize(self) -> "BaseBayesObject":
+        """
+        Public Transformation API. Handles deep-cloning to maintain public 
+        immutability, and delegates the entire volume calculation and array 
+        mutation to the protected in-place engine.
+
+        Leaves the calling object entirely unmodified.
+
+        Returns
+        -------
+        BaseBayesObject
+            A fresh, independent clone of this object containing the 
+            fully normalized probability distribution.
+        """
+        # 1. Create a complete, isolated clone of the current instance
+        working_instance = self.copy()
+        # 2. Delegate to the core engine to compute volume and mutate the clone's array
+        working_instance._normalize_in_place(working_instance.prob)
+
+        # 3. Return the pristine new object container
+        return working_instance
+
     def write(self, fname):
         """
         Standard entry point to write the object to an HDF5 file.
@@ -460,6 +513,162 @@ class BaseBayesObject(ABC):
         
         return fig, ax
 
+    def plot_1d_marginals(
+        self, 
+        normalization: str = None, 
+        plot_in_ln: bool = False,
+        axes: np.ndarray = None,
+        figsize_per_axis: tuple = (4, 3),
+        **kwargs
+    ) -> tuple:
+        """
+        Public Diagnostic & Comparison API. Integrates over all dimensions except 
+        one to generate or overplot 1D marginalized step-profiles for every coordinate axis.
+        Assumes coordinate arrays represent the LEFT edges of the bins.
+
+        Parameters
+        ----------
+        normalization : str, optional
+            The scaling strategy: None, 'integral', or 'max'. Default is None.
+        plot_in_ln : bool, optional
+            If True, renders the y-axis in natural log space. Default is False.
+        axes : np.ndarray of matplotlib.axes.Axes, optional
+            An existing array of subplots to overplot onto.
+        figsize_per_axis : tuple
+            The (width, height) per subplot, ignored if custom 'axes' are provided.
+        **kwargs : dict
+            Matplotlib line properties passed directly to ax.step() (e.g., color='red', lw=2).
+
+        Returns
+        -------
+        fig, axes : matplotlib.figure.Figure or None, np.ndarray of matplotlib.axes.Axes
+        """
+        ### 1. Check the mode input
+        valid_modes = [None, "integral", "max"]
+        if normalization not in valid_modes:
+            raise ValueError(f"Normalization mode must be one of {valid_modes}. Received: '{normalization}'")
+
+        ### 2. The figure should have the same number of axes as the numer of coordinates. 
+        expected_num_axes = len(self.REQUIRED_COORDS)
+        fig = None
+
+        ### 3. Allocate a figure if needed
+        if axes is None:
+            fig, internal_axes = plt.subplots(
+                1, expected_num_axes, 
+                figsize=(figsize_per_axis[0] * expected_num_axes, figsize_per_axis[1]),
+                sharey=False
+            )
+            # If there is only one dimension in the object, 
+            # make is an array cause we loop below. 
+            if expected_num_axes == 1:
+                internal_axes = np.array([internal_axes])
+            
+        else:
+            internal_axes = valid.validate_matplotlib_axes(axes)
+            if len(internal_axes.flat) != expected_num_axes:
+                raise ValueError(
+                    f"Canvas Mismatch: Provided axes array has length {len(axes.flat)}, "
+                    f"but this object requires exactly {expected_num_axes} subplots."
+                )
+
+        ### 4. Extract default plotting settings
+        plot_kwargs = kwargs.copy()
+        if "color" not in plot_kwargs:
+            plot_kwargs["color"] = "k"
+        if "lw" not in plot_kwargs and "linewidth" not in plot_kwargs:
+            plot_kwargs["lw"] = 1
+            
+        # step function alignment: 
+        # 'where="post"' means the y-value stays constant from left_edge[i] to left_edge[i+1]
+        plot_kwargs["where"] = "post"
+
+        ### 5. Normalize the probability if normalization = 'integral'
+        if normalization == "integral":
+            plotting_source = self.normalize()
+        else:
+            plotting_source = self
+
+        # 3. Execution Loop: Extract marginal profiles and draw onto the canvas        
+        for i, coord_name in enumerate(self.REQUIRED_COORDS):
+            
+            # Flattens the axes to make it easier to loop through. 
+            ax = internal_axes.flat[i]
+
+            # Identify all spatial dimensions except the current active 1D trace axis
+            all_axes = list(range(len(self.REQUIRED_COORDS)))
+            all_axes.remove(i)
+
+            # Fetch the actual tracking grid coordinate array (e.g., self.x or self.y)
+            coord_array = getattr(plotting_source, coord_name)
+            clean_coord_label = coord_name.replace("_arr", "").replace("_coord", "")
+
+            # Collapse the remaining axes to yield a 1D vector matching the active coordinate array
+            marginal_1d, _ = plotting_source.marginalize(axis=all_axes)
+            print(marginal_1d)
+
+            # Force into log space if the native object source was configured as linear
+            if not plotting_source.PROB_IS_LOG:
+                with np.errstate(divide='ignore'):
+                    marginal_1d = np.log(marginal_1d)
+
+            # --- AT THIS POINT, 'marginal_1d' IS GUARANTEED TO BE IN LOG SPACE ---
+
+            # --- HANDLE PER-PANEL PEAK NORMALIZATION (IN LOG SPACE via subtraction) ---
+            if normalization == 'max':
+                max_log_val = np.max(marginal_1d)
+                if np.isneginf(max_log_val):
+                    raise ValueError(
+                        f"Normalization Error: Cannot peak-normalize dimension '{coord_name}' "
+                        f"because its maximum value is negative infinity (absolute 0 probability)."
+                    )
+                # ln(P / P_max) = ln(P) - ln(P_max)
+                marginal_1d = marginal_1d - max_log_val
+
+            # --- CONDITIONAL CANVAS RENDERING SPACE SWITCH ---
+            if plot_in_ln:
+                # Keep in log space. Handle formatting and guardrails against true -inf boundaries
+                max_log = np.max(marginal_1d)
+                if np.isneginf(max_log): 
+                    floor_val = -100.0
+                else:
+                    floor_val = max_log - 50.0  # Standard frame padding window below the peak
+                
+                #marginal_1d = np.where(np.isneginf(marginal_1d) | (marginal_1d < floor_val), floor_val, marginal_1d)
+
+                # Set log-specific strings
+                if normalization == 'max':
+                    y_label_text = "ln(Relative Probability) [Peak=0.0]"
+                elif normalization == 'integral':
+                    y_label_text = "ln(Probability Density)"
+                else:
+                    y_label_text = "ln(Density Value)"
+            else:
+                # User wants a linear plot layout -> Convert out of log space right before plotting
+                marginal_1d = np.exp(marginal_1d)
+
+                # Set standard linear strings
+                if normalization == 'max':
+                    y_label_text = "Relative Probability (Peak=1.0)"
+                elif normalization == 'integral':
+                    y_label_text = "Probability Density"
+                else:
+                    y_label_text = "Density Value"
+            # -----------------------------------------------------------------            
+
+            print(marginal_1d)
+
+            ax.step(coord_array, marginal_1d, where='mid', **kwargs)
+
+            # 6. Visual Layout Polish
+            ax.set_xlabel(coord_name)
+            ax.set_ylabel(y_label_text)
+            
+            #if "label" in plot_kwargs:
+            #    ax.legend(fontsize=8, loc='upper right')
+
+        return fig if axes is None else ax.get_figure(), internal_axes
+
     def broadcast_ln_prior(self, **kwargs) -> np.ndarray:
         """
         Public Inspection API. Dynamically broadcasts 1D coordinate ln(prior) arrays 
@@ -484,7 +693,7 @@ class BaseBayesObject(ABC):
         total_prior_matrix = np.zeros_like(self.prob)
 
         # 2. Leverage the underlying in-place architecture to populate it!
-        self._apply_ln_priors_inplace(total_prior_matrix, kwargs)
+        self._apply_ln_priors_in_place(total_prior_matrix, kwargs)
 
         return total_prior_matrix
 
@@ -572,8 +781,8 @@ class BaseBayesObject(ABC):
     # 6. Core Mathematical Backends
     #-------------------------------------
 
-    def _apply_ln_priors_inplace(self, 
-                             workspace_matrix:np.ndarray,
+    def _apply_ln_priors_in_place(self, 
+                             target_array:np.ndarray,
                              ln_prior_dict: dict
                              )-> None:
         """
@@ -583,9 +792,10 @@ class BaseBayesObject(ABC):
 
         Parameters
         ----------
-        workspace_matrix : np.ndarray
-            The mutable data matrix to update in-place. Must match the dimensionality 
-            and structural axis layout of self.prob.
+        target_array : np.ndarray
+            The data matrix to update in-place. Must match the dimensionality 
+            and structural axis layout of self.prob. Can be an external matrix passed to the function,
+            or can be passed self.prob for a completely inplace (to use in class functions for large objects)
         ln_prior_dict : dict
             A dictionary mapping raw coordinate names (e.g., 'beta', 'noise') 
             to their corresponding 1D natural-log-prior vectors or scalar constants.
@@ -598,15 +808,15 @@ class BaseBayesObject(ABC):
                 f"Received type: {type(ln_prior_dict).__name__}"
             )
 
-        if not isinstance(workspace_matrix, np.ndarray):
+        if not isinstance(target_array, np.ndarray):
             raise TypeError(
-                f"Architecture Error: workspace_matrix must be a numpy ndarray. "
-                f"Received type: {type(workspace_matrix).__name__}"
+                f"Architecture Error: target_array must be a numpy ndarray. "
+                f"Received type: {type(target_array).__name__}"
             )
             
-        if workspace_matrix.shape != self.prob.shape:
+        if target_array.shape != self.prob.shape:
             raise ValueError(
-                f"Architecture Error: workspace_matrix shape {workspace_matrix.shape} "
+                f"Architecture Error: target_array shape {target_array.shape} "
                 f"does not match the expected shape of this {type(self).__name__} grid {self.prob.shape}."
             )   
 
@@ -632,9 +842,9 @@ class BaseBayesObject(ABC):
             #prior_arr = np.atleast_1d(np.asarray(prior_val))
             prior_arr = valid.convert_to_numpy_and_validate_numerical("prior_val", prior_val)
 
-            if prior_arr.size > 1 and len(prior_arr) != workspace_matrix.shape[axis_idx]:
+            if prior_arr.size > 1 and len(prior_arr) != target_array.shape[axis_idx]:
                 raise ValueError(
-                    f"Prior Size Mismatch: Axis '{coord_axis_name}' expects length {workspace_matrix.shape[axis_idx]}. "
+                    f"Prior Size Mismatch: Axis '{coord_axis_name}' expects length {target_array.shape[axis_idx]}. "
                     f"Received prior of length {len(prior_arr)}."
                 )
             
@@ -643,10 +853,10 @@ class BaseBayesObject(ABC):
 
         # --- PASS 2: calcuation ---
         for axis_idx, prior_arr in validated_priors:
-            slices = [np.newaxis] * workspace_matrix.ndim
+            slices = [np.newaxis] * target_array.ndim
             slices[axis_idx] = slice(None)
             # the passed prior is in natural log, so adding. 
-            workspace_matrix += prior_arr[tuple(slices)]          
+            target_array += prior_arr[tuple(slices)]          
 
     def _log_sum_exp(self, validated_axis_indices):
         """Robust Log-Sum-Exp implementation."""
@@ -699,3 +909,35 @@ class BaseBayesObject(ABC):
 
         return total_ln_prob + ln_total_dx_volume
     
+    def _normalize_in_place(self, target_array: np.ndarray) -> None:
+        """
+        Protected Core Engine. Automatically computes the total integrated 
+        hyper-volume of the space using the native marginalize engine and 
+        performs direct, in-place mathematical mutation on the target array.
+
+        Parameters
+        ----------
+        target_array : np.ndarray
+            The array to modify in-place (e.g., self.prob or a working clone).
+        """
+        # 1. Identify all coordinate tracking dimensions to collapse them entirely
+        all_axes = list(range(len(self.REQUIRED_COORDS)))
+
+        # 2. Compute the full multi-dimensional hyper-volume integration
+        # total_volume_result is a 0D scalar array representing the total integral
+        # in whatever log/linear space the object natively tracks.
+        total_volume_result, _ = self.marginalize(axis=all_axes)
+        volume_modifier = float(total_volume_result)
+
+        # 3. Apply the scaling factor based on the dynamic probability space
+        if self.PROB_IS_LOG:
+            # ln(P_norm) = ln(P) - ln(Total_Volume)
+            target_array -= volume_modifier
+        else:
+            # P_norm = P / Total_Volume
+            if volume_modifier <= 0.0:
+                raise ValueError(
+                    f"Normalization Error: The integrated volume of {type(self).__name__} "
+                    f"is {volume_modifier}. Cannot normalize an array with zero or negative volume."
+                )
+            target_array /= volume_modifier
