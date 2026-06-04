@@ -143,7 +143,6 @@ class LnLikelihood(base.BaseBayesObject):
         avg_ln_error: float, 
         noise_coord: np.typing.ArrayLike = 1.0,
         ) -> "LnLikelihood":       
-    
         """
         Computes the log-likelihood grid across a 1D noise coordinate space.
 

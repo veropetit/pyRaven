@@ -627,15 +627,6 @@ class BaseBayesObject(ABC):
 
             # --- CONDITIONAL CANVAS RENDERING SPACE SWITCH ---
             if plot_in_ln:
-                # Keep in log space. Handle formatting and guardrails against true -inf boundaries
-                max_log = np.max(marginal_1d)
-                if np.isneginf(max_log): 
-                    floor_val = -100.0
-                else:
-                    floor_val = max_log - 50.0  # Standard frame padding window below the peak
-                
-                #marginal_1d = np.where(np.isneginf(marginal_1d) | (marginal_1d < floor_val), floor_val, marginal_1d)
-
                 # Set log-specific strings
                 if normalization == 'max':
                     y_label_text = "ln(Relative Probability) [Peak=0.0]"
@@ -656,16 +647,11 @@ class BaseBayesObject(ABC):
                     y_label_text = "Density Value"
             # -----------------------------------------------------------------            
 
-            print(marginal_1d)
-
             ax.step(coord_array, marginal_1d, where='mid', **kwargs)
 
             # 6. Visual Layout Polish
-            ax.set_xlabel(coord_name)
+            ax.set_xlabel(clean_coord_label)
             ax.set_ylabel(y_label_text)
-            
-            #if "label" in plot_kwargs:
-            #    ax.legend(fontsize=8, loc='upper right')
 
         return fig if axes is None else ax.get_figure(), internal_axes
 
